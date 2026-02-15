@@ -31,3 +31,13 @@
 ---
 
 *MindCoach AI — 陪伴你更好地了解自己*
+
+---
+
+## 开发工作流（Spec Kit + Roadmap）
+
+- `roadmap.md` 定义产品优先级（P0/P1/Phase2+）
+- 初始化任务骨架：`scripts/init-roadmap-tasks.sh`
+- 查看功能文档完整度：`scripts/spec-status.sh`
+- 运行治理门禁检查：`scripts/constitution-check.sh`
+- 运行后端测试（001 原型）：`scripts/run-backend-tests.sh`

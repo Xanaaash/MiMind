@@ -1,10 +1,10 @@
 ---
-description: 自动推进开发：阅读宪法 → 确定下一项工作 → 新分支实现 → 直接 merge 回 main
+description: 自动推进开发：读取 roadmap 与宪法 → 自动选取下一项任务 → 实现并合并 main
 ---
 
 # Autodev - 自动推进工作流
 
-执行自动推进开发流程：阅读宪法、确定下一个待完成功能、在新分支上实现、直接 merge 回 main（无 PR）。
+执行自动推进开发流程：读取 roadmap 与宪法、确定下一个待完成功能、在新分支上实现、直接 merge 回 main（无 PR）。
 
 ## 用户输入（可选）
 
@@ -16,22 +16,18 @@ $ARGUMENTS
 
 ## 执行流程
 
-### 1. 阅读宪法与项目状态
+### 1. 阅读宪法、Roadmap 与项目状态
 
 - 读取 `.specify/memory/constitution.md` 全部内容
-- 列出 `specs/` 下所有功能目录及状态（是否有 spec.md、plan.md、tasks.md、是否已实现）
-- 读取计划中的功能拆分建议：
-  - 001-user-registration-assessment
-  - 002-interactive-tests
-  - 003-ai-coach-core
-  - 004-healing-tools
-  - 005-subscription-billing
-  - 006-safety-nlu-crisis
+- 读取 `roadmap.md` 作为优先级来源（P0 > P1 > 远期）
+- 运行 `scripts/spec-status.sh` 获取 `spec/plan/tasks` 完整度
+- 若 `specs/` 尚未初始化，先运行 `scripts/init-roadmap-tasks.sh`
 
 ### 2. 确定下一项工作
 
-- 按编号顺序，找出首个「有 spec 但未完成实现」或「无 spec 需新建」的功能
+- 按 roadmap 优先级与编号顺序，找出首个「ready 且未实现」功能
 - 若用户输入了具体功能，则按用户指定执行
+- 若状态全为 partial/todo，先补齐该功能 `spec/plan/tasks`
 - 输出：下一项工作 = `00x-feature-name`
 
 ### 3. 切换到新分支并落实
@@ -48,6 +44,7 @@ $ARGUMENTS
 
 ### 4. Merge 回 main（无 PR，直接合并）
 
+- merge 前运行 `scripts/constitution-check.sh`，未通过不得合并
 - `git checkout main`
 - `git merge 00x-feature-name` 或 `git cherry-pick <latest-commit>`（若更倾向 cherry-pick）
 - 不创建 Pull Request，直接合并

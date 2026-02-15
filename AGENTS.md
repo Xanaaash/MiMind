@@ -21,6 +21,7 @@ MindCoach AI 是专业心理教练平台，非医疗产品。面向无/轻度心
 ## 关键文件
 
 - **宪法**: `.specify/memory/constitution.md` — 治理原则、红线、安全机制、技术标准
+- **产品路线图**: `roadmap.md` — MVP 优先级与阶段规划（P0/P1/Phase2+）
 - **功能规格**: `specs/00x-feature-name/spec.md`
 - **实现计划**: `specs/00x-feature-name/plan.md`
 - **任务列表**: `specs/00x-feature-name/tasks.md`
@@ -37,6 +38,9 @@ MindCoach AI 是专业心理教练平台，非医疗产品。面向无/轻度心
 - `.specify/scripts/create-new-feature.sh` — 创建新功能分支与 spec
 - `.specify/scripts/check-prerequisites.sh` — 检查 plan、tasks 等是否就绪
 - `.specify/scripts/setup-plan.sh` — 初始化 plan.md
+- `scripts/init-roadmap-tasks.sh` — 按 roadmap 初始化 001~006 的 spec/plan/tasks
+- `scripts/spec-status.sh` — 查看 specs 完整度状态（spec/plan/tasks）
+- `scripts/constitution-check.sh` — 宪法红线与任务测试门禁检查
 
 ## 环境变量
 

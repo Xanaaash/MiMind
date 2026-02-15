@@ -1,0 +1,26 @@
+name: Governance Checks
+
+on:
+  push:
+    branches:
+      - main
+      - "[0-9][0-9][0-9]-*"
+  pull_request:
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate scripts are executable
+        run: |
+          chmod +x scripts/spec-status.sh
+          chmod +x scripts/constitution-check.sh
+
+      - name: Feature doc status
+        run: scripts/spec-status.sh
+
+      - name: Constitution gate
+        run: scripts/constitution-check.sh
