@@ -1,0 +1,26 @@
+---
+description: Git 提交规范 — 每次任务完成即 commit，多 commit 可溯源
+alwaysApply: true
+---
+
+# Git 提交规范
+
+## 核心规则
+
+1. **每完成一个可独立计数的任务就执行 `git commit`** — 不积累多个任务再一次性提交
+2. **多 commit** — 粒度细、每个 commit 对应一个清晰改动，便于回溯和 code review
+3. **Commit message 格式**: `类型(范围): 简短描述`，例如：
+   - `feat(auth): 添加登录 API`
+   - `fix(scale): 修正 PHQ-9 计分逻辑`
+   - `docs: 更新 README`
+
+## 执行时机
+
+- 完成 `/speckit.implement` 中的单个任务后
+- 完成 `/autodev` 中一个功能实现后
+- 任何产生可交付代码变更的 Agent 操作结束时
+
+## 禁止
+
+- 不要在一次会话中积累大量未提交改动
+- 不要使用笼统的 commit message（如「更新」「fix」）而不说明具体改动
