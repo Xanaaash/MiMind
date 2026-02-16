@@ -15,5 +15,6 @@ Initialized from `roadmap.md` (v2.0, 2026-02-15).
 | `009-provider-routing-coach` | P0/P1 | provider路由与coach生成接入网关 |
 | `010-prompt-registry-rollout` | P0 | prompt版本注册、激活与回滚 |
 | `011-memory-retrieval-upgrade` | P0 | embedding+rereanker记忆检索升级 |
+| `012-model-observability` | P0 | 模型调用审计与观测接口 |
 
 Use `scripts/spec-status.sh` to view document completeness.

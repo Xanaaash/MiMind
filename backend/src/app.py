@@ -3,6 +3,7 @@ from fastapi import Body, FastAPI, HTTPException, Query
 from modules.api.billing_endpoints import BillingAPI
 from modules.api.coach_endpoints import CoachAPI
 from modules.api.endpoints import OnboardingAPI
+from modules.api.observability_endpoints import ObservabilityAPI
 from modules.api.prompt_endpoints import PromptRegistryAPI
 from modules.api.safety_endpoints import SafetyAPI
 from modules.api.scales_endpoints import ClinicalScalesAPI
@@ -20,6 +21,7 @@ billing_api = BillingAPI(store=store)
 safety_api = SafetyAPI(store=store)
 scales_api = ClinicalScalesAPI()
 prompt_api = PromptRegistryAPI()
+observability_api = ObservabilityAPI(store=store)
 
 app = FastAPI(
     title="MindCoach AI Prototype API",
@@ -96,6 +98,22 @@ def get_active_prompt_pack() -> dict:
 @app.post("/api/prompts/activate")
 def activate_prompt_pack(payload: dict = Body(...)) -> dict:
     status, body = prompt_api.post_activate(payload)
+    return _unwrap(status, body)
+
+
+@app.get("/api/observability/model-invocations")
+def get_model_invocations(
+    limit: int = Query(50, ge=1, le=500),
+    task_type: str = Query("", alias="task_type"),
+    provider: str = Query("", alias="provider"),
+) -> list[dict]:
+    normalized_task = task_type.strip() or None
+    normalized_provider = provider.strip() or None
+    status, body = observability_api.get_model_invocations(
+        limit=limit,
+        task_type=normalized_task,
+        provider=normalized_provider,
+    )
     return _unwrap(status, body)
 
 

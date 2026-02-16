@@ -26,7 +26,7 @@ class CoachSessionService:
         self._safety_runtime = SafetyRuntimeService(store)
         self._summary_service = CoachSummaryService()
         self._memory_service = MemoryService(store)
-        self._model_gateway = ModelGatewayService()
+        self._model_gateway = ModelGatewayService(audit_store=store)
 
     def start_session(self, user_id: str, style_id: str, subscription_active: bool) -> dict:
         self._access_guard.ensure_session_access(user_id=user_id, subscription_active=subscription_active)

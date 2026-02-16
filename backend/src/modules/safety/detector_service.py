@@ -3,12 +3,13 @@ from typing import Optional
 from modules.model_gateway.models import ModelTaskType
 from modules.model_gateway.service import ModelGatewayService
 from modules.safety.models import SafetyDetectionResult
+from modules.storage.in_memory import InMemoryStore
 from modules.triage.models import DialogueRiskSignal, RiskLevel
 
 
 class SafetyDetectorService:
-    def __init__(self, gateway: Optional[ModelGatewayService] = None) -> None:
-        self._gateway = gateway or ModelGatewayService()
+    def __init__(self, gateway: Optional[ModelGatewayService] = None, store: Optional[InMemoryStore] = None) -> None:
+        self._gateway = gateway or ModelGatewayService(audit_store=store)
 
     def detect(self, text: str, override_signal: Optional[DialogueRiskSignal] = None) -> SafetyDetectionResult:
         try:

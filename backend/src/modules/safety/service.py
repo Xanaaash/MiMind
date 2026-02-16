@@ -8,7 +8,7 @@ from modules.triage.models import DialogueRiskSignal
 
 class SafetyRuntimeService:
     def __init__(self, store: InMemoryStore) -> None:
-        self._detector = SafetyDetectorService()
+        self._detector = SafetyDetectorService(store=store)
         self._interruption = SafetyInterruptionService(store)
 
     def assess_and_respond(
