@@ -32,6 +32,60 @@ class ScaleCatalogAPIContractTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(body["data"]["score"], 9)
 
+    def test_score_scale_contract_for_all_supported_scales(self) -> None:
+        cases = [
+            (
+                {
+                    "scale_id": "gad7",
+                    "answers": [1] * 7,
+                },
+                ("score", 7),
+            ),
+            (
+                {
+                    "scale_id": "pss10",
+                    "answers": [2] * 10,
+                },
+                ("score", 20),
+            ),
+            (
+                {
+                    "scale_id": "cssrs",
+                    "answers": {"q1": False, "q2": True},
+                },
+                ("positive", True),
+            ),
+            (
+                {
+                    "scale_id": "scl90",
+                    "answers": [2] * 90,
+                },
+                ("global_index", 2.0),
+            ),
+            (
+                {
+                    "scale_id": "scl90",
+                    "answers": {
+                        "somatization": 1,
+                        "obsessive_compulsive": 1,
+                        "interpersonal_sensitivity": 1,
+                        "depression": 2,
+                        "anxiety": 2,
+                        "hostility": 1,
+                        "phobic_anxiety": 1,
+                        "paranoid_ideation": 1,
+                        "psychoticism": 1,
+                    },
+                },
+                ("moderate_or_above", False),
+            ),
+        ]
+
+        for payload, (expected_key, expected_value) in cases:
+            status, body = self.api.post_score_scale(payload)
+            self.assertEqual(status, 200)
+            self.assertEqual(body["data"][expected_key], expected_value)
+
 
 if __name__ == "__main__":
     unittest.main()

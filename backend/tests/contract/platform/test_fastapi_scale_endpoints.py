@@ -31,6 +31,18 @@ class FastAPIScaleEndpointTests(unittest.TestCase):
         payload = response.json()
         self.assertEqual(payload["global_index"], 2.0)
 
+    def test_cssrs_scale_score_http(self) -> None:
+        response = self.client.post(
+            "/api/scales/score",
+            json={
+                "scale_id": "cssrs",
+                "answers": {"q1": False, "q2": True},
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertTrue(payload["positive"])
+
 
 if __name__ == "__main__":
     unittest.main()
