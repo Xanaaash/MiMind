@@ -46,6 +46,7 @@
 
 - 依赖管理：`uv + pyproject.toml`
 - 一键初始化：`scripts/dev-setup.sh`
+- 启动 API 服务：`scripts/run-api.sh`（默认 `http://127.0.0.1:8000`）
 - 常用命令：
   - `uv run pytest`
   - `uv run ruff check .`

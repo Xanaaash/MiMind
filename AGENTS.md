@@ -43,6 +43,7 @@ MindCoach AI 是专业心理教练平台，非医疗产品。面向无/轻度心
 - `scripts/constitution-check.sh` — 宪法红线与任务测试门禁检查
 - `scripts/dev-setup.sh` — 使用 uv 初始化本地开发环境（依赖 + 工具）
 - `scripts/run-backend-tests.sh` — 运行后端全量测试（支持 uv run）
+- `scripts/run-api.sh` — 启动 FastAPI 原型服务入口
 
 ## 环境变量
 
