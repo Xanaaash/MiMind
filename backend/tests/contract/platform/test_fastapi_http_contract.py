@@ -79,6 +79,16 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         self.assertGreaterEqual(len(data), 1)
         self.assertTrue(all(item["task_type"] == "coach_generation" for item in data))
 
+        summary = self.client.get(
+            "/api/observability/model-invocations/summary",
+            params={"limit": 10, "task_type": "coach_generation"},
+        )
+        self.assertEqual(summary.status_code, 200)
+        summary_data = summary.json()
+        self.assertIn("totals", summary_data)
+        self.assertIn("by_task_type", summary_data)
+        self.assertGreaterEqual(summary_data["totals"]["total"], 1)
+
     def test_register_and_assessment_flow(self) -> None:
         email = f"api-{uuid4().hex[:8]}@example.com"
 
