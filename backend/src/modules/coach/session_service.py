@@ -9,6 +9,7 @@ from modules.memory.service import MemoryService
 from modules.prompt.context.builder import build_context_prompt
 from modules.prompt.styles.registry import get_style_prompt
 from modules.prompt.system.prompt import get_system_prompt
+from modules.safety.service import SafetyRuntimeService
 from modules.storage.in_memory import InMemoryStore
 from modules.triage.models import DialogueRiskSignal, RiskLevel
 from modules.triage.triage_service import TriageService
@@ -19,6 +20,7 @@ class CoachSessionService:
         self._store = store
         self._access_guard = CoachAccessGuard(store)
         self._triage_service = TriageService()
+        self._safety_runtime = SafetyRuntimeService(store)
         self._summary_service = CoachSummaryService()
         self._memory_service = MemoryService(store)
 
@@ -65,12 +67,35 @@ class CoachSessionService:
         if scores is None:
             raise ValueError("Assessment scores required before coaching")
 
-        triage = self._triage_service.evaluate(scores=scores, dialogue_risk=dialogue_risk)
-        if triage.dialogue_risk_level in (RiskLevel.HIGH, RiskLevel.EXTREME):
-            crisis_text = (
-                "I hear that this may be a high-risk moment. I need to pause normal coaching now. "
-                "Please contact local crisis support immediately."
-            )
+        user = self._store.get_user(session.user_id)
+        locale = user.locale if user else "en-US"
+        safety = self._safety_runtime.assess_and_respond(
+            user_id=session.user_id,
+            locale=locale,
+            text=user_message,
+            override_signal=dialogue_risk,
+            legal_policy_enabled=False,
+        )
+
+        level_map = {
+            "low": RiskLevel.LOW,
+            "medium": RiskLevel.MEDIUM,
+            "high": RiskLevel.HIGH,
+            "extreme": RiskLevel.EXTREME,
+        }
+        detected_level = level_map.get(safety["detection"]["level"], RiskLevel.HIGH)
+        effective_signal = DialogueRiskSignal(
+            level=detected_level,
+            text=user_message,
+            is_joke=dialogue_risk.is_joke if dialogue_risk is not None else False,
+        )
+        triage = self._triage_service.evaluate(scores=scores, dialogue_risk=effective_signal)
+
+        action = safety["action"]
+        if action["stop_coaching"]:
+            hotline = safety.get("hotline")
+            hotline_text = f" {hotline['text']}" if hotline else ""
+            crisis_text = f"{action['message']}{hotline_text}"
             session.turns.append(CoachTurn(role="coach", message=crisis_text))
             session.halted_for_safety = True
             session.active = False
@@ -79,19 +104,18 @@ class CoachSessionService:
                 "halted": True,
                 "triage": triage.to_dict(),
                 "coach_message": crisis_text,
+                "safety": safety,
             }
 
-        if triage.dialogue_risk_level == RiskLevel.MEDIUM:
-            safe_text = (
-                "I want to slow down and focus on your safety first. "
-                "If you can, consider reaching out to a trusted person or local support resource."
-            )
+        if action["pause_topic"]:
+            safe_text = action["message"]
             session.turns.append(CoachTurn(role="coach", message=safe_text))
             return {
                 "mode": "safety_pause",
                 "halted": False,
                 "triage": triage.to_dict(),
                 "coach_message": safe_text,
+                "safety": safety,
             }
 
         reply = self._generate_coach_reply(style_id=session.style_id, user_message=user_message)
@@ -101,6 +125,7 @@ class CoachSessionService:
             "halted": False,
             "triage": triage.to_dict(),
             "coach_message": reply,
+            "safety": safety,
         }
 
     def end_session(self, session_id: str) -> dict:

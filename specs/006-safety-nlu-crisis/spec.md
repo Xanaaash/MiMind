@@ -2,7 +2,7 @@
 
 **Feature Branch**: `[006-safety-nlu-crisis]`
 **Created**: 2026-02-15
-**Status**: Draft
+**Status**: Implemented (Prototype)
 **Input**: constitution redlines + roadmap safety chapter
 
 ## User Scenarios & Testing *(mandatory)*

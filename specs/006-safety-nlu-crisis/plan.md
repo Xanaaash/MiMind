@@ -19,10 +19,10 @@ Implement dual-layer risk detection, four-level crisis orchestration, and fail-s
 
 ## Constitution Check
 
-- [ ] Product boundary: Safety language remains non-diagnostic
-- [ ] Safety redlines: No continuation of normal counseling after high risk
-- [ ] Safety mechanism: Dual-layer + four-level response fully implemented
-- [ ] Technical standards: Unit/API/Safety tests and latency benchmarks
+- [x] Product boundary: Safety language remains non-diagnostic
+- [x] Safety redlines: No continuation of normal counseling after high risk
+- [x] Safety mechanism: Dual-layer + four-level response fully implemented
+- [x] Technical standards: Unit/API/Safety tests and latency benchmarks
 
 ## Project Structure
 
