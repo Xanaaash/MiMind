@@ -16,6 +16,8 @@ Initialized from `roadmap.md` (v2.0, 2026-02-15).
 | `010-prompt-registry-rollout` | P0 | prompt版本注册、激活与回滚 |
 | `011-memory-retrieval-upgrade` | P0 | embedding+rereanker记忆检索升级 |
 | `012-model-observability` | P0 | 模型调用审计与观测接口 |
+| `013-warm-frontend` | P1 | 暖色系前端体验与入口页面优化 |
 | `014-observability-summary` | P0/P1 | 模型调用汇总指标与筛选查询 |
+| `015-data-governance-controls` | P0 | 用户数据导出/删除与治理接口 |
 
 Use `scripts/spec-status.sh` to view document completeness.
