@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
 @dataclass
@@ -17,6 +17,9 @@ class AssessmentScoreSet:
     gad7_score: int
     pss10_score: int
     cssrs_positive: bool
+    scl90_global_index: Optional[float] = None
+    scl90_dimension_scores: Optional[Dict[str, float]] = None
+    scl90_moderate_or_above: bool = False
 
     def to_dict(self) -> dict:
         return {
@@ -24,6 +27,9 @@ class AssessmentScoreSet:
             "gad7_score": self.gad7_score,
             "pss10_score": self.pss10_score,
             "cssrs_positive": self.cssrs_positive,
+            "scl90_global_index": self.scl90_global_index,
+            "scl90_dimension_scores": self.scl90_dimension_scores,
+            "scl90_moderate_or_above": self.scl90_moderate_or_above,
         }
 
 

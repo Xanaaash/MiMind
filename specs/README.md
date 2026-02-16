@@ -10,5 +10,6 @@ Initialized from `roadmap.md` (v2.0, 2026-02-15).
 | `004-healing-tools` | P0/P1 | 白噪音、呼吸、冥想、情绪日记 |
 | `005-subscription-billing` | P0 | 阶梯订阅、试用、配额、支付 |
 | `006-safety-nlu-crisis` | P0 | 双层检测、四级响应、危机兜底 |
+| `007-scale-test-foundation` | P0/P1 | 量表扩展(SCL-90)、测试扩展与输入契约 |
 
 Use `scripts/spec-status.sh` to view document completeness.

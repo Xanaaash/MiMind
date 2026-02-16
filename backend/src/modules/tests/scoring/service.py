@@ -96,6 +96,114 @@ def score_love_language(answers: dict) -> dict:
     )
 
 
+def score_stress_coping(answers: dict) -> dict:
+    parsed = _require_numeric_map(
+        answers,
+        ["problem_focused", "emotion_focused", "avoidance", "support_seeking"],
+        0,
+        100,
+    )
+    primary = max(parsed.items(), key=lambda item: item[1])[0]
+    return {
+        "scores": {k: round(v, 2) for k, v in parsed.items()},
+        "primary_style": primary,
+    }
+
+
+def score_eq(answers: dict) -> dict:
+    parsed = _require_numeric_map(
+        answers,
+        ["self_awareness", "self_regulation", "empathy", "relationship_management"],
+        0,
+        100,
+    )
+    overall = round(sum(parsed.values()) / len(parsed), 2)
+    if overall >= 75:
+        level = "high"
+    elif overall >= 50:
+        level = "developing"
+    else:
+        level = "emerging"
+
+    return {
+        "scores": {k: round(v, 2) for k, v in parsed.items()},
+        "overall_score": overall,
+        "level": level,
+    }
+
+
+def score_inner_child(answers: dict) -> dict:
+    parsed = _require_numeric_map(
+        answers,
+        ["playful", "wounded", "resilient", "protective"],
+        0,
+        100,
+    )
+    primary = max(parsed.items(), key=lambda item: item[1])[0]
+    return {
+        "scores": {k: round(v, 2) for k, v in parsed.items()},
+        "primary_profile": primary,
+    }
+
+
+def score_boundary(answers: dict) -> dict:
+    parsed = _require_numeric_map(
+        answers,
+        ["emotional", "physical", "digital", "work", "social"],
+        0,
+        100,
+    )
+    average = round(sum(parsed.values()) / len(parsed), 2)
+    if average >= 70:
+        profile = "healthy"
+    elif average >= 45:
+        profile = "developing"
+    else:
+        profile = "fragile"
+
+    return {
+        "scores": {k: round(v, 2) for k, v in parsed.items()},
+        "boundary_profile": profile,
+        "average_score": average,
+    }
+
+
+def score_psych_age(answers: dict) -> dict:
+    parsed = _require_numeric_map(
+        answers,
+        ["chronological_age", "curiosity", "emotional_regulation", "social_energy"],
+        0,
+        100,
+    )
+
+    chronological_age = parsed["chronological_age"]
+    if chronological_age < 13 or chronological_age > 90:
+        raise ValueError("chronological_age must be between 13 and 90")
+
+    vitality = (parsed["curiosity"] + parsed["social_energy"]) / 2
+    stability = parsed["emotional_regulation"]
+    adjustment = round((stability - vitality) / 10)
+    psych_age = int(max(10, min(90, round(chronological_age + adjustment))))
+
+    if psych_age < 25:
+        band = "youthful"
+    elif psych_age <= 45:
+        band = "balanced"
+    else:
+        band = "mature"
+
+    return {
+        "psychological_age": psych_age,
+        "age_band": band,
+        "inputs": {
+            "chronological_age": round(chronological_age, 2),
+            "curiosity": round(parsed["curiosity"], 2),
+            "emotional_regulation": round(parsed["emotional_regulation"], 2),
+            "social_energy": round(parsed["social_energy"], 2),
+        },
+    }
+
+
 def score_test(scoring_type: str, answers: dict) -> dict:
     if scoring_type == "mbti":
         return score_mbti(answers)
@@ -107,5 +215,15 @@ def score_test(scoring_type: str, answers: dict) -> dict:
         return score_attachment(answers)
     if scoring_type == "love_language":
         return score_love_language(answers)
+    if scoring_type == "stress_coping":
+        return score_stress_coping(answers)
+    if scoring_type == "eq":
+        return score_eq(answers)
+    if scoring_type == "inner_child":
+        return score_inner_child(answers)
+    if scoring_type == "boundary":
+        return score_boundary(answers)
+    if scoring_type == "psych_age":
+        return score_psych_age(answers)
 
     raise ValueError(f"Unsupported scoring_type: {scoring_type}")

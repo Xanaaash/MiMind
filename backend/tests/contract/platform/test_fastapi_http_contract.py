@@ -51,6 +51,49 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         self.assertEqual(entitlements.status_code, 200)
         self.assertEqual(entitlements.json()["plan_id"], "free")
 
+    def test_interactive_tests_http_catalog_and_submit(self) -> None:
+        email = f"tests-{uuid4().hex[:8]}@example.com"
+        register = self.client.post(
+            "/api/register",
+            json={
+                "email": email,
+                "locale": "en-US",
+                "policy_version": "2026.02",
+            },
+        )
+        self.assertEqual(register.status_code, 200)
+        user_id = register.json()["user_id"]
+
+        catalog = self.client.get("/api/tests/catalog")
+        self.assertEqual(catalog.status_code, 200)
+        catalog_payload = catalog.json()
+        self.assertIn("eq", catalog_payload)
+        self.assertIn("stress_coping", catalog_payload)
+        self.assertIn("psych_age", catalog_payload)
+        self.assertIn("required_answer_keys", catalog_payload["eq"])
+
+        eq_schema = self.client.get("/api/tests/catalog/eq")
+        self.assertEqual(eq_schema.status_code, 200)
+        eq_payload = eq_schema.json()
+        self.assertEqual(eq_payload["scoring_type"], "eq")
+        self.assertEqual(eq_payload["category"], "social_emotional")
+
+        submit = self.client.post(
+            f"/api/tests/{user_id}/submit",
+            json={
+                "test_id": "eq",
+                "answers": {
+                    "self_awareness": 79,
+                    "self_regulation": 75,
+                    "empathy": 81,
+                    "relationship_management": 72,
+                },
+            },
+        )
+        self.assertEqual(submit.status_code, 200)
+        submit_payload = submit.json()
+        self.assertIn("overall_score", submit_payload["summary"])
+
 
 if __name__ == "__main__":
     unittest.main()

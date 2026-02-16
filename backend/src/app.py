@@ -4,6 +4,7 @@ from modules.api.billing_endpoints import BillingAPI
 from modules.api.coach_endpoints import CoachAPI
 from modules.api.endpoints import OnboardingAPI
 from modules.api.safety_endpoints import SafetyAPI
+from modules.api.scales_endpoints import ClinicalScalesAPI
 from modules.api.tests_endpoints import InteractiveTestsAPI
 from modules.api.tools_endpoints import HealingToolsAPI
 from modules.onboarding.service import OnboardingService
@@ -16,6 +17,7 @@ coach_api = CoachAPI(store=store)
 healing_tools_api = HealingToolsAPI(store=store)
 billing_api = BillingAPI(store=store)
 safety_api = SafetyAPI(store=store)
+scales_api = ClinicalScalesAPI()
 
 app = FastAPI(
     title="MindCoach AI Prototype API",
@@ -47,6 +49,18 @@ def submit_assessment(user_id: str, payload: dict = Body(...)) -> dict:
     return _unwrap(status, body)
 
 
+@app.get("/api/scales/catalog")
+def get_scales_catalog() -> dict:
+    status, body = scales_api.get_catalog()
+    return _unwrap(status, body)
+
+
+@app.post("/api/scales/score")
+def score_single_clinical_scale(payload: dict = Body(...)) -> dict:
+    status, body = scales_api.post_score_scale(payload)
+    return _unwrap(status, body)
+
+
 @app.get("/api/entitlements/{user_id}")
 def get_entitlements(user_id: str) -> dict:
     status, body = onboarding_api.get_entitlements(user_id)
@@ -56,6 +70,12 @@ def get_entitlements(user_id: str) -> dict:
 @app.get("/api/tests/catalog")
 def get_tests_catalog() -> dict:
     status, body = interactive_tests_api.get_catalog()
+    return _unwrap(status, body)
+
+
+@app.get("/api/tests/catalog/{test_id}")
+def get_test_catalog_item(test_id: str) -> dict:
+    status, body = interactive_tests_api.get_catalog_item(test_id=test_id)
     return _unwrap(status, body)
 
 

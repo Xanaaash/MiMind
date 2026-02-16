@@ -49,6 +49,14 @@ class TriageService:
                 show_hotline=False,
             )
 
+        if scores.scl90_moderate_or_above:
+            return TriageDecision(
+                channel=TriageChannel.YELLOW,
+                reasons=["scl90-elevated"],
+                halt_coaching=False,
+                show_hotline=False,
+            )
+
         return TriageDecision(
             channel=TriageChannel.GREEN,
             reasons=["scale-low-risk"],
