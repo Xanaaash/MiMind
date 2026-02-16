@@ -7,6 +7,7 @@ configure_import_path()
 from modules.model_gateway.config import ModelGatewayRoutingConfig
 from modules.model_gateway.models import ModelGatewayRequest, ModelTaskType
 from modules.model_gateway.service import ModelGatewayService
+from modules.storage.in_memory import InMemoryStore
 from modules.triage.models import RiskLevel
 
 
@@ -55,6 +56,41 @@ class ModelGatewayServiceUnitTests(unittest.TestCase):
 
         with self.assertRaises(RuntimeError):
             gateway.run(ModelTaskType.SAFETY_NLU_FAST, "hello")
+
+    def test_gateway_persists_success_audit_record(self) -> None:
+        store = InMemoryStore()
+        gateway = ModelGatewayService(audit_store=store)
+
+        result = gateway.run(
+            ModelTaskType.COACH_GENERATION,
+            "I had a difficult day at work",
+            metadata={"user_id": "u1", "session_id": "s1"},
+        )
+        self.assertTrue(bool(result.trace_id))
+
+        records = store.list_model_invocations()
+        self.assertEqual(len(records), 1)
+        self.assertTrue(records[0].success)
+        self.assertEqual(records[0].task_type, ModelTaskType.COACH_GENERATION)
+        self.assertEqual(records[0].metadata.get("user_id"), "u1")
+
+    def test_gateway_persists_failure_audit_record(self) -> None:
+        class BrokenProvider:
+            def infer(self, request: ModelGatewayRequest):
+                raise RuntimeError("provider down")
+
+        store = InMemoryStore()
+        gateway = ModelGatewayService(
+            providers={ModelTaskType.SAFETY_NLU_FAST: BrokenProvider()},
+            audit_store=store,
+        )
+        with self.assertRaises(RuntimeError):
+            gateway.run(ModelTaskType.SAFETY_NLU_FAST, "hello")
+
+        records = store.list_model_invocations()
+        self.assertEqual(len(records), 1)
+        self.assertFalse(records[0].success)
+        self.assertIn("provider down", str(records[0].error))
 
     def test_openai_coach_provider_without_api_key_fails_clearly(self) -> None:
         gateway = ModelGatewayService(

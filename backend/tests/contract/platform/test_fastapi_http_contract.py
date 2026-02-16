@@ -31,6 +31,54 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         active_payload = active.json()
         self.assertIn("active_version", active_payload)
 
+    def test_observability_http_contract(self) -> None:
+        email = f"obs-{uuid4().hex[:8]}@example.com"
+        register = self.client.post(
+            "/api/register",
+            json={
+                "email": email,
+                "locale": "en-US",
+                "policy_version": "2026.02",
+            },
+        )
+        self.assertEqual(register.status_code, 200)
+        user_id = register.json()["user_id"]
+
+        assessment = self.client.post(
+            f"/api/assessment/{user_id}",
+            json={
+                "responses": {
+                    "phq9": [0] * 9,
+                    "gad7": [0] * 7,
+                    "pss10": [0] * 10,
+                    "cssrs": {"q1": False, "q2": False},
+                }
+            },
+        )
+        self.assertEqual(assessment.status_code, 200)
+
+        start = self.client.post(
+            f"/api/coach/{user_id}/start",
+            json={"style_id": "warm_guide", "subscription_active": True},
+        )
+        self.assertEqual(start.status_code, 200)
+        session_id = start.json()["session"]["session_id"]
+
+        chat = self.client.post(
+            f"/api/coach/{session_id}/chat",
+            json={"user_message": "I feel stressed before work meetings."},
+        )
+        self.assertEqual(chat.status_code, 200)
+
+        obs = self.client.get(
+            "/api/observability/model-invocations",
+            params={"limit": 10, "task_type": "coach_generation"},
+        )
+        self.assertEqual(obs.status_code, 200)
+        data = obs.json()
+        self.assertGreaterEqual(len(data), 1)
+        self.assertTrue(all(item["task_type"] == "coach_generation" for item in data))
+
     def test_register_and_assessment_flow(self) -> None:
         email = f"api-{uuid4().hex[:8]}@example.com"
 

@@ -9,6 +9,7 @@ from modules.coach.models import CoachSession
 from modules.compliance.models import ConsentRecord
 from modules.journal.models import JournalEntry
 from modules.memory.models import MemoryVectorRecord
+from modules.observability.models import ModelInvocationRecord
 from modules.tests.models import TestResult
 from modules.triage.models import TriageDecision
 from modules.user.models import User
@@ -30,6 +31,7 @@ class InMemoryStore:
     memory_vectors: Dict[str, List[MemoryVectorRecord]] = field(default_factory=dict)
     journal_entries: Dict[str, List[JournalEntry]] = field(default_factory=dict)
     tool_events: Dict[str, List[dict]] = field(default_factory=dict)
+    model_invocations: List[ModelInvocationRecord] = field(default_factory=list)
     subscriptions: Dict[str, SubscriptionRecord] = field(default_factory=dict)
     processed_webhooks: set = field(default_factory=set)
 
@@ -71,6 +73,9 @@ class InMemoryStore:
     def save_tool_event(self, user_id: str, event: dict) -> None:
         self.tool_events.setdefault(user_id, []).append(event)
 
+    def save_model_invocation(self, record: ModelInvocationRecord) -> None:
+        self.model_invocations.append(record)
+
     def save_subscription(self, subscription: SubscriptionRecord) -> None:
         self.subscriptions[subscription.user_id] = subscription
 
@@ -110,6 +115,9 @@ class InMemoryStore:
 
     def get_subscription(self, user_id: str) -> Optional[SubscriptionRecord]:
         return self.subscriptions.get(user_id)
+
+    def list_model_invocations(self) -> List[ModelInvocationRecord]:
+        return list(self.model_invocations)
 
     def is_webhook_processed(self, event_id: str) -> bool:
         return event_id in self.processed_webhooks
