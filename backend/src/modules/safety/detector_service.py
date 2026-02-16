@@ -1,30 +1,42 @@
 from typing import Optional
 
+from modules.model_gateway.models import ModelTaskType
+from modules.model_gateway.service import ModelGatewayService
 from modules.safety.models import SafetyDetectionResult
-from modules.safety.nlu.classifier import NLUClassifier
-from modules.safety.semantic.evaluator import SemanticRiskEvaluator
 from modules.triage.models import DialogueRiskSignal, RiskLevel
 
 
 class SafetyDetectorService:
-    def __init__(self) -> None:
-        self._nlu = NLUClassifier()
-        self._semantic = SemanticRiskEvaluator()
+    def __init__(self, gateway: Optional[ModelGatewayService] = None) -> None:
+        self._gateway = gateway or ModelGatewayService()
 
     def detect(self, text: str, override_signal: Optional[DialogueRiskSignal] = None) -> SafetyDetectionResult:
         try:
-            nlu_result = self._nlu.classify(text)
+            nlu_result = self._gateway.run(
+                task_type=ModelTaskType.SAFETY_NLU_FAST,
+                text=text,
+                timeout_ms=100,
+                metadata={"component": "safety_detector"},
+            )
+            nlu_level = nlu_result.risk_level or RiskLevel.LOW
 
-            if nlu_result.level in (RiskLevel.HIGH, RiskLevel.EXTREME):
-                level = nlu_result.level
+            if nlu_level in (RiskLevel.HIGH, RiskLevel.EXTREME):
+                level = nlu_level
                 reasons = list(nlu_result.reasons)
                 semantic_latency_ms = 0.0
                 source = "nlu-short-circuit"
             else:
-                semantic_result = self._semantic.evaluate(text)
-                level = max(nlu_result.level, semantic_result.level)
+                semantic_result = self._gateway.run(
+                    task_type=ModelTaskType.SAFETY_SEMANTIC_JUDGE,
+                    text=text,
+                    timeout_ms=2000,
+                    metadata={"component": "safety_detector"},
+                )
+                semantic_level = semantic_result.risk_level or RiskLevel.LOW
+
+                level = max(nlu_level, semantic_level)
                 reasons = list(nlu_result.reasons) + list(semantic_result.reasons)
-                semantic_latency_ms = semantic_result.semantic_latency_ms
+                semantic_latency_ms = semantic_result.latency_ms
                 source = "nlu+semantic"
 
             if override_signal is not None and override_signal.level > level:
@@ -40,7 +52,7 @@ class SafetyDetectorService:
                 level=level,
                 source=source,
                 reasons=reasons,
-                nlu_latency_ms=nlu_result.nlu_latency_ms,
+                nlu_latency_ms=nlu_result.latency_ms,
                 semantic_latency_ms=semantic_latency_ms,
             )
         except Exception as error:
