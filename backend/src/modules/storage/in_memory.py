@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 from modules.assessment.models import AssessmentScoreSet, AssessmentSubmission, ReassessmentSchedule
+from modules.coach.models import CoachSession
 from modules.compliance.models import ConsentRecord
 from modules.tests.models import TestResult
 from modules.triage.models import TriageDecision
@@ -20,6 +21,9 @@ class InMemoryStore:
     schedules: Dict[str, ReassessmentSchedule] = field(default_factory=dict)
     test_results: Dict[str, TestResult] = field(default_factory=dict)
     user_test_results: Dict[str, List[str]] = field(default_factory=dict)
+    coach_sessions: Dict[str, CoachSession] = field(default_factory=dict)
+    user_coach_sessions: Dict[str, List[str]] = field(default_factory=dict)
+    memory_summaries: Dict[str, List[str]] = field(default_factory=dict)
 
     def save_user(self, user: User) -> None:
         self.users[user.user_id] = user
@@ -43,6 +47,13 @@ class InMemoryStore:
         self.test_results[result.result_id] = result
         self.user_test_results.setdefault(result.user_id, []).append(result.result_id)
 
+    def save_coach_session(self, session: CoachSession) -> None:
+        self.coach_sessions[session.session_id] = session
+        self.user_coach_sessions.setdefault(session.user_id, []).append(session.session_id)
+
+    def save_memory_summary(self, user_id: str, summary: str) -> None:
+        self.memory_summaries.setdefault(user_id, []).append(summary)
+
     def get_user(self, user_id: str) -> Optional[User]:
         return self.users.get(user_id)
 
@@ -61,3 +72,9 @@ class InMemoryStore:
     def list_user_test_results(self, user_id: str) -> List[TestResult]:
         result_ids = self.user_test_results.get(user_id, [])
         return [self.test_results[result_id] for result_id in result_ids if result_id in self.test_results]
+
+    def get_coach_session(self, session_id: str) -> Optional[CoachSession]:
+        return self.coach_sessions.get(session_id)
+
+    def list_memory_summaries(self, user_id: str) -> List[str]:
+        return list(self.memory_summaries.get(user_id, []))

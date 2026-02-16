@@ -19,10 +19,10 @@ Deliver MVP coaching engine with layered prompts, style modules, session lifecyc
 
 ## Constitution Check
 
-- [ ] Product boundary: Coaching language only, no diagnosis/treatment
-- [ ] Safety redlines: Forbidden advice and promises blocked
-- [ ] Safety mechanism: Every turn goes through risk detection gateway
-- [ ] Technical standards: Unit/API/Safety tests included
+- [x] Product boundary: Coaching language only, no diagnosis/treatment
+- [x] Safety redlines: Forbidden advice and promises blocked
+- [x] Safety mechanism: Every turn goes through risk detection gateway
+- [x] Technical standards: Unit/API/Safety tests included
 
 ## Project Structure
 
