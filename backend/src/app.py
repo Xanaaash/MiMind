@@ -4,6 +4,7 @@ from modules.api.billing_endpoints import BillingAPI
 from modules.api.coach_endpoints import CoachAPI
 from modules.api.endpoints import OnboardingAPI
 from modules.api.safety_endpoints import SafetyAPI
+from modules.api.scales_endpoints import ClinicalScalesAPI
 from modules.api.tests_endpoints import InteractiveTestsAPI
 from modules.api.tools_endpoints import HealingToolsAPI
 from modules.onboarding.service import OnboardingService
@@ -16,6 +17,7 @@ coach_api = CoachAPI(store=store)
 healing_tools_api = HealingToolsAPI(store=store)
 billing_api = BillingAPI(store=store)
 safety_api = SafetyAPI(store=store)
+scales_api = ClinicalScalesAPI()
 
 app = FastAPI(
     title="MindCoach AI Prototype API",
@@ -44,6 +46,18 @@ def register(payload: dict = Body(...)) -> dict:
 @app.post("/api/assessment/{user_id}")
 def submit_assessment(user_id: str, payload: dict = Body(...)) -> dict:
     status, body = onboarding_api.post_assessment(user_id=user_id, payload=payload)
+    return _unwrap(status, body)
+
+
+@app.get("/api/scales/catalog")
+def get_scales_catalog() -> dict:
+    status, body = scales_api.get_catalog()
+    return _unwrap(status, body)
+
+
+@app.post("/api/scales/score")
+def score_single_clinical_scale(payload: dict = Body(...)) -> dict:
+    status, body = scales_api.post_score_scale(payload)
     return _unwrap(status, body)
 
 
