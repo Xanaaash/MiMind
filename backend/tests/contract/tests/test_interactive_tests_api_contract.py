@@ -31,6 +31,10 @@ class InteractiveTestsAPIContractTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertIn("mbti", body["data"])
         self.assertIn("theory_reference", body["data"]["mbti"])
+        self.assertIn("eq", body["data"])
+        self.assertIn("inner_child", body["data"])
+        self.assertIn("boundary", body["data"])
+        self.assertIn("psych_age", body["data"])
 
     def test_submit_report_share_and_pairing_contract(self) -> None:
         submit_status, submit_body = self.tests_api.post_submit(
@@ -92,6 +96,72 @@ class InteractiveTestsAPIContractTests(unittest.TestCase):
         )
         self.assertEqual(pairing_status, 200)
         self.assertIn("compatibility_score", pairing_body["data"])
+
+    def test_submit_new_test_types_contract(self) -> None:
+        cases = [
+            (
+                "stress_coping",
+                {
+                    "problem_focused": 70,
+                    "emotion_focused": 40,
+                    "avoidance": 20,
+                    "support_seeking": 60,
+                },
+                "primary_style",
+            ),
+            (
+                "eq",
+                {
+                    "self_awareness": 80,
+                    "self_regulation": 75,
+                    "empathy": 70,
+                    "relationship_management": 72,
+                },
+                "overall_score",
+            ),
+            (
+                "inner_child",
+                {
+                    "playful": 45,
+                    "wounded": 50,
+                    "resilient": 78,
+                    "protective": 40,
+                },
+                "primary_profile",
+            ),
+            (
+                "boundary",
+                {
+                    "emotional": 62,
+                    "physical": 65,
+                    "digital": 55,
+                    "work": 60,
+                    "social": 64,
+                },
+                "boundary_profile",
+            ),
+            (
+                "psych_age",
+                {
+                    "chronological_age": 31,
+                    "curiosity": 68,
+                    "emotional_regulation": 62,
+                    "social_energy": 70,
+                },
+                "psychological_age",
+            ),
+        ]
+
+        for test_id, answers, expected_key in cases:
+            status, body = self.tests_api.post_submit(
+                user_id=self.user_id,
+                payload={
+                    "test_id": test_id,
+                    "answers": answers,
+                },
+            )
+            self.assertEqual(status, 200)
+            self.assertIn(expected_key, body["data"]["summary"])
 
 
 if __name__ == "__main__":
