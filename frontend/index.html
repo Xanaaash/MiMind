@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MindCoach AI - Warm Frontend Prototype</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Nunito+Sans:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true"></div>
+
+    <header class="topbar panel reveal">
+      <div>
+        <p class="eyebrow">MindCoach AI</p>
+        <h1 data-i18n="app.title">温暖自我探索空间</h1>
+      </div>
+      <div class="topbar-actions">
+        <label class="compact-field">
+          <span data-i18n="app.apiBase">API 地址</span>
+          <input id="apiBase" type="text" />
+        </label>
+        <button id="langToggle" class="ghost">EN</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="hero panel reveal">
+        <p class="eyebrow" data-i18n="hero.kicker">Constitution Aligned</p>
+        <h2 data-i18n="hero.title">先被理解，再一起前进。</h2>
+        <p data-i18n="hero.subtitle">
+          这里是心理教练产品，不是医疗诊疗服务。我们帮助你进行自我认知、情绪调节与成长练习。
+        </p>
+        <div class="pill-row">
+          <span class="pill" data-i18n="hero.pill1">非医疗，不做诊断/处方</span>
+          <span class="pill" data-i18n="hero.pill2">风险优先，必要时暂停咨询</span>
+          <span class="pill" data-i18n="hero.pill3">中英双语，移动端可用</span>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <article class="panel reveal">
+          <h3 data-i18n="onboarding.title">1) 用户注册与基线测评</h3>
+          <p data-i18n="onboarding.desc">先注册，再一键提交低风险示例测评，获取分流结果。</p>
+          <form id="registerForm" class="stack">
+            <label>
+              <span>Email</span>
+              <input id="regEmail" type="email" required placeholder="you@example.com" />
+            </label>
+            <label>
+              <span data-i18n="onboarding.locale">语言偏好</span>
+              <select id="regLocale">
+                <option value="zh-CN">zh-CN</option>
+                <option value="en-US">en-US</option>
+              </select>
+            </label>
+            <button type="submit" data-i18n="onboarding.register">注册用户</button>
+          </form>
+
+          <div class="status-row">
+            <span class="label" data-i18n="onboarding.userId">当前 user_id</span>
+            <code id="userId">-</code>
+          </div>
+
+          <div class="inline-actions">
+            <button id="baselineAssessBtn" class="secondary" data-i18n="onboarding.baseline">
+              提交基线测评示例
+            </button>
+            <span id="triageBadge" class="tag neutral">-</span>
+          </div>
+        </article>
+
+        <article class="panel reveal">
+          <h3 data-i18n="tools.title">2) 疗愈工具工作台</h3>
+          <p data-i18n="tools.desc">白噪音、呼吸练习、正念引导，支持快速体验。</p>
+          <div class="inline-actions">
+            <button id="loadLibrariesBtn" data-i18n="tools.load">加载工具库</button>
+          </div>
+
+          <div class="stack">
+            <label>
+              <span data-i18n="tools.audio">白噪音</span>
+              <select id="audioTrack"></select>
+            </label>
+            <label>
+              <span data-i18n="tools.minutes">时长（分钟）</span>
+              <input id="audioMinutes" type="number" min="1" max="180" value="10" />
+            </label>
+            <button id="startAudioBtn" class="secondary" data-i18n="tools.startAudio">开始播放</button>
+          </div>
+
+          <div class="stack breathing-box">
+            <div class="breath-orb" aria-hidden="true"></div>
+            <label>
+              <span data-i18n="tools.cycles">呼吸轮次</span>
+              <input id="breathingCycles" type="number" min="1" max="20" value="4" />
+            </label>
+            <button id="completeBreathingBtn" class="secondary" data-i18n="tools.finishBreathing">
+              完成呼吸练习
+            </button>
+          </div>
+
+          <div class="stack">
+            <label>
+              <span data-i18n="tools.meditation">正念引导</span>
+              <select id="meditationId"></select>
+            </label>
+            <button id="startMeditationBtn" class="secondary" data-i18n="tools.startMeditation">
+              开始正念
+            </button>
+          </div>
+        </article>
+
+        <article class="panel reveal">
+          <h3 data-i18n="journal.title">3) 情绪日记</h3>
+          <p data-i18n="journal.desc">记录当下情绪与能量，查看近 7 天趋势。</p>
+          <form id="journalForm" class="stack">
+            <label>
+              <span data-i18n="journal.mood">情绪标签</span>
+              <select id="journalMood">
+                <option value="calm">calm</option>
+                <option value="anxious">anxious</option>
+                <option value="sad">sad</option>
+                <option value="hopeful">hopeful</option>
+                <option value="tired">tired</option>
+              </select>
+            </label>
+            <label>
+              <span data-i18n="journal.energy">能量值 (0-10)</span>
+              <input id="journalEnergy" type="range" min="0" max="10" value="6" />
+              <strong id="energyValue">6</strong>
+            </label>
+            <label>
+              <span data-i18n="journal.note">笔记</span>
+              <textarea id="journalNote" rows="3" data-i18n-placeholder="journal.notePlaceholder"></textarea>
+            </label>
+            <button type="submit" data-i18n="journal.save">保存日记</button>
+          </form>
+          <div class="inline-actions">
+            <button id="loadTrendBtn" class="secondary" data-i18n="journal.trend">加载 7 天趋势</button>
+          </div>
+          <pre id="trendView" class="result">{}</pre>
+        </article>
+
+        <article class="panel reveal">
+          <h3 data-i18n="coach.title">4) AI 心理教练</h3>
+          <p data-i18n="coach.desc">仅作心理教练陪伴，不提供临床诊断、药物与处方建议。</p>
+
+          <div class="stack">
+            <label>
+              <span data-i18n="coach.style">风格</span>
+              <select id="coachStyle">
+                <option value="warm_guide">warm_guide</option>
+                <option value="rational_analysis">rational_analysis</option>
+              </select>
+            </label>
+            <label class="checkbox-field">
+              <input id="coachSubscription" type="checkbox" checked />
+              <span data-i18n="coach.subscription">模拟 coach 订阅有效</span>
+            </label>
+            <div class="inline-actions">
+              <button id="startCoachBtn" data-i18n="coach.start">开始会话</button>
+              <button id="endCoachBtn" class="secondary" data-i18n="coach.end">结束会话</button>
+            </div>
+          </div>
+
+          <form id="coachForm" class="stack">
+            <label>
+              <span data-i18n="coach.message">消息</span>
+              <textarea id="coachMessage" rows="3" data-i18n-placeholder="coach.messagePlaceholder"></textarea>
+            </label>
+            <button type="submit" data-i18n="coach.send">发送消息</button>
+          </form>
+          <pre id="coachReply" class="result">{}</pre>
+        </article>
+
+        <article class="panel reveal safety-panel">
+          <h3 data-i18n="safety.title">安全与求助资源</h3>
+          <p data-i18n="safety.desc">
+            如果你正在经历紧急危险，请优先联系当地紧急服务或危机热线。以下号码为前端本地缓存示例。
+          </p>
+          <ul id="hotlineList" class="hotline-list"></ul>
+          <div id="crisisBanner" class="crisis-banner hidden" role="alert"></div>
+        </article>
+
+        <aside class="panel reveal log-panel">
+          <h3 data-i18n="log.title">活动日志</h3>
+          <p data-i18n="log.desc">展示前端对 API 的请求结果，便于开发调试。</p>
+          <ul id="activityLog"></ul>
+        </aside>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
