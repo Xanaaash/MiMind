@@ -73,6 +73,12 @@ def get_tests_catalog() -> dict:
     return _unwrap(status, body)
 
 
+@app.get("/api/tests/catalog/{test_id}")
+def get_test_catalog_item(test_id: str) -> dict:
+    status, body = interactive_tests_api.get_catalog_item(test_id=test_id)
+    return _unwrap(status, body)
+
+
 @app.post("/api/tests/{user_id}/submit")
 def submit_test(user_id: str, payload: dict = Body(...)) -> dict:
     status, body = interactive_tests_api.post_submit(user_id=user_id, payload=payload)

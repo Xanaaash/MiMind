@@ -31,10 +31,23 @@ class InteractiveTestsAPIContractTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertIn("mbti", body["data"])
         self.assertIn("theory_reference", body["data"]["mbti"])
+        self.assertIn("required_answer_keys", body["data"]["mbti"])
+        self.assertIn("answer_range", body["data"]["mbti"])
         self.assertIn("eq", body["data"])
         self.assertIn("inner_child", body["data"])
         self.assertIn("boundary", body["data"])
         self.assertIn("psych_age", body["data"])
+
+    def test_catalog_item_contract_returns_input_schema(self) -> None:
+        status, body = self.tests_api.get_catalog_item("eq")
+        self.assertEqual(status, 200)
+        data = body["data"]
+        self.assertEqual(data["category"], "social_emotional")
+        self.assertEqual(data["scoring_type"], "eq")
+        self.assertEqual(
+            data["required_answer_keys"],
+            ["self_awareness", "self_regulation", "empathy", "relationship_management"],
+        )
 
     def test_submit_report_share_and_pairing_contract(self) -> None:
         submit_status, submit_body = self.tests_api.post_submit(

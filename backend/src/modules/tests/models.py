@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 
 @dataclass
@@ -10,6 +10,21 @@ class TestDefinition:
     version: str
     theory_reference: str
     scoring_type: str
+    required_answer_keys: List[str]
+    answer_range: str
+    category: str
+
+    def to_catalog_dict(self) -> dict:
+        return {
+            "display_name": self.display_name,
+            "version": self.version,
+            "theory_reference": self.theory_reference,
+            "scoring_type": self.scoring_type,
+            "required_answer_keys": list(self.required_answer_keys),
+            "answer_range": self.answer_range,
+            "category": self.category,
+            "input_dimension_count": len(self.required_answer_keys),
+        }
 
 
 @dataclass

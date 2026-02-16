@@ -20,13 +20,12 @@ class InteractiveTestsService:
 
     def list_catalog(self) -> Dict[str, dict]:
         return {
-            test_id: {
-                "display_name": definition.display_name,
-                "version": definition.version,
-                "theory_reference": definition.theory_reference,
-            }
+            test_id: definition.to_catalog_dict()
             for test_id, definition in self._catalog.list_tests().items()
         }
+
+    def get_catalog_item(self, test_id: str) -> dict:
+        return self._catalog.get(test_id).to_catalog_dict()
 
     def submit_test(self, user_id: str, test_id: str, answers: dict) -> dict:
         if self._store.get_user(user_id) is None:

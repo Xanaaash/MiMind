@@ -8,6 +8,9 @@ CORE_TEST_DEFINITIONS = {
         version="1.0",
         theory_reference="Jungian type theory",
         scoring_type="mbti",
+        required_answer_keys=["ei", "sn", "tf", "jp"],
+        answer_range="-100 to 100",
+        category="personality",
     ),
     "16p": TestDefinition(
         test_id="16p",
@@ -15,6 +18,9 @@ CORE_TEST_DEFINITIONS = {
         version="1.0",
         theory_reference="Myers-Briggs inspired personality dimensions",
         scoring_type="16p",
+        required_answer_keys=["ei", "sn", "tf", "jp", "identity"],
+        answer_range="-100 to 100",
+        category="personality",
     ),
     "big5": TestDefinition(
         test_id="big5",
@@ -22,6 +28,9 @@ CORE_TEST_DEFINITIONS = {
         version="1.0",
         theory_reference="Five-factor model (OCEAN)",
         scoring_type="big5",
+        required_answer_keys=["O", "C", "E", "A", "N"],
+        answer_range="0 to 100",
+        category="personality",
     ),
     "attachment": TestDefinition(
         test_id="attachment",
@@ -29,6 +38,9 @@ CORE_TEST_DEFINITIONS = {
         version="1.0",
         theory_reference="Attachment theory (Bowlby / Ainsworth)",
         scoring_type="attachment",
+        required_answer_keys=["secure", "anxious", "avoidant", "fearful"],
+        answer_range="0 to 100",
+        category="relationship",
     ),
     "love_language": TestDefinition(
         test_id="love_language",
@@ -36,6 +48,9 @@ CORE_TEST_DEFINITIONS = {
         version="1.0",
         theory_reference="Five love languages framework",
         scoring_type="love_language",
+        required_answer_keys=["words", "acts", "gifts", "time", "touch"],
+        answer_range="0 to 100",
+        category="relationship",
     ),
     "stress_coping": TestDefinition(
         test_id="stress_coping",
@@ -43,6 +58,9 @@ CORE_TEST_DEFINITIONS = {
         version="1.0",
         theory_reference="Lazarus and Folkman coping model",
         scoring_type="stress_coping",
+        required_answer_keys=["problem_focused", "emotion_focused", "avoidance", "support_seeking"],
+        answer_range="0 to 100",
+        category="resilience",
     ),
     "eq": TestDefinition(
         test_id="eq",
@@ -50,6 +68,9 @@ CORE_TEST_DEFINITIONS = {
         version="1.0",
         theory_reference="Emotional intelligence model (Goleman)",
         scoring_type="eq",
+        required_answer_keys=["self_awareness", "self_regulation", "empathy", "relationship_management"],
+        answer_range="0 to 100",
+        category="social_emotional",
     ),
     "inner_child": TestDefinition(
         test_id="inner_child",
@@ -57,6 +78,9 @@ CORE_TEST_DEFINITIONS = {
         version="1.0",
         theory_reference="Inner child framework in trauma-informed therapy",
         scoring_type="inner_child",
+        required_answer_keys=["playful", "wounded", "resilient", "protective"],
+        answer_range="0 to 100",
+        category="self_exploration",
     ),
     "boundary": TestDefinition(
         test_id="boundary",
@@ -64,6 +88,9 @@ CORE_TEST_DEFINITIONS = {
         version="1.0",
         theory_reference="Boundary setting theory in relational psychology",
         scoring_type="boundary",
+        required_answer_keys=["emotional", "physical", "digital", "work", "social"],
+        answer_range="0 to 100",
+        category="relationship",
     ),
     "psych_age": TestDefinition(
         test_id="psych_age",
@@ -71,5 +98,8 @@ CORE_TEST_DEFINITIONS = {
         version="1.0",
         theory_reference="Developmental and personality trait composites",
         scoring_type="psych_age",
+        required_answer_keys=["chronological_age", "curiosity", "emotional_regulation", "social_energy"],
+        answer_range="0 to 100 (chronological_age additionally constrained to 13 to 90)",
+        category="self_exploration",
     ),
 }

@@ -70,6 +70,13 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         self.assertIn("eq", catalog_payload)
         self.assertIn("stress_coping", catalog_payload)
         self.assertIn("psych_age", catalog_payload)
+        self.assertIn("required_answer_keys", catalog_payload["eq"])
+
+        eq_schema = self.client.get("/api/tests/catalog/eq")
+        self.assertEqual(eq_schema.status_code, 200)
+        eq_payload = eq_schema.json()
+        self.assertEqual(eq_payload["scoring_type"], "eq")
+        self.assertEqual(eq_payload["category"], "social_emotional")
 
         submit = self.client.post(
             f"/api/tests/{user_id}/submit",

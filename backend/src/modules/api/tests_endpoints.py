@@ -16,6 +16,12 @@ class InteractiveTestsAPI:
     def get_catalog(self) -> Tuple[int, Dict[str, Any]]:
         return 200, {"data": self._service.list_catalog()}
 
+    def get_catalog_item(self, test_id: str) -> Tuple[int, Dict[str, Any]]:
+        try:
+            return 200, {"data": self._service.get_catalog_item(test_id)}
+        except ValueError as error:
+            return 400, {"error": str(error)}
+
     def post_submit(self, user_id: str, payload: Dict[str, Any]) -> Tuple[int, Dict[str, Any]]:
         try:
             test_id = str(payload.get("test_id", "")).strip()
