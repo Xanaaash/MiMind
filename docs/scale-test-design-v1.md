@@ -46,6 +46,6 @@ This keeps behavior auditable and constitution-aligned.
 
 ## 5. Next Step
 
-- Replace in-memory scoring persistence with relational schema
-- Add multilingual question banks (`zh-CN` / `en-US`)
 - Add psychometric validation datasets and score reliability checks
+- Add submission mode that aggregates question-level answers into scoring dimensions
+- Introduce migration/backup tooling for SQLite to managed Postgres in production

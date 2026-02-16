@@ -10,9 +10,9 @@ from modules.api.scales_endpoints import ClinicalScalesAPI
 from modules.api.tests_endpoints import InteractiveTestsAPI
 from modules.api.tools_endpoints import HealingToolsAPI
 from modules.onboarding.service import OnboardingService
-from modules.storage.in_memory import InMemoryStore
+from modules.storage import build_application_store
 
-store = InMemoryStore()
+store = build_application_store()
 onboarding_api = OnboardingAPI(service=OnboardingService(store))
 interactive_tests_api = InteractiveTestsAPI(store=store)
 coach_api = CoachAPI(store=store)
