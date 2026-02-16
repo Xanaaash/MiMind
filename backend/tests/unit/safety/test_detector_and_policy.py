@@ -30,11 +30,11 @@ class DetectorAndPolicyUnitTests(unittest.TestCase):
     def test_detector_fail_closed_when_internal_error(self) -> None:
         detector = SafetyDetectorService()
 
-        class BrokenNLU:
-            def classify(self, text: str):
-                raise RuntimeError("nlu failure")
+        class BrokenGateway:
+            def run(self, task_type: str, text: str, timeout_ms: int = 2000, metadata=None):
+                raise RuntimeError("gateway failure")
 
-        detector._nlu = BrokenNLU()  # type: ignore[attr-defined]
+        detector._gateway = BrokenGateway()  # type: ignore[attr-defined]
         result = detector.detect("any message")
         self.assertEqual(result.level, RiskLevel.HIGH)
         self.assertTrue(result.fail_closed)
