@@ -5,6 +5,7 @@ from typing import Dict, List, Optional
 
 from modules.assessment.models import AssessmentScoreSet, AssessmentSubmission, ReassessmentSchedule
 from modules.compliance.models import ConsentRecord
+from modules.tests.models import TestResult
 from modules.triage.models import TriageDecision
 from modules.user.models import User
 
@@ -17,6 +18,8 @@ class InMemoryStore:
     scores: Dict[str, AssessmentScoreSet] = field(default_factory=dict)
     triage_decisions: Dict[str, TriageDecision] = field(default_factory=dict)
     schedules: Dict[str, ReassessmentSchedule] = field(default_factory=dict)
+    test_results: Dict[str, TestResult] = field(default_factory=dict)
+    user_test_results: Dict[str, List[str]] = field(default_factory=dict)
 
     def save_user(self, user: User) -> None:
         self.users[user.user_id] = user
@@ -36,6 +39,10 @@ class InMemoryStore:
     def save_schedule(self, user_id: str, schedule: ReassessmentSchedule) -> None:
         self.schedules[user_id] = schedule
 
+    def save_test_result(self, result: TestResult) -> None:
+        self.test_results[result.result_id] = result
+        self.user_test_results.setdefault(result.user_id, []).append(result.result_id)
+
     def get_user(self, user_id: str) -> Optional[User]:
         return self.users.get(user_id)
 
@@ -47,3 +54,10 @@ class InMemoryStore:
 
     def get_schedule(self, user_id: str) -> Optional[ReassessmentSchedule]:
         return self.schedules.get(user_id)
+
+    def get_test_result(self, result_id: str) -> Optional[TestResult]:
+        return self.test_results.get(result_id)
+
+    def list_user_test_results(self, user_id: str) -> List[TestResult]:
+        result_ids = self.user_test_results.get(user_id, [])
+        return [self.test_results[result_id] for result_id in result_ids if result_id in self.test_results]

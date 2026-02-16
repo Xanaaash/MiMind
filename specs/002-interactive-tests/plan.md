@@ -19,10 +19,10 @@ Build an extensible interactive test system with scoring, report paywall, share 
 
 ## Constitution Check
 
-- [ ] Product boundary: Non-medical test language only
-- [ ] Safety redlines: No diagnosis or medication advice in reports
-- [ ] Safety mechanism: Risk signals forwarded to safety module
-- [ ] Technical standards: Unit/API/Safety tests included
+- [x] Product boundary: Non-medical test language only
+- [x] Safety redlines: No diagnosis or medication advice in reports
+- [x] Safety mechanism: Risk signals forwarded to safety module
+- [x] Technical standards: Unit/API/Safety tests included
 
 ## Project Structure
 
