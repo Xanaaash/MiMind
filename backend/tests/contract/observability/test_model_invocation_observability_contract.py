@@ -88,6 +88,36 @@ class ModelInvocationObservabilityContractTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(body["data"], [])
 
+    def test_summary_contract(self) -> None:
+        start_status, start_body = self.coach_api.post_start_session(
+            user_id=self.user_id,
+            payload={
+                "style_id": "warm_guide",
+                "subscription_active": True,
+            },
+        )
+        self.assertEqual(start_status, 200)
+        session_id = start_body["data"]["session"]["session_id"]
+        self.coach_api.post_chat(
+            session_id=session_id,
+            payload={"user_message": "I feel stressed before work meetings."},
+        )
+
+        status, body = self.observability_api.get_model_invocation_summary(limit=50)
+        self.assertEqual(status, 200)
+        data = body["data"]
+        self.assertIn("totals", data)
+        self.assertIn("by_task_type", data)
+        self.assertIn("by_provider", data)
+        self.assertGreaterEqual(data["totals"]["total"], 1)
+
+        filtered_status, filtered_body = self.observability_api.get_model_invocation_summary(
+            limit=50,
+            task_type="coach_generation",
+        )
+        self.assertEqual(filtered_status, 200)
+        self.assertGreaterEqual(filtered_body["data"]["totals"]["total"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -117,6 +117,22 @@ def get_model_invocations(
     return _unwrap(status, body)
 
 
+@app.get("/api/observability/model-invocations/summary")
+def get_model_invocation_summary(
+    limit: int = Query(200, ge=1, le=2000),
+    task_type: str = Query("", alias="task_type"),
+    provider: str = Query("", alias="provider"),
+) -> dict:
+    normalized_task = task_type.strip() or None
+    normalized_provider = provider.strip() or None
+    status, body = observability_api.get_model_invocation_summary(
+        limit=limit,
+        task_type=normalized_task,
+        provider=normalized_provider,
+    )
+    return _unwrap(status, body)
+
+
 @app.post("/api/tests/{user_id}/submit")
 def submit_test(user_id: str, payload: dict = Body(...)) -> dict:
     status, body = interactive_tests_api.post_submit(user_id=user_id, payload=payload)
