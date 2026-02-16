@@ -41,6 +41,8 @@ MindCoach AI 是专业心理教练平台，非医疗产品。面向无/轻度心
 - `scripts/init-roadmap-tasks.sh` — 按 roadmap 初始化 001~006 的 spec/plan/tasks
 - `scripts/spec-status.sh` — 查看 specs 完整度状态（spec/plan/tasks）
 - `scripts/constitution-check.sh` — 宪法红线与任务测试门禁检查
+- `scripts/dev-setup.sh` — 使用 uv 初始化本地开发环境（依赖 + 工具）
+- `scripts/run-backend-tests.sh` — 运行后端全量测试（支持 uv run）
 
 ## 环境变量
 

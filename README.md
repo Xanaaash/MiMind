@@ -41,3 +41,13 @@
 - 查看功能文档完整度：`scripts/spec-status.sh`
 - 运行治理门禁检查：`scripts/constitution-check.sh`
 - 运行后端测试（001 原型）：`scripts/run-backend-tests.sh`
+
+## 本地开发环境
+
+- 依赖管理：`uv + pyproject.toml`
+- 一键初始化：`scripts/dev-setup.sh`
+- 常用命令：
+  - `uv run pytest`
+  - `uv run ruff check .`
+  - `uv run mypy`
+  - `scripts/run-backend-tests.sh`
