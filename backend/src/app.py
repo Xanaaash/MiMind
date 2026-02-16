@@ -3,6 +3,7 @@ from fastapi import Body, FastAPI, HTTPException, Query
 from modules.api.billing_endpoints import BillingAPI
 from modules.api.coach_endpoints import CoachAPI
 from modules.api.endpoints import OnboardingAPI
+from modules.api.prompt_endpoints import PromptRegistryAPI
 from modules.api.safety_endpoints import SafetyAPI
 from modules.api.scales_endpoints import ClinicalScalesAPI
 from modules.api.tests_endpoints import InteractiveTestsAPI
@@ -18,6 +19,7 @@ healing_tools_api = HealingToolsAPI(store=store)
 billing_api = BillingAPI(store=store)
 safety_api = SafetyAPI(store=store)
 scales_api = ClinicalScalesAPI()
+prompt_api = PromptRegistryAPI()
 
 app = FastAPI(
     title="MindCoach AI Prototype API",
@@ -76,6 +78,24 @@ def get_tests_catalog() -> dict:
 @app.get("/api/tests/catalog/{test_id}")
 def get_test_catalog_item(test_id: str) -> dict:
     status, body = interactive_tests_api.get_catalog_item(test_id=test_id)
+    return _unwrap(status, body)
+
+
+@app.get("/api/prompts/packs")
+def get_prompt_packs() -> dict:
+    status, body = prompt_api.get_packs()
+    return _unwrap(status, body)
+
+
+@app.get("/api/prompts/active")
+def get_active_prompt_pack() -> dict:
+    status, body = prompt_api.get_active()
+    return _unwrap(status, body)
+
+
+@app.post("/api/prompts/activate")
+def activate_prompt_pack(payload: dict = Body(...)) -> dict:
+    status, body = prompt_api.post_activate(payload)
     return _unwrap(status, body)
 
 
