@@ -14,8 +14,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Sync dependencies
+        run: uv sync --extra dev
+
       - name: Validate scripts are executable
         run: |
+          chmod +x scripts/dev-setup.sh
+          chmod +x scripts/run-api.sh
+          chmod +x scripts/run-backend-tests.sh
           chmod +x scripts/spec-status.sh
           chmod +x scripts/constitution-check.sh
 
@@ -24,3 +38,6 @@ jobs:
 
       - name: Constitution gate
         run: scripts/constitution-check.sh
+
+      - name: Backend tests
+        run: scripts/run-backend-tests.sh
