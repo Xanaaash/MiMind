@@ -1,11 +1,13 @@
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, Tuple
 
 from modules.coach.access_guard import CoachAccessGuard
 from modules.coach.models import CoachSession, CoachTurn
 from modules.coach.summary_service import CoachSummaryService
 from modules.memory.service import MemoryService
+from modules.model_gateway.models import ModelTaskType
+from modules.model_gateway.service import ModelGatewayService
 from modules.prompt.context.builder import build_context_prompt
 from modules.prompt.styles.registry import get_style_prompt
 from modules.prompt.system.prompt import get_system_prompt
@@ -23,6 +25,7 @@ class CoachSessionService:
         self._safety_runtime = SafetyRuntimeService(store)
         self._summary_service = CoachSummaryService()
         self._memory_service = MemoryService(store)
+        self._model_gateway = ModelGatewayService()
 
     def start_session(self, user_id: str, style_id: str, subscription_active: bool) -> dict:
         self._access_guard.ensure_session_access(user_id=user_id, subscription_active=subscription_active)
@@ -118,7 +121,7 @@ class CoachSessionService:
                 "safety": safety,
             }
 
-        reply = self._generate_coach_reply(style_id=session.style_id, user_message=user_message)
+        reply, model_info = self._generate_coach_reply(session=session, user_message=user_message)
         session.turns.append(CoachTurn(role="coach", message=reply))
         return {
             "mode": "coaching",
@@ -126,6 +129,7 @@ class CoachSessionService:
             "triage": triage.to_dict(),
             "coach_message": reply,
             "safety": safety,
+            "model": model_info,
         }
 
     def end_session(self, session_id: str) -> dict:
@@ -166,8 +170,49 @@ class CoachSessionService:
             is_joke=bool(payload.get("is_joke", False)),
         )
 
+    def _generate_coach_reply(self, session: CoachSession, user_message: str) -> Tuple[str, dict]:
+        user = self._store.get_user(session.user_id)
+        locale = user.locale if user else "en-US"
+
+        style_prompt = get_style_prompt(session.style_id)
+        context_prompt = build_context_prompt(self._store, session.user_id)
+
+        try:
+            response = self._model_gateway.run(
+                task_type=ModelTaskType.COACH_GENERATION,
+                text=user_message,
+                locale=locale,
+                timeout_ms=4000,
+                metadata={
+                    "session_id": session.session_id,
+                    "user_id": session.user_id,
+                    "style_id": session.style_id,
+                    "system_prompt": get_system_prompt(),
+                    "style_prompt": style_prompt,
+                    "context_prompt": context_prompt,
+                },
+            )
+            if not response.output_text or not response.output_text.strip():
+                raise ValueError("Gateway returned empty coach output_text")
+
+            return response.output_text.strip(), {
+                "provider": response.provider,
+                "trace_id": response.trace_id,
+                "task_type": response.task_type,
+                "latency_ms": round(response.latency_ms, 3),
+            }
+        except Exception as error:
+            fallback = self._fallback_coach_reply(style_id=session.style_id, user_message=user_message)
+            return fallback, {
+                "provider": "fallback-local-template",
+                "trace_id": None,
+                "task_type": ModelTaskType.COACH_GENERATION,
+                "latency_ms": 0.0,
+                "error": str(error),
+            }
+
     @staticmethod
-    def _generate_coach_reply(style_id: str, user_message: str) -> str:
+    def _fallback_coach_reply(style_id: str, user_message: str) -> str:
         if style_id == "warm_guide":
             return (
                 "I hear how important this is for you. "
