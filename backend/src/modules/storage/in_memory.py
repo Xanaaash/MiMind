@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from modules.assessment.models import AssessmentScoreSet, AssessmentSubmission, ReassessmentSchedule
 from modules.billing.models import SubscriptionRecord
@@ -101,8 +101,18 @@ class InMemoryStore:
         result_ids = self.user_test_results.get(user_id, [])
         return [self.test_results[result_id] for result_id in result_ids if result_id in self.test_results]
 
+    def list_submissions(self, user_id: str) -> List[AssessmentSubmission]:
+        return list(self.submissions.get(user_id, []))
+
+    def list_user_consents(self, user_id: str) -> List[ConsentRecord]:
+        return [consent for consent in self.consents.values() if consent.user_id == user_id]
+
     def get_coach_session(self, session_id: str) -> Optional[CoachSession]:
         return self.coach_sessions.get(session_id)
+
+    def list_user_coach_sessions(self, user_id: str) -> List[CoachSession]:
+        session_ids = self.user_coach_sessions.get(user_id, [])
+        return [self.coach_sessions[session_id] for session_id in session_ids if session_id in self.coach_sessions]
 
     def list_memory_summaries(self, user_id: str) -> List[str]:
         return list(self.memory_summaries.get(user_id, []))
@@ -121,3 +131,125 @@ class InMemoryStore:
 
     def is_webhook_processed(self, event_id: str) -> bool:
         return event_id in self.processed_webhooks
+
+    def export_user_data(self, user_id: str) -> Dict[str, Any]:
+        user = self.get_user(user_id)
+        if user is None:
+            raise ValueError("Unknown user_id")
+
+        scores = self.get_scores(user_id)
+        triage = self.get_triage(user_id)
+        schedule = self.get_schedule(user_id)
+        subscription = self.get_subscription(user_id)
+
+        return {
+            "user": {
+                "user_id": user.user_id,
+                "email": user.email,
+                "locale": user.locale,
+                "created_at": user.created_at.isoformat(),
+            },
+            "consents": [
+                {
+                    "consent_id": consent.consent_id,
+                    "policy_version": consent.policy_version,
+                    "accepted_at": consent.accepted_at.isoformat(),
+                }
+                for consent in self.list_user_consents(user_id)
+            ],
+            "assessment": {
+                "submissions": [
+                    {
+                        "submission_id": submission.submission_id,
+                        "responses": dict(submission.responses),
+                        "submitted_at": submission.submitted_at.isoformat(),
+                    }
+                    for submission in self.list_submissions(user_id)
+                ],
+                "scores": scores.to_dict() if scores is not None else None,
+                "triage": triage.to_dict() if triage is not None else None,
+                "reassessment_due": schedule.to_dict() if schedule is not None else None,
+            },
+            "tests": {
+                "results": [result.to_dict() for result in self.list_user_test_results(user_id)],
+            },
+            "coach": {
+                "sessions": [session.to_dict() for session in self.list_user_coach_sessions(user_id)],
+            },
+            "tools": {
+                "journal_entries": [entry.to_dict() for entry in self.list_journal_entries(user_id)],
+                "tool_events": list(self.tool_events.get(user_id, [])),
+            },
+            "memory": {
+                "summaries": self.list_memory_summaries(user_id),
+                "vectors": [
+                    {
+                        "memory_id": vector.memory_id,
+                        "text_preview": vector.text[:80],
+                        "embedding_dimensions": len(vector.embedding),
+                        "created_at": vector.created_at.isoformat(),
+                    }
+                    for vector in self.list_memory_vectors(user_id)
+                ],
+            },
+            "billing": {
+                "subscription": {
+                    "plan_id": subscription.plan_id,
+                    "status": subscription.status,
+                    "started_at": subscription.started_at.isoformat(),
+                    "ends_at": subscription.ends_at.isoformat() if subscription.ends_at else None,
+                    "trial": subscription.trial,
+                    "ai_quota_monthly": subscription.ai_quota_monthly,
+                    "ai_used_in_cycle": subscription.ai_used_in_cycle,
+                    "cycle_reset_at": subscription.cycle_reset_at.isoformat(),
+                }
+                if subscription is not None
+                else None
+            },
+        }
+
+    def erase_user_data(self, user_id: str) -> Dict[str, int]:
+        removed_consents = 0
+        consent_ids_to_remove = [consent_id for consent_id, consent in self.consents.items() if consent.user_id == user_id]
+        for consent_id in consent_ids_to_remove:
+            self.consents.pop(consent_id, None)
+            removed_consents += 1
+
+        removed_submissions = len(self.submissions.pop(user_id, []))
+
+        removed_scores = 1 if self.scores.pop(user_id, None) is not None else 0
+        removed_triage = 1 if self.triage_decisions.pop(user_id, None) is not None else 0
+        removed_schedule = 1 if self.schedules.pop(user_id, None) is not None else 0
+
+        removed_test_results = 0
+        for result_id in self.user_test_results.pop(user_id, []):
+            if self.test_results.pop(result_id, None) is not None:
+                removed_test_results += 1
+
+        removed_coach_sessions = 0
+        for session_id in self.user_coach_sessions.pop(user_id, []):
+            if self.coach_sessions.pop(session_id, None) is not None:
+                removed_coach_sessions += 1
+
+        removed_journal_entries = len(self.journal_entries.pop(user_id, []))
+        removed_tool_events = len(self.tool_events.pop(user_id, []))
+        removed_memory_summaries = len(self.memory_summaries.pop(user_id, []))
+        removed_memory_vectors = len(self.memory_vectors.pop(user_id, []))
+        removed_subscription = 1 if self.subscriptions.pop(user_id, None) is not None else 0
+        removed_user = 1 if self.users.pop(user_id, None) is not None else 0
+
+        return {
+            "user": removed_user,
+            "consents": removed_consents,
+            "assessment_submissions": removed_submissions,
+            "assessment_scores": removed_scores,
+            "triage_decisions": removed_triage,
+            "reassessment_schedules": removed_schedule,
+            "test_results": removed_test_results,
+            "coach_sessions": removed_coach_sessions,
+            "journal_entries": removed_journal_entries,
+            "tool_events": removed_tool_events,
+            "memory_summaries": removed_memory_summaries,
+            "memory_vectors": removed_memory_vectors,
+            "subscriptions": removed_subscription,
+        }

@@ -161,6 +161,39 @@ class SQLiteStore(InMemoryStore):
             )
             self._connection.commit()
 
+    def list_submissions(self, user_id: str) -> List[AssessmentSubmission]:
+        cached = super().list_submissions(user_id)
+        if cached:
+            return cached
+
+        with self._lock:
+            rows = self._connection.execute(
+                """
+                SELECT
+                    submission_id,
+                    user_id,
+                    responses_json,
+                    submitted_at
+                FROM assessment_submissions
+                WHERE user_id = ?
+                ORDER BY submitted_at ASC
+                """,
+                (user_id,),
+            ).fetchall()
+
+        hydrated: List[AssessmentSubmission] = []
+        for row in rows:
+            submission = AssessmentSubmission(
+                submission_id=row["submission_id"],
+                user_id=row["user_id"],
+                responses=json.loads(row["responses_json"]),
+                submitted_at=datetime.fromisoformat(row["submitted_at"]),
+            )
+            super().add_submission(submission)
+            hydrated.append(submission)
+
+        return hydrated
+
     def save_scores(self, user_id: str, scores: AssessmentScoreSet) -> None:
         super().save_scores(user_id, scores)
         with self._lock:
@@ -451,6 +484,59 @@ class SQLiteStore(InMemoryStore):
             summary=json.loads(row["summary_json"]),
             created_at=datetime.fromisoformat(row["created_at"]),
         )
+
+    def erase_user_data(self, user_id: str) -> Dict[str, int]:
+        with self._lock:
+            persisted_counts = {
+                "assessment_submissions": self._count_rows("assessment_submissions", user_id),
+                "assessment_scores": self._count_rows("assessment_scores", user_id),
+                "triage_decisions": self._count_rows("triage_decisions", user_id),
+                "reassessment_schedules": self._count_rows("reassessment_schedules", user_id),
+                "test_results": self._count_rows("test_results", user_id),
+                "user": self._count_rows("users", user_id),
+            }
+
+            self._connection.execute("DELETE FROM assessment_submissions WHERE user_id = ?", (user_id,))
+            self._connection.execute("DELETE FROM assessment_scores WHERE user_id = ?", (user_id,))
+            self._connection.execute("DELETE FROM triage_decisions WHERE user_id = ?", (user_id,))
+            self._connection.execute("DELETE FROM reassessment_schedules WHERE user_id = ?", (user_id,))
+            self._connection.execute("DELETE FROM test_results WHERE user_id = ?", (user_id,))
+            self._connection.execute("DELETE FROM users WHERE user_id = ?", (user_id,))
+            self._connection.commit()
+
+        in_memory_counts = super().erase_user_data(user_id)
+
+        return {
+            **in_memory_counts,
+            "assessment_submissions": max(
+                in_memory_counts.get("assessment_submissions", 0),
+                persisted_counts["assessment_submissions"],
+            ),
+            "assessment_scores": max(
+                in_memory_counts.get("assessment_scores", 0),
+                persisted_counts["assessment_scores"],
+            ),
+            "triage_decisions": max(
+                in_memory_counts.get("triage_decisions", 0),
+                persisted_counts["triage_decisions"],
+            ),
+            "reassessment_schedules": max(
+                in_memory_counts.get("reassessment_schedules", 0),
+                persisted_counts["reassessment_schedules"],
+            ),
+            "test_results": max(
+                in_memory_counts.get("test_results", 0),
+                persisted_counts["test_results"],
+            ),
+            "user": max(in_memory_counts.get("user", 0), persisted_counts["user"]),
+        }
+
+    def _count_rows(self, table_name: str, user_id: str) -> int:
+        row = self._connection.execute(
+            f"SELECT COUNT(*) AS count FROM {table_name} WHERE user_id = ?",
+            (user_id,),
+        ).fetchone()
+        return int(row["count"]) if row is not None else 0
 
     def close(self) -> None:
         with self._lock:

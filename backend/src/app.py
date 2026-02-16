@@ -1,6 +1,7 @@
 from fastapi import Body, FastAPI, HTTPException, Query
 
 from modules.api.billing_endpoints import BillingAPI
+from modules.api.compliance_endpoints import DataGovernanceAPI
 from modules.api.coach_endpoints import CoachAPI
 from modules.api.endpoints import OnboardingAPI
 from modules.api.observability_endpoints import ObservabilityAPI
@@ -18,6 +19,7 @@ interactive_tests_api = InteractiveTestsAPI(store=store)
 coach_api = CoachAPI(store=store)
 healing_tools_api = HealingToolsAPI(store=store)
 billing_api = BillingAPI(store=store)
+compliance_api = DataGovernanceAPI(store=store)
 safety_api = SafetyAPI(store=store)
 scales_api = ClinicalScalesAPI()
 prompt_api = PromptRegistryAPI()
@@ -278,4 +280,16 @@ def safety_assess(user_id: str, payload: dict = Body(...)) -> dict:
 @app.get("/api/safety/hotline-cache")
 def safety_hotline_cache() -> dict:
     status, body = safety_api.get_hotline_cache()
+    return _unwrap(status, body)
+
+
+@app.get("/api/compliance/{user_id}/export")
+def export_user_data(user_id: str) -> dict:
+    status, body = compliance_api.get_export(user_id=user_id)
+    return _unwrap(status, body)
+
+
+@app.post("/api/compliance/{user_id}/erase")
+def erase_user_data(user_id: str) -> dict:
+    status, body = compliance_api.post_erase(user_id=user_id)
     return _unwrap(status, body)

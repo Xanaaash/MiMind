@@ -1,12 +1,12 @@
 import tempfile
 import unittest
-from datetime import date
+from datetime import date, datetime, timezone
 
 from backend.tests.bootstrap import configure_import_path
 
 configure_import_path()
 
-from modules.assessment.models import AssessmentScoreSet, ReassessmentSchedule
+from modules.assessment.models import AssessmentScoreSet, AssessmentSubmission, ReassessmentSchedule
 from modules.storage.sqlite_store import SQLiteStore
 from modules.tests.models import TestResult
 from modules.triage.models import RiskLevel, TriageChannel, TriageDecision
@@ -104,6 +104,68 @@ class SQLiteStorePersistenceTests(unittest.TestCase):
             self.assertEqual(len(user_results), 1)
             self.assertEqual(user_results[0].result_id, "r-1")
             store_two.close()
+
+    def test_erase_user_data_removes_persisted_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            db_path = f"{temp_dir}/mindcoach.db"
+
+            store = SQLiteStore(db_path=db_path)
+            store.save_user(User(user_id="u-erase", email="erase@example.com", locale="en-US"))
+            store.add_submission(
+                AssessmentSubmission(
+                    submission_id="sub-1",
+                    user_id="u-erase",
+                    responses={"phq9": [1] * 9},
+                    submitted_at=datetime.now(timezone.utc),
+                )
+            )
+            store.save_scores(
+                "u-erase",
+                AssessmentScoreSet(
+                    phq9_score=9,
+                    gad7_score=7,
+                    pss10_score=10,
+                    cssrs_positive=False,
+                ),
+            )
+            store.save_triage(
+                "u-erase",
+                TriageDecision(channel=TriageChannel.GREEN, reasons=["baseline_green"]),
+            )
+            store.save_schedule(
+                "u-erase",
+                ReassessmentSchedule(due_dates={"phq9": date(2026, 3, 1)}),
+            )
+            store.save_test_result(
+                TestResult(
+                    result_id="r-erase",
+                    user_id="u-erase",
+                    test_id="eq",
+                    answers={
+                        "self_awareness": 70,
+                        "self_regulation": 72,
+                        "empathy": 74,
+                        "relationship_management": 76,
+                    },
+                    summary={"overall_score": 73.0, "level": "high"},
+                )
+            )
+
+            deleted = store.erase_user_data("u-erase")
+            self.assertEqual(deleted["user"], 1)
+            self.assertEqual(deleted["assessment_submissions"], 1)
+            self.assertEqual(deleted["assessment_scores"], 1)
+            self.assertEqual(deleted["test_results"], 1)
+
+            store.close()
+
+            restored = SQLiteStore(db_path=db_path)
+            self.assertIsNone(restored.get_user("u-erase"))
+            self.assertEqual(restored.list_submissions("u-erase"), [])
+            self.assertIsNone(restored.get_scores("u-erase"))
+            self.assertIsNone(restored.get_test_result("r-erase"))
+            self.assertEqual(sum(restored.erase_user_data("u-erase").values()), 0)
+            restored.close()
 
 
 if __name__ == "__main__":

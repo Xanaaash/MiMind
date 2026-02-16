@@ -164,6 +164,60 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         submit_payload = submit.json()
         self.assertIn("overall_score", submit_payload["summary"])
 
+    def test_compliance_export_and_erase_http(self) -> None:
+        email = f"compliance-{uuid4().hex[:8]}@example.com"
+        register = self.client.post(
+            "/api/register",
+            json={
+                "email": email,
+                "locale": "en-US",
+                "policy_version": "2026.02",
+            },
+        )
+        self.assertEqual(register.status_code, 200)
+        user_id = register.json()["user_id"]
+
+        assessment = self.client.post(
+            f"/api/assessment/{user_id}",
+            json={
+                "responses": {
+                    "phq9": [0] * 9,
+                    "gad7": [0] * 7,
+                    "pss10": [1] * 10,
+                    "cssrs": {"q1": False, "q2": False},
+                }
+            },
+        )
+        self.assertEqual(assessment.status_code, 200)
+
+        submit = self.client.post(
+            f"/api/tests/{user_id}/submit",
+            json={
+                "test_id": "eq",
+                "answers": {
+                    "self_awareness": 75,
+                    "self_regulation": 70,
+                    "empathy": 72,
+                    "relationship_management": 74,
+                },
+            },
+        )
+        self.assertEqual(submit.status_code, 200)
+
+        export = self.client.get(f"/api/compliance/{user_id}/export")
+        self.assertEqual(export.status_code, 200)
+        export_payload = export.json()
+        self.assertEqual(export_payload["user_id"], user_id)
+        self.assertIn("assessment", export_payload["data"])
+        self.assertIn("tests", export_payload["data"])
+
+        erase = self.client.post(f"/api/compliance/{user_id}/erase")
+        self.assertEqual(erase.status_code, 200)
+        self.assertGreater(erase.json()["total_deleted"], 0)
+
+        export_after_erase = self.client.get(f"/api/compliance/{user_id}/export")
+        self.assertEqual(export_after_erase.status_code, 400)
+
 
 if __name__ == "__main__":
     unittest.main()
