@@ -37,6 +37,8 @@ class InteractiveTestsAPIContractTests(unittest.TestCase):
         self.assertIn("inner_child", body["data"])
         self.assertIn("boundary", body["data"])
         self.assertIn("psych_age", body["data"])
+        self.assertIn("question_bank", body["data"]["mbti"])
+        self.assertIn("en-US", body["data"]["mbti"]["question_bank"]["supported_locales"])
 
     def test_catalog_item_contract_returns_input_schema(self) -> None:
         status, body = self.tests_api.get_catalog_item("eq")
@@ -48,6 +50,9 @@ class InteractiveTestsAPIContractTests(unittest.TestCase):
             data["required_answer_keys"],
             ["self_awareness", "self_regulation", "empathy", "relationship_management"],
         )
+        self.assertIn("question_bank", data)
+        self.assertGreaterEqual(len(data["question_bank"]["questions"]), 4)
+        self.assertIn("zh-CN", data["question_bank"]["questions"][0]["text"])
 
     def test_submit_report_share_and_pairing_contract(self) -> None:
         submit_status, submit_body = self.tests_api.post_submit(

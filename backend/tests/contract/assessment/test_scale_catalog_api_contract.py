@@ -21,6 +21,9 @@ class ScaleCatalogAPIContractTests(unittest.TestCase):
         self.assertIn("cssrs", data)
         self.assertIn("scl90", data)
         self.assertEqual(data["scl90"]["cadence_days"], 90)
+        self.assertIn("question_bank", data["phq9"])
+        self.assertIn("zh-CN", data["phq9"]["question_bank"]["supported_locales"])
+        self.assertEqual(len(data["scl90"]["question_bank"]["questions"]), 90)
 
     def test_score_scale_contract(self) -> None:
         status, body = self.api.post_score_scale(

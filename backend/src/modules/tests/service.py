@@ -4,6 +4,7 @@ from typing import Dict
 from modules.cards.service import ShareCardService
 from modules.storage.in_memory import InMemoryStore
 from modules.tests.catalog.repository import TestCatalogRepository
+from modules.tests.catalog.question_bank import get_test_question_bank
 from modules.tests.models import TestResult
 from modules.tests.pairing.service import PairingService
 from modules.tests.report.service import TestReportService
@@ -19,13 +20,10 @@ class InteractiveTestsService:
         self._pairing_service = PairingService()
 
     def list_catalog(self) -> Dict[str, dict]:
-        return {
-            test_id: definition.to_catalog_dict()
-            for test_id, definition in self._catalog.list_tests().items()
-        }
+        return {test_id: self._build_catalog_item(test_id) for test_id in self._catalog.list_tests()}
 
     def get_catalog_item(self, test_id: str) -> dict:
-        return self._catalog.get(test_id).to_catalog_dict()
+        return self._build_catalog_item(test_id)
 
     def submit_test(self, user_id: str, test_id: str, answers: dict) -> dict:
         if self._store.get_user(user_id) is None:
@@ -68,3 +66,9 @@ class InteractiveTestsService:
         if result.user_id != user_id:
             raise ValueError("Result does not belong to user")
         return result
+
+    def _build_catalog_item(self, test_id: str) -> dict:
+        definition = self._catalog.get(test_id)
+        data = definition.to_catalog_dict()
+        data["question_bank"] = get_test_question_bank(test_id)
+        return data

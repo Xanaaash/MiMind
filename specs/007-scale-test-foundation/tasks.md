@@ -23,7 +23,7 @@
 - [x] **T3.1** Add product/system design baseline docs - `docs/system-design-v1.md`, `docs/scale-test-design-v1.md`
 - [x] **T3.2** Add/extend unit + contract + platform tests for scale/test expansion - `backend/tests/unit/`, `backend/tests/contract/`
 - [x] **T3.3** Run full regression suite after each major milestone - `scripts/run-backend-tests.sh`
-- [ ] **T3.4** Add bilingual question-bank assets for all scales/tests - `backend/src/modules/*/catalog/` (deferred)
+- [x] **T3.4** Add bilingual question-bank assets for all scales/tests - `backend/src/modules/*/catalog/`
 - [ ] **T3.5** Migrate in-memory scale/test storage to persistent relational schema (deferred)
 
 ## Dependencies

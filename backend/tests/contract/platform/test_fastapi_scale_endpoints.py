@@ -18,6 +18,8 @@ class FastAPIScaleEndpointTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         payload = response.json()
         self.assertIn("scl90", payload)
+        self.assertIn("question_bank", payload["phq9"])
+        self.assertEqual(len(payload["scl90"]["question_bank"]["questions"]), 90)
 
     def test_single_scale_score_http(self) -> None:
         response = self.client.post(
