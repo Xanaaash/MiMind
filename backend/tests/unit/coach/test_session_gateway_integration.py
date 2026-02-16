@@ -6,6 +6,7 @@ configure_import_path()
 
 from modules.api.coach_endpoints import CoachAPI
 from modules.api.endpoints import OnboardingAPI
+from modules.memory.service import MemoryService
 from modules.onboarding.service import OnboardingService
 from modules.storage.in_memory import InMemoryStore
 
@@ -38,6 +39,10 @@ class CoachGatewayIntegrationUnitTests(unittest.TestCase):
         )
 
     def test_chat_includes_model_info_when_gateway_succeeds(self) -> None:
+        memory = MemoryService(self.store)
+        memory.index_summary(self.user_id, "Work stress peaks before presentations.")
+        memory.index_summary(self.user_id, "I calm down when I breathe slowly.")
+
         start_status, start_body = self.coach_api.post_start_session(
             user_id=self.user_id,
             payload={
@@ -58,6 +63,7 @@ class CoachGatewayIntegrationUnitTests(unittest.TestCase):
         self.assertEqual(chat_body["data"]["mode"], "coaching")
         self.assertIn("model", chat_body["data"])
         self.assertIn("provider", chat_body["data"]["model"])
+        self.assertGreaterEqual(chat_body["data"]["model"]["relevant_memory_count"], 1)
 
     def test_chat_falls_back_when_gateway_fails(self) -> None:
         start_status, start_body = self.coach_api.post_start_session(
@@ -86,6 +92,33 @@ class CoachGatewayIntegrationUnitTests(unittest.TestCase):
         self.assertEqual(chat_body["data"]["mode"], "coaching")
         self.assertEqual(chat_body["data"]["model"]["provider"], "fallback-local-template")
         self.assertIn("error", chat_body["data"]["model"])
+
+    def test_chat_continues_when_memory_retrieval_fails(self) -> None:
+        start_status, start_body = self.coach_api.post_start_session(
+            user_id=self.user_id,
+            payload={
+                "style_id": "warm_guide",
+                "subscription_active": True,
+            },
+        )
+        self.assertEqual(start_status, 200)
+        session_id = start_body["data"]["session"]["session_id"]
+
+        class BrokenMemoryService:
+            def retrieve_relevant(self, user_id: str, query: str, limit: int = 3):
+                raise RuntimeError("memory retrieval down")
+
+        self.coach_api._service._memory_service = BrokenMemoryService()  # type: ignore[attr-defined]
+
+        chat_status, chat_body = self.coach_api.post_chat(
+            session_id=session_id,
+            payload={
+                "user_message": "I am worried about work stress again.",
+            },
+        )
+        self.assertEqual(chat_status, 200)
+        self.assertEqual(chat_body["data"]["mode"], "coaching")
+        self.assertIn("memory_retrieval_error", chat_body["data"]["model"])
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ from modules.billing.models import SubscriptionRecord
 from modules.coach.models import CoachSession
 from modules.compliance.models import ConsentRecord
 from modules.journal.models import JournalEntry
+from modules.memory.models import MemoryVectorRecord
 from modules.tests.models import TestResult
 from modules.triage.models import TriageDecision
 from modules.user.models import User
@@ -26,6 +27,7 @@ class InMemoryStore:
     coach_sessions: Dict[str, CoachSession] = field(default_factory=dict)
     user_coach_sessions: Dict[str, List[str]] = field(default_factory=dict)
     memory_summaries: Dict[str, List[str]] = field(default_factory=dict)
+    memory_vectors: Dict[str, List[MemoryVectorRecord]] = field(default_factory=dict)
     journal_entries: Dict[str, List[JournalEntry]] = field(default_factory=dict)
     tool_events: Dict[str, List[dict]] = field(default_factory=dict)
     subscriptions: Dict[str, SubscriptionRecord] = field(default_factory=dict)
@@ -59,6 +61,9 @@ class InMemoryStore:
 
     def save_memory_summary(self, user_id: str, summary: str) -> None:
         self.memory_summaries.setdefault(user_id, []).append(summary)
+
+    def save_memory_vector(self, record: MemoryVectorRecord) -> None:
+        self.memory_vectors.setdefault(record.user_id, []).append(record)
 
     def save_journal_entry(self, entry: JournalEntry) -> None:
         self.journal_entries.setdefault(entry.user_id, []).append(entry)
@@ -96,6 +101,9 @@ class InMemoryStore:
 
     def list_memory_summaries(self, user_id: str) -> List[str]:
         return list(self.memory_summaries.get(user_id, []))
+
+    def list_memory_vectors(self, user_id: str) -> List[MemoryVectorRecord]:
+        return list(self.memory_vectors.get(user_id, []))
 
     def list_journal_entries(self, user_id: str) -> List[JournalEntry]:
         return list(self.journal_entries.get(user_id, []))

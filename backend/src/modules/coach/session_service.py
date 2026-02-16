@@ -179,6 +179,19 @@ class CoachSessionService:
 
         style_prompt = get_style_prompt(session.style_id)
         context_prompt = build_context_prompt(self._store, session.user_id)
+        retrieval_error = None
+        relevant_memories = []
+        try:
+            relevant_memories = self._memory_service.retrieve_relevant(
+                user_id=session.user_id,
+                query=user_message,
+                limit=3,
+            )
+        except Exception as error:
+            retrieval_error = str(error)
+
+        if relevant_memories:
+            context_prompt["relevant_memory_summaries"] = list(relevant_memories)
 
         try:
             response = self._model_gateway.run(
@@ -193,26 +206,37 @@ class CoachSessionService:
                     "system_prompt": get_system_prompt(),
                     "style_prompt": style_prompt,
                     "context_prompt": context_prompt,
+                    "relevant_memories": list(relevant_memories),
                 },
             )
             if not response.output_text or not response.output_text.strip():
                 raise ValueError("Gateway returned empty coach output_text")
 
-            return response.output_text.strip(), {
+            model_info = {
                 "provider": response.provider,
                 "trace_id": response.trace_id,
                 "task_type": response.task_type,
                 "latency_ms": round(response.latency_ms, 3),
+                "relevant_memory_count": len(relevant_memories),
             }
+            if retrieval_error:
+                model_info["memory_retrieval_error"] = retrieval_error
+
+            return response.output_text.strip(), model_info
         except Exception as error:
             fallback = self._fallback_coach_reply(style_id=session.style_id, user_message=user_message)
-            return fallback, {
+            model_info = {
                 "provider": "fallback-local-template",
                 "trace_id": None,
                 "task_type": ModelTaskType.COACH_GENERATION,
                 "latency_ms": 0.0,
                 "error": str(error),
+                "relevant_memory_count": len(relevant_memories),
             }
+            if retrieval_error:
+                model_info["memory_retrieval_error"] = retrieval_error
+
+            return fallback, model_info
 
     @staticmethod
     def _fallback_coach_reply(style_id: str, user_message: str) -> str:
