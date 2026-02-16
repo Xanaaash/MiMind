@@ -8,6 +8,7 @@ from modules.triage.models import RiskLevel
 class ModelTaskType:
     SAFETY_NLU_FAST = "safety_nlu_fast"
     SAFETY_SEMANTIC_JUDGE = "safety_semantic_judge"
+    COACH_GENERATION = "coach_generation"
 
 
 @dataclass
@@ -26,6 +27,7 @@ class ModelGatewayResponse:
     risk_level: Optional[RiskLevel]
     reasons: List[str]
     latency_ms: float
+    output_text: Optional[str] = None
     trace_id: str = field(default_factory=lambda: str(uuid4()))
     raw: Dict[str, Any] = field(default_factory=dict)
 
@@ -36,6 +38,7 @@ class ModelGatewayResponse:
             "risk_level": self.risk_level.name.lower() if self.risk_level else None,
             "reasons": list(self.reasons),
             "latency_ms": round(self.latency_ms, 3),
+            "output_text": self.output_text,
             "trace_id": self.trace_id,
             "raw": dict(self.raw),
         }
