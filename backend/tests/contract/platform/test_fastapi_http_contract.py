@@ -19,6 +19,18 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "ok")
 
+    def test_prompt_catalog_http(self) -> None:
+        packs = self.client.get("/api/prompts/packs")
+        self.assertEqual(packs.status_code, 200)
+        payload = packs.json()
+        self.assertIn("2026.02.0", payload)
+        self.assertIn("2026.02.1", payload)
+
+        active = self.client.get("/api/prompts/active")
+        self.assertEqual(active.status_code, 200)
+        active_payload = active.json()
+        self.assertIn("active_version", active_payload)
+
     def test_register_and_assessment_flow(self) -> None:
         email = f"api-{uuid4().hex[:8]}@example.com"
 

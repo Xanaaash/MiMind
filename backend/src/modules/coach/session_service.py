@@ -9,6 +9,7 @@ from modules.memory.service import MemoryService
 from modules.model_gateway.models import ModelTaskType
 from modules.model_gateway.service import ModelGatewayService
 from modules.prompt.context.builder import build_context_prompt
+from modules.prompt.registry.runtime import get_prompt_registry
 from modules.prompt.styles.registry import get_style_prompt
 from modules.prompt.system.prompt import get_system_prompt
 from modules.safety.service import SafetyRuntimeService
@@ -36,6 +37,7 @@ class CoachSessionService:
 
         style = get_style_prompt(style_id)
         context = build_context_prompt(self._store, user_id)
+        prompt_pack_version = get_prompt_registry().get_active_version()
 
         session = CoachSession(
             session_id=str(uuid.uuid4()),
@@ -51,6 +53,7 @@ class CoachSessionService:
                 "style": style,
                 "context": context,
             },
+            "prompt_pack_version": prompt_pack_version,
         }
 
     def chat(self, session_id: str, user_message: str, dialogue_risk: Optional[DialogueRiskSignal]) -> dict:

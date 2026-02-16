@@ -63,6 +63,7 @@ class CoachAPIContractTests(unittest.TestCase):
         )
         self.assertEqual(start_status, 200)
         self.assertIn("prompt_stack", start_body["data"])
+        self.assertIn("prompt_pack_version", start_body["data"])
         session_id = start_body["data"]["session"]["session_id"]
 
         chat_status, chat_body = self.coach_api.post_chat(

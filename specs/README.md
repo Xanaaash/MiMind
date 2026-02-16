@@ -13,5 +13,6 @@ Initialized from `roadmap.md` (v2.0, 2026-02-15).
 | `007-scale-test-foundation` | P0/P1 | 量表扩展(SCL-90)、测试扩展与输入契约 |
 | `008-model-gateway-and-evals` | P0 | 模型网关抽象、安全路由与评测基线 |
 | `009-provider-routing-coach` | P0/P1 | provider路由与coach生成接入网关 |
+| `010-prompt-registry-rollout` | P0 | prompt版本注册、激活与回滚 |
 
 Use `scripts/spec-status.sh` to view document completeness.
