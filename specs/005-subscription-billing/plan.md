@@ -19,10 +19,10 @@ Implement billing engine, entitlement service, trial lifecycle, and quota enforc
 
 ## Constitution Check
 
-- [ ] Product boundary: Billing copy avoids medical claims
-- [ ] Safety redlines: Access controls enforce non-green restrictions
-- [ ] Safety mechanism: Entitlement checks integrated before AI use
-- [ ] Technical standards: Unit/API/Safety tests included
+- [x] Product boundary: Billing copy avoids medical claims
+- [x] Safety redlines: Access controls enforce non-green restrictions
+- [x] Safety mechanism: Entitlement checks integrated before AI use
+- [x] Technical standards: Unit/API/Safety tests included
 
 ## Project Structure
 

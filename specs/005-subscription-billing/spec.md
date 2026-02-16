@@ -2,7 +2,7 @@
 
 **Feature Branch**: `[005-subscription-billing]`
 **Created**: 2026-02-15
-**Status**: Draft
+**Status**: Implemented (Prototype)
 **Input**: roadmap.md pricing model and entitlement rules
 
 ## User Scenarios & Testing *(mandatory)*

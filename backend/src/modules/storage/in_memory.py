@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 from modules.assessment.models import AssessmentScoreSet, AssessmentSubmission, ReassessmentSchedule
+from modules.billing.models import SubscriptionRecord
 from modules.coach.models import CoachSession
 from modules.compliance.models import ConsentRecord
 from modules.journal.models import JournalEntry
@@ -27,6 +28,8 @@ class InMemoryStore:
     memory_summaries: Dict[str, List[str]] = field(default_factory=dict)
     journal_entries: Dict[str, List[JournalEntry]] = field(default_factory=dict)
     tool_events: Dict[str, List[dict]] = field(default_factory=dict)
+    subscriptions: Dict[str, SubscriptionRecord] = field(default_factory=dict)
+    processed_webhooks: set = field(default_factory=set)
 
     def save_user(self, user: User) -> None:
         self.users[user.user_id] = user
@@ -63,6 +66,12 @@ class InMemoryStore:
     def save_tool_event(self, user_id: str, event: dict) -> None:
         self.tool_events.setdefault(user_id, []).append(event)
 
+    def save_subscription(self, subscription: SubscriptionRecord) -> None:
+        self.subscriptions[subscription.user_id] = subscription
+
+    def mark_webhook_processed(self, event_id: str) -> None:
+        self.processed_webhooks.add(event_id)
+
     def get_user(self, user_id: str) -> Optional[User]:
         return self.users.get(user_id)
 
@@ -90,3 +99,9 @@ class InMemoryStore:
 
     def list_journal_entries(self, user_id: str) -> List[JournalEntry]:
         return list(self.journal_entries.get(user_id, []))
+
+    def get_subscription(self, user_id: str) -> Optional[SubscriptionRecord]:
+        return self.subscriptions.get(user_id)
+
+    def is_webhook_processed(self, event_id: str) -> bool:
+        return event_id in self.processed_webhooks

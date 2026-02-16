@@ -14,5 +14,13 @@ class CoachAccessGuard:
         if triage.channel != TriageChannel.GREEN:
             raise ValueError("AI coaching is only available for green channel users")
 
+        subscription = self._store.get_subscription(user_id)
+        if subscription is not None:
+            if subscription.status != "active" or subscription.plan_id != "coach":
+                raise ValueError("Active coach subscription is required")
+            if subscription.quota_remaining() <= 0:
+                raise ValueError("Monthly AI session quota exhausted")
+            return
+
         if not subscription_active:
             raise ValueError("Active coach subscription is required")

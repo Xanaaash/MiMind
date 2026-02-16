@@ -24,6 +24,11 @@ class CoachSessionService:
 
     def start_session(self, user_id: str, style_id: str, subscription_active: bool) -> dict:
         self._access_guard.ensure_session_access(user_id=user_id, subscription_active=subscription_active)
+
+        subscription = self._store.get_subscription(user_id)
+        if subscription is not None and subscription.plan_id == "coach":
+            subscription.ai_used_in_cycle += 1
+
         style = get_style_prompt(style_id)
         context = build_context_prompt(self._store, user_id)
 
