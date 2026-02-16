@@ -2,7 +2,7 @@
 
 **Feature Branch**: `[004-healing-tools]`
 **Created**: 2026-02-15
-**Status**: Draft
+**Status**: Implemented (Prototype)
 **Input**: roadmap.md healing tools + P1 journal scope
 
 ## User Scenarios & Testing *(mandatory)*

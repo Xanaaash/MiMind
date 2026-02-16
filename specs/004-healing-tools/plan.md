@@ -19,10 +19,10 @@ Build MVP healing tools and mood journal with backend APIs and AI context integr
 
 ## Constitution Check
 
-- [ ] Product boundary: No treatment claims in tool copy
-- [ ] Safety redlines: Emotional language remains non-diagnostic
-- [ ] Safety mechanism: Journal risk signals forwarded to feature 006
-- [ ] Technical standards: Unit/API/Safety tests included
+- [x] Product boundary: No treatment claims in tool copy
+- [x] Safety redlines: Emotional language remains non-diagnostic
+- [x] Safety mechanism: Journal risk signals forwarded to feature 006
+- [x] Technical standards: Unit/API/Safety tests included
 
 ## Project Structure
 
