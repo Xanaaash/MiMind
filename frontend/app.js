@@ -1,137 +1,74 @@
 const HOTLINES = [
-  {
-    locale: "en-US",
-    title: "US/Canada 988 Suicide & Crisis Lifeline",
-    action: "Call or text 988",
-  },
-  {
-    locale: "zh-CN",
-    title: "中国生命危机干预热线（示例）",
-    action: "北京心理援助热线：800-810-1117",
-  },
-  {
-    locale: "global",
-    title: "Emergency services",
-    action: "Call local emergency number immediately if there is immediate danger.",
-  },
+  "US/Canada 988 Suicide & Crisis Lifeline: call/text 988",
+  "中国心理援助热线示例: 800-810-1117",
+  "若有即时危险，请立即联系当地紧急服务。",
 ];
 
-const TEXT = {
-  zh: {
-    "app.title": "温暖自我探索空间",
-    "app.apiBase": "API 地址",
-    "hero.kicker": "Constitution 对齐",
-    "hero.title": "先被理解，再一起前进。",
-    "hero.subtitle": "这里是心理教练产品，不是医疗诊疗服务。我们帮助你进行自我认知、情绪调节与成长练习。",
-    "hero.pill1": "非医疗，不做诊断/处方",
-    "hero.pill2": "风险优先，必要时暂停咨询",
-    "hero.pill3": "中英双语，移动端可用",
-    "onboarding.title": "1) 用户注册与基线测评",
-    "onboarding.desc": "先注册，再一键提交低风险示例测评，获取分流结果。",
-    "onboarding.locale": "语言偏好",
-    "onboarding.register": "注册用户",
-    "onboarding.userId": "当前 user_id",
-    "onboarding.baseline": "提交基线测评示例",
-    "tools.title": "2) 疗愈工具工作台",
-    "tools.desc": "白噪音、呼吸练习、正念引导，支持快速体验。",
-    "tools.load": "加载工具库",
-    "tools.audio": "白噪音",
-    "tools.minutes": "时长（分钟）",
-    "tools.startAudio": "开始播放",
-    "tools.cycles": "呼吸轮次",
-    "tools.finishBreathing": "完成呼吸练习",
-    "tools.meditation": "正念引导",
-    "tools.startMeditation": "开始正念",
-    "journal.title": "3) 情绪日记",
-    "journal.desc": "记录当下情绪与能量，查看近 7 天趋势。",
-    "journal.mood": "情绪标签",
-    "journal.energy": "能量值 (0-10)",
-    "journal.note": "笔记",
-    "journal.notePlaceholder": "今天最明显的感受是什么？",
-    "journal.save": "保存日记",
-    "journal.trend": "加载 7 天趋势",
-    "coach.title": "4) AI 心理教练",
-    "coach.desc": "仅作心理教练陪伴，不提供临床诊断、药物与处方建议。",
-    "coach.style": "风格",
-    "coach.subscription": "模拟 coach 订阅有效",
-    "coach.start": "开始会话",
-    "coach.end": "结束会话",
-    "coach.message": "消息",
-    "coach.messagePlaceholder": "输入你想被倾听的一段内容...",
-    "coach.send": "发送消息",
-    "safety.title": "安全与求助资源",
-    "safety.desc": "如果你正在经历紧急危险，请优先联系当地紧急服务或危机热线。以下号码为前端本地缓存示例。",
-    "log.title": "活动日志",
-    "log.desc": "展示前端对 API 的请求结果，便于开发调试。",
-  },
-  en: {
-    "app.title": "A Warm Space For Self-Discovery",
-    "app.apiBase": "API Base",
-    "hero.kicker": "Constitution Aligned",
-    "hero.title": "Feel understood first, then move forward.",
-    "hero.subtitle": "This is a non-medical coaching product. It supports self-awareness, emotional regulation, and growth routines.",
-    "hero.pill1": "Non-medical: no diagnosis or prescriptions",
-    "hero.pill2": "Safety first: pause coaching on risk",
-    "hero.pill3": "Bilingual and mobile friendly",
-    "onboarding.title": "1) Registration And Baseline Assessment",
-    "onboarding.desc": "Register first, then submit a low-risk sample assessment to get triage output.",
-    "onboarding.locale": "Locale",
-    "onboarding.register": "Register User",
-    "onboarding.userId": "Current user_id",
-    "onboarding.baseline": "Submit baseline sample",
-    "tools.title": "2) Healing Tools Studio",
-    "tools.desc": "White noise, breathing practice, and guided meditation in one place.",
-    "tools.load": "Load libraries",
-    "tools.audio": "White noise",
-    "tools.minutes": "Minutes",
-    "tools.startAudio": "Start audio",
-    "tools.cycles": "Breathing cycles",
-    "tools.finishBreathing": "Complete breathing",
-    "tools.meditation": "Meditation",
-    "tools.startMeditation": "Start meditation",
-    "journal.title": "3) Mood Journal",
-    "journal.desc": "Capture mood and energy, then inspect your 7-day trend.",
-    "journal.mood": "Mood",
-    "journal.energy": "Energy (0-10)",
-    "journal.note": "Note",
-    "journal.notePlaceholder": "What feeling stood out most today?",
-    "journal.save": "Save entry",
-    "journal.trend": "Load 7-day trend",
-    "coach.title": "4) AI Coach",
-    "coach.desc": "For psychological coaching only, not clinical diagnosis or medication advice.",
-    "coach.style": "Style",
-    "coach.subscription": "Simulate active coach subscription",
-    "coach.start": "Start session",
-    "coach.end": "End session",
-    "coach.message": "Message",
-    "coach.messagePlaceholder": "Type what you want to process right now...",
-    "coach.send": "Send message",
-    "safety.title": "Safety And Crisis Resources",
-    "safety.desc": "If you are in immediate danger, contact local emergency services first. Numbers below are local-cache examples in UI.",
-    "log.title": "Activity Log",
-    "log.desc": "Shows frontend request results for easier prototype debugging.",
-  },
+const BASELINE_RESPONSES = {
+  phq9: Array(9).fill(0),
+  gad7: Array(7).fill(0),
+  pss10: Array(10).fill(0),
+  cssrs: { q1: false, q2: false, q3: false, q4: false, q5: false, q6: false },
 };
 
 const state = {
-  lang: "zh",
   apiBase: "",
-  userId: "",
+  isAuthenticated: false,
+  activeModule: "home",
+  authConfig: null,
+  demoUserId: "",
+  demoUserReady: false,
+  demoAssessmentReady: false,
+  scaleCatalog: null,
+  selectedScaleId: "",
+  selectedScale: null,
+  scaleAnswers: {},
+  scalePage: 0,
+  testsCatalog: null,
+  selectedTestId: "",
+  selectedTest: null,
+  testQuestionAnswers: {},
   coachSessionId: "",
   audioTracks: [],
   meditations: [],
 };
 
 const nodes = {
+  globalAlert: document.getElementById("globalAlert"),
+  authGate: document.getElementById("authGate"),
+  adminApp: document.getElementById("adminApp"),
   apiBase: document.getElementById("apiBase"),
-  langToggle: document.getElementById("langToggle"),
-  registerForm: document.getElementById("registerForm"),
-  regEmail: document.getElementById("regEmail"),
-  regLocale: document.getElementById("regLocale"),
-  userId: document.getElementById("userId"),
-  baselineAssessBtn: document.getElementById("baselineAssessBtn"),
-  triageBadge: document.getElementById("triageBadge"),
-  loadLibrariesBtn: document.getElementById("loadLibrariesBtn"),
+  loginForm: document.getElementById("loginForm"),
+  loginUsername: document.getElementById("loginUsername"),
+  loginPassword: document.getElementById("loginPassword"),
+  loginError: document.getElementById("loginError"),
+  logoutBtn: document.getElementById("logoutBtn"),
+  moduleNav: document.getElementById("moduleNav"),
+  jumpButtons: document.querySelectorAll(".jump-btn"),
+  hotlineList: document.getElementById("hotlineList"),
+  activityLog: document.getElementById("activityLog"),
+  demoUserId: document.getElementById("demoUserId"),
+
+  loadScaleCatalogBtn: document.getElementById("loadScaleCatalogBtn"),
+  scaleCatalog: document.getElementById("scaleCatalog"),
+  scaleWorkspace: document.getElementById("scaleWorkspace"),
+  scaleTitle: document.getElementById("scaleTitle"),
+  scaleProgress: document.getElementById("scaleProgress"),
+  scaleForm: document.getElementById("scaleForm"),
+  scalePrevBtn: document.getElementById("scalePrevBtn"),
+  scaleNextBtn: document.getElementById("scaleNextBtn"),
+  scaleSubmitBtn: document.getElementById("scaleSubmitBtn"),
+  scaleResult: document.getElementById("scaleResult"),
+
+  loadTestsCatalogBtn: document.getElementById("loadTestsCatalogBtn"),
+  testsCatalog: document.getElementById("testsCatalog"),
+  testWorkspace: document.getElementById("testWorkspace"),
+  testTitle: document.getElementById("testTitle"),
+  testForm: document.getElementById("testForm"),
+  testSubmitBtn: document.getElementById("testSubmitBtn"),
+  testResult: document.getElementById("testResult"),
+
+  loadToolLibraryBtn: document.getElementById("loadToolLibraryBtn"),
   audioTrack: document.getElementById("audioTrack"),
   audioMinutes: document.getElementById("audioMinutes"),
   startAudioBtn: document.getElementById("startAudioBtn"),
@@ -139,6 +76,7 @@ const nodes = {
   completeBreathingBtn: document.getElementById("completeBreathingBtn"),
   meditationId: document.getElementById("meditationId"),
   startMeditationBtn: document.getElementById("startMeditationBtn"),
+
   journalForm: document.getElementById("journalForm"),
   journalMood: document.getElementById("journalMood"),
   journalEnergy: document.getElementById("journalEnergy"),
@@ -146,6 +84,7 @@ const nodes = {
   journalNote: document.getElementById("journalNote"),
   loadTrendBtn: document.getElementById("loadTrendBtn"),
   trendView: document.getElementById("trendView"),
+
   coachStyle: document.getElementById("coachStyle"),
   coachSubscription: document.getElementById("coachSubscription"),
   startCoachBtn: document.getElementById("startCoachBtn"),
@@ -153,14 +92,15 @@ const nodes = {
   coachForm: document.getElementById("coachForm"),
   coachMessage: document.getElementById("coachMessage"),
   coachReply: document.getElementById("coachReply"),
-  hotlineList: document.getElementById("hotlineList"),
+
   crisisBanner: document.getElementById("crisisBanner"),
-  activityLog: document.getElementById("activityLog"),
+
+  checkAdminUsersBtn: document.getElementById("checkAdminUsersBtn"),
+  adminUsersResult: document.getElementById("adminUsersResult"),
 };
 
 function defaultApiBase() {
-  const hasHttpOrigin = window.location.protocol === "http:" || window.location.protocol === "https:";
-  if (hasHttpOrigin && window.location.host) {
+  if ((window.location.protocol === "http:" || window.location.protocol === "https:") && window.location.host) {
     return window.location.origin;
   }
   return "http://127.0.0.1:8000";
@@ -170,101 +110,420 @@ function normalizeBase(base) {
   return String(base || "").trim().replace(/\/$/, "");
 }
 
-function setLang(nextLang) {
-  state.lang = nextLang;
-  document.documentElement.lang = nextLang === "zh" ? "zh-CN" : "en-US";
-  nodes.langToggle.textContent = nextLang === "zh" ? "EN" : "中";
-
-  document.querySelectorAll("[data-i18n]").forEach((el) => {
-    const key = el.getAttribute("data-i18n");
-    const value = TEXT[nextLang][key];
-    if (value) {
-      el.textContent = value;
-    }
-  });
-
-  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
-    const key = el.getAttribute("data-i18n-placeholder");
-    const value = TEXT[nextLang][key];
-    if (value) {
-      el.setAttribute("placeholder", value);
-    }
-  });
+function showGlobalAlert(message) {
+  nodes.globalAlert.textContent = message;
+  nodes.globalAlert.classList.remove("hidden");
 }
 
-function renderHotlines() {
-  nodes.hotlineList.innerHTML = "";
-  HOTLINES.forEach((item) => {
-    const li = document.createElement("li");
-    li.textContent = `${item.title}: ${item.action}`;
-    nodes.hotlineList.appendChild(li);
-  });
+function hideGlobalAlert() {
+  nodes.globalAlert.classList.add("hidden");
+  nodes.globalAlert.textContent = "";
 }
 
-function appendLog(title, payload, type = "info") {
+function logActivity(title, payload, isError = false) {
   const li = document.createElement("li");
   const stamp = new Date().toLocaleTimeString();
   li.innerHTML = `<strong>[${stamp}] ${title}</strong><pre>${JSON.stringify(payload, null, 2)}</pre>`;
-  if (type === "error") {
-    li.style.borderColor = "#e8abab";
+  if (isError) {
     li.style.background = "#fff0f0";
+    li.style.borderColor = "#e2aaaa";
   }
   nodes.activityLog.prepend(li);
 }
 
-function showError(context, error) {
-  const message = error instanceof Error ? error.message : String(error);
-  appendLog(`${context} failed`, { error: message }, "error");
-}
-
-function updateTriage(channel) {
-  const tag = nodes.triageBadge;
-  tag.className = "tag";
-  if (channel === "green" || channel === "yellow" || channel === "red") {
-    tag.classList.add(channel);
-    tag.textContent = channel.toUpperCase();
-    return;
-  }
-  tag.classList.add("neutral");
-  tag.textContent = "-";
-}
-
-function ensureUser() {
-  if (!state.userId) {
-    throw new Error("Please register user first.");
+function setAuthState(authenticated) {
+  state.isAuthenticated = authenticated;
+  if (authenticated) {
+    nodes.authGate.classList.add("hidden");
+    nodes.adminApp.classList.remove("hidden");
+  } else {
+    nodes.authGate.classList.remove("hidden");
+    nodes.adminApp.classList.add("hidden");
+    state.coachSessionId = "";
   }
 }
 
-async function request(path, options = {}) {
+function switchModule(moduleId) {
+  state.activeModule = moduleId;
+  document.querySelectorAll(".nav-btn").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.module === moduleId);
+  });
+  document.querySelectorAll("[data-module-panel]").forEach((panel) => {
+    panel.classList.toggle("active", panel.dataset.modulePanel === moduleId);
+  });
+}
+
+async function api(path, options = {}, requireAuth = true) {
   state.apiBase = normalizeBase(nodes.apiBase.value);
   if (!state.apiBase) {
-    throw new Error("API base is required.");
+    throw new Error("API base is required");
   }
 
-  const config = {
+  const requestInit = {
     method: options.method || "GET",
     headers: {
       "Content-Type": "application/json",
       ...(options.headers || {}),
     },
+    credentials: "include",
   };
+
   if (options.body !== undefined) {
-    config.body = JSON.stringify(options.body);
+    requestInit.body = JSON.stringify(options.body);
   }
 
   let response;
   try {
-    response = await fetch(`${state.apiBase}${path}`, config);
+    response = await fetch(`${state.apiBase}${path}`, requestInit);
   } catch (error) {
+    showGlobalAlert(`网络错误: ${String(error)}`);
     throw new Error(`Network error: ${String(error)}`);
   }
 
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const message = body.detail || body.error || "Request failed";
-    throw new Error(message);
+    const detail = body.detail || body.error || "Request failed";
+    if (response.status === 401 && requireAuth) {
+      setAuthState(false);
+    }
+    throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
   }
+  hideGlobalAlert();
   return body;
+}
+
+function renderHotlines() {
+  nodes.hotlineList.innerHTML = "";
+  HOTLINES.forEach((line) => {
+    const li = document.createElement("li");
+    li.textContent = line;
+    nodes.hotlineList.appendChild(li);
+  });
+}
+
+async function restoreSession() {
+  try {
+    const data = await api("/api/admin/session", {}, false);
+    state.authConfig = data.auth_config || null;
+    setAuthState(true);
+    logActivity("session restored", data);
+    return true;
+  } catch {
+    setAuthState(false);
+    return false;
+  }
+}
+
+async function ensureDemoUser() {
+  if (state.demoUserReady && state.demoUserId) {
+    return state.demoUserId;
+  }
+
+  const payload = {
+    email: `demo-${Date.now()}@example.com`,
+    locale: "zh-CN",
+    policy_version: "2026.02",
+  };
+  const data = await api("/api/register", { method: "POST", body: payload });
+  state.demoUserId = data.user_id;
+  state.demoUserReady = true;
+  nodes.demoUserId.textContent = state.demoUserId;
+  logActivity("demo user created", data);
+  return state.demoUserId;
+}
+
+async function ensureDemoAssessment() {
+  const userId = await ensureDemoUser();
+  if (state.demoAssessmentReady) {
+    return;
+  }
+
+  const data = await api(`/api/assessment/${userId}`, {
+    method: "POST",
+    body: {
+      responses: BASELINE_RESPONSES,
+    },
+  });
+  state.demoAssessmentReady = true;
+  logActivity("demo baseline assessment submitted", data);
+}
+
+function inferNumericRange(answerRange) {
+  const text = String(answerRange || "").toLowerCase();
+  if (text.includes("-100 to 100")) {
+    return { min: -100, max: 100, step: 1 };
+  }
+  if (text.includes("13 to 90")) {
+    return { min: 13, max: 90, step: 1 };
+  }
+  return { min: 0, max: 100, step: 1 };
+}
+
+function scalePageSize(scaleId) {
+  return scaleId === "scl90" ? 15 : 200;
+}
+
+function scaleQuestions() {
+  return state.selectedScale?.question_bank?.questions || [];
+}
+
+function scaleAnswerLabels() {
+  const labels = state.selectedScale?.question_bank?.answer_labels;
+  if (!labels) {
+    return null;
+  }
+  return labels["zh-CN"] || labels["en-US"] || null;
+}
+
+function renderScaleCatalog() {
+  nodes.scaleCatalog.innerHTML = "";
+  if (!state.scaleCatalog) {
+    return;
+  }
+
+  Object.entries(state.scaleCatalog).forEach(([scaleId, item]) => {
+    const card = document.createElement("article");
+    card.className = "catalog-item";
+    card.innerHTML = `
+      <h4>${scaleId.toUpperCase()}</h4>
+      <p>${item.display_name}</p>
+      <p>题数: ${item.item_count}</p>
+      <button data-scale-id="${scaleId}" type="button">开始</button>
+    `;
+    nodes.scaleCatalog.appendChild(card);
+  });
+
+  nodes.scaleCatalog.querySelectorAll("button[data-scale-id]").forEach((btn) => {
+    btn.addEventListener("click", () => startScale(btn.dataset.scaleId));
+  });
+}
+
+function startScale(scaleId) {
+  const item = state.scaleCatalog[scaleId];
+  state.selectedScaleId = scaleId;
+  state.selectedScale = item;
+  state.scalePage = 0;
+
+  const questions = item.question_bank.questions;
+  questions.forEach((q) => {
+    if (!(q.question_id in state.scaleAnswers)) {
+      state.scaleAnswers[q.question_id] = scaleId === "cssrs" ? false : 0;
+    }
+  });
+
+  nodes.scaleWorkspace.classList.remove("hidden");
+  nodes.scaleTitle.textContent = `${scaleId.toUpperCase()} - ${item.display_name}`;
+  renderScalePage();
+  switchModule("clinical_scales");
+}
+
+function renderScalePage() {
+  if (!state.selectedScale) {
+    return;
+  }
+
+  const questions = scaleQuestions();
+  const pageSize = scalePageSize(state.selectedScaleId);
+  const start = state.scalePage * pageSize;
+  const end = Math.min(start + pageSize, questions.length);
+  const pageQuestions = questions.slice(start, end);
+  const labels = scaleAnswerLabels();
+
+  nodes.scaleProgress.textContent = `题目 ${start + 1}-${end} / ${questions.length}`;
+  nodes.scaleForm.innerHTML = "";
+
+  pageQuestions.forEach((q, index) => {
+    const wrap = document.createElement("div");
+    wrap.className = "question";
+
+    const qText = q.text?.["zh-CN"] || q.text?.["en-US"] || q.question_id;
+    const qNo = start + index + 1;
+
+    if (state.selectedScaleId === "cssrs") {
+      wrap.innerHTML = `
+        <label>
+          <strong>${qNo}. ${qText}</strong>
+          <select data-scale-question-id="${q.question_id}">
+            <option value="false">否</option>
+            <option value="true">是</option>
+          </select>
+        </label>
+      `;
+      const select = wrap.querySelector("select");
+      select.value = String(Boolean(state.scaleAnswers[q.question_id]));
+      select.addEventListener("change", () => {
+        state.scaleAnswers[q.question_id] = select.value === "true";
+      });
+    } else {
+      const options = (labels || []).map((label, value) => `<option value="${value}">${value}: ${label}</option>`).join("");
+      wrap.innerHTML = `
+        <label>
+          <strong>${qNo}. ${qText}</strong>
+          <select data-scale-question-id="${q.question_id}">${options}</select>
+        </label>
+      `;
+      const select = wrap.querySelector("select");
+      select.value = String(Number(state.scaleAnswers[q.question_id] ?? 0));
+      select.addEventListener("change", () => {
+        state.scaleAnswers[q.question_id] = Number(select.value);
+      });
+    }
+
+    nodes.scaleForm.appendChild(wrap);
+  });
+
+  nodes.scalePrevBtn.disabled = state.scalePage === 0;
+  nodes.scaleNextBtn.disabled = end >= questions.length;
+}
+
+function scalePayload() {
+  const questions = scaleQuestions();
+  if (state.selectedScaleId === "cssrs") {
+    const answers = {};
+    questions.forEach((q) => {
+      answers[q.question_id] = Boolean(state.scaleAnswers[q.question_id]);
+    });
+    return { scale_id: state.selectedScaleId, answers };
+  }
+
+  const answers = questions.map((q) => Number(state.scaleAnswers[q.question_id] ?? 0));
+  return { scale_id: state.selectedScaleId, answers };
+}
+
+async function submitScale() {
+  if (!state.selectedScaleId) {
+    throw new Error("请先选择量表");
+  }
+  const payload = scalePayload();
+  const data = await api("/api/scales/score", { method: "POST", body: payload });
+  nodes.scaleResult.textContent = JSON.stringify(data, null, 2);
+  logActivity(`scale scored: ${state.selectedScaleId}`, data);
+}
+
+function renderTestsCatalog() {
+  nodes.testsCatalog.innerHTML = "";
+  if (!state.testsCatalog) {
+    return;
+  }
+
+  Object.entries(state.testsCatalog).forEach(([testId, item]) => {
+    const card = document.createElement("article");
+    card.className = "catalog-item";
+    card.innerHTML = `
+      <h4>${testId}</h4>
+      <p>${item.display_name}</p>
+      <p>维度: ${item.input_dimension_count}</p>
+      <button data-test-id="${testId}" type="button">开始</button>
+    `;
+    nodes.testsCatalog.appendChild(card);
+  });
+
+  nodes.testsCatalog.querySelectorAll("button[data-test-id]").forEach((btn) => {
+    btn.addEventListener("click", () => startTest(btn.dataset.testId));
+  });
+}
+
+async function startTest(testId) {
+  const data = await api(`/api/tests/catalog/${testId}`);
+  state.selectedTestId = testId;
+  state.selectedTest = data;
+  state.testQuestionAnswers = {};
+
+  nodes.testWorkspace.classList.remove("hidden");
+  nodes.testTitle.textContent = `${testId} - ${data.display_name}`;
+
+  const range = inferNumericRange(data.answer_range);
+  nodes.testForm.innerHTML = "";
+  data.question_bank.questions.forEach((q, idx) => {
+    const text = q.text?.["zh-CN"] || q.text?.["en-US"] || q.question_id;
+    const initial = q.dimension_key === "chronological_age" ? 25 : Math.round((range.min + range.max) / 2);
+    state.testQuestionAnswers[q.question_id] = initial;
+
+    const wrap = document.createElement("div");
+    wrap.className = "question";
+    wrap.innerHTML = `
+      <label>
+        <strong>${idx + 1}. ${text}</strong>
+        <input data-test-question-id="${q.question_id}" type="range" min="${range.min}" max="${range.max}" step="${range.step}" value="${initial}" />
+        <span id="test-value-${q.question_id}">${initial}</span>
+      </label>
+    `;
+    nodes.testForm.appendChild(wrap);
+  });
+
+  nodes.testForm.querySelectorAll("input[data-test-question-id]").forEach((input) => {
+    input.addEventListener("input", () => {
+      const qid = input.dataset.testQuestionId;
+      state.testQuestionAnswers[qid] = Number(input.value);
+      const view = document.getElementById(`test-value-${qid}`);
+      if (view) {
+        view.textContent = String(input.value);
+      }
+    });
+  });
+
+  switchModule("interactive_tests");
+}
+
+function buildInteractiveAnswers() {
+  const definition = state.selectedTest;
+  const questions = definition.question_bank.questions;
+
+  const sums = {};
+  const counts = {};
+  questions.forEach((q) => {
+    const value = Number(state.testQuestionAnswers[q.question_id] ?? 0);
+    const key = q.dimension_key;
+    sums[key] = (sums[key] || 0) + value;
+    counts[key] = (counts[key] || 0) + 1;
+  });
+
+  const answers = {};
+  definition.required_answer_keys.forEach((key) => {
+    if (counts[key]) {
+      answers[key] = Math.round(sums[key] / counts[key]);
+    } else {
+      answers[key] = 0;
+    }
+  });
+  return answers;
+}
+
+async function submitInteractiveTest() {
+  if (!state.selectedTestId) {
+    throw new Error("请先选择互动测试");
+  }
+  const userId = await ensureDemoUser();
+  const answers = buildInteractiveAnswers();
+
+  const data = await api(`/api/tests/${userId}/submit`, {
+    method: "POST",
+    body: {
+      test_id: state.selectedTestId,
+      answers,
+    },
+  });
+  nodes.testResult.textContent = JSON.stringify(data, null, 2);
+  logActivity(`interactive test submitted: ${state.selectedTestId}`, data);
+}
+
+async function loadToolLibraries() {
+  const [audioData, meditationData] = await Promise.all([
+    api("/api/tools/audio/library"),
+    api("/api/tools/meditation/library"),
+  ]);
+
+  state.audioTracks = Object.entries(audioData).map(([trackId, value]) => ({ trackId, ...value }));
+  state.meditations = Object.entries(meditationData).map(([meditationId, value]) => ({ meditationId, ...value }));
+
+  nodes.audioTrack.innerHTML = state.audioTracks
+    .map((item) => `<option value="${item.trackId}">${item.trackId} - ${item.name}</option>`)
+    .join("");
+  nodes.meditationId.innerHTML = state.meditations
+    .map((item) => `<option value="${item.meditationId}">${item.meditationId} - ${item.name}</option>`)
+    .join("");
+
+  logActivity("tool libraries loaded", { audio_count: state.audioTracks.length, meditation_count: state.meditations.length });
 }
 
 function maybeShowCrisisBanner(payload) {
@@ -276,135 +535,159 @@ function maybeShowCrisisBanner(payload) {
   }
 
   const detection = payload.safety?.detection;
-  const hotlineText = payload.safety?.hotline?.text;
+  const hotline = payload.safety?.hotline?.text || "";
   const message = payload.coach_message || payload.safety?.action?.message || "";
-  const summary = [message, detection ? `risk=${detection.level}` : "", hotlineText || ""].filter(Boolean).join(" | ");
-
+  nodes.crisisBanner.textContent = [message, detection ? `risk=${detection.level}` : "", hotline].filter(Boolean).join(" | ");
   nodes.crisisBanner.classList.remove("hidden");
-  nodes.crisisBanner.textContent = summary;
 }
 
-async function loadToolLibraries() {
-  const [audioData, meditationData] = await Promise.all([
-    request("/api/tools/audio/library"),
-    request("/api/tools/meditation/library"),
-  ]);
-
-  state.audioTracks = Object.entries(audioData).map(([trackId, value]) => ({ trackId, ...value }));
-  state.meditations = Object.entries(meditationData).map(([meditationId, value]) => ({
-    meditationId,
-    ...value,
-  }));
-
-  nodes.audioTrack.innerHTML = state.audioTracks
-    .map((item) => `<option value="${item.trackId}">${item.trackId} - ${item.name}</option>`)
-    .join("");
-  nodes.meditationId.innerHTML = state.meditations
-    .map((item) => `<option value="${item.meditationId}">${item.meditationId} - ${item.name}</option>`)
-    .join("");
-
-  appendLog("Loaded tool libraries", {
-    audioTracks: state.audioTracks.length,
-    meditations: state.meditations.length,
+function bindNavigation() {
+  nodes.moduleNav.querySelectorAll(".nav-btn").forEach((btn) => {
+    btn.addEventListener("click", () => switchModule(btn.dataset.module));
   });
-}
-
-function baselineResponses() {
-  return {
-    phq9: Array(9).fill(0),
-    gad7: Array(7).fill(0),
-    pss10: Array(10).fill(0),
-    cssrs: [false, false, false, false, false],
-  };
+  nodes.jumpButtons.forEach((btn) => {
+    btn.addEventListener("click", () => switchModule(btn.dataset.jump));
+  });
 }
 
 function bindEvents() {
-  nodes.langToggle.addEventListener("click", () => {
-    setLang(state.lang === "zh" ? "en" : "zh");
-  });
-
-  nodes.registerForm.addEventListener("submit", async (event) => {
+  nodes.loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    nodes.loginError.classList.add("hidden");
+    nodes.loginError.textContent = "";
+
     try {
-      const payload = {
-        email: nodes.regEmail.value,
-        locale: nodes.regLocale.value,
-        policy_version: "2026.02",
-      };
-      const data = await request("/api/register", { method: "POST", body: payload });
-      state.userId = data.user_id;
-      nodes.userId.textContent = data.user_id;
-      appendLog("Registered user", data);
+      const login = await api(
+        "/api/admin/login",
+        {
+          method: "POST",
+          body: {
+            username: nodes.loginUsername.value,
+            password: nodes.loginPassword.value,
+          },
+        },
+        false,
+      );
+      logActivity("admin login success", login);
+      await restoreSession();
+      switchModule("home");
+      nodes.loginPassword.value = "";
     } catch (error) {
-      showError("register", error);
+      nodes.loginError.textContent = error instanceof Error ? error.message : String(error);
+      nodes.loginError.classList.remove("hidden");
+      logActivity("admin login failed", { error: nodes.loginError.textContent }, true);
     }
   });
 
-  nodes.baselineAssessBtn.addEventListener("click", async () => {
+  nodes.logoutBtn.addEventListener("click", async () => {
     try {
-      ensureUser();
-      const payload = { responses: baselineResponses() };
-      const data = await request(`/api/assessment/${state.userId}`, {
-        method: "POST",
-        body: payload,
-      });
-      updateTriage(data.triage?.channel);
-      appendLog("Submitted baseline assessment", data);
-    } catch (error) {
-      showError("assessment", error);
+      const data = await api("/api/admin/logout", { method: "POST" }, false);
+      logActivity("admin logout", data);
+    } finally {
+      setAuthState(false);
     }
   });
 
-  nodes.loadLibrariesBtn.addEventListener("click", async () => {
+  nodes.loadScaleCatalogBtn.addEventListener("click", async () => {
+    try {
+      const data = await api("/api/scales/catalog");
+      state.scaleCatalog = data;
+      renderScaleCatalog();
+      logActivity("scale catalog loaded", { scale_count: Object.keys(data).length });
+    } catch (error) {
+      logActivity("scale catalog failed", { error: String(error) }, true);
+    }
+  });
+
+  nodes.scalePrevBtn.addEventListener("click", () => {
+    if (state.scalePage > 0) {
+      state.scalePage -= 1;
+      renderScalePage();
+    }
+  });
+
+  nodes.scaleNextBtn.addEventListener("click", () => {
+    const pageSize = scalePageSize(state.selectedScaleId);
+    if ((state.scalePage + 1) * pageSize < scaleQuestions().length) {
+      state.scalePage += 1;
+      renderScalePage();
+    }
+  });
+
+  nodes.scaleSubmitBtn.addEventListener("click", async () => {
+    try {
+      await submitScale();
+    } catch (error) {
+      logActivity("submit scale failed", { error: String(error) }, true);
+    }
+  });
+
+  nodes.loadTestsCatalogBtn.addEventListener("click", async () => {
+    try {
+      const data = await api("/api/tests/catalog");
+      state.testsCatalog = data;
+      renderTestsCatalog();
+      logActivity("tests catalog loaded", { test_count: Object.keys(data).length });
+    } catch (error) {
+      logActivity("tests catalog failed", { error: String(error) }, true);
+    }
+  });
+
+  nodes.testSubmitBtn.addEventListener("click", async () => {
+    try {
+      await submitInteractiveTest();
+    } catch (error) {
+      logActivity("submit interactive test failed", { error: String(error) }, true);
+    }
+  });
+
+  nodes.loadToolLibraryBtn.addEventListener("click", async () => {
     try {
       await loadToolLibraries();
     } catch (error) {
-      showError("load libraries", error);
+      logActivity("load tool library failed", { error: String(error) }, true);
     }
   });
 
   nodes.startAudioBtn.addEventListener("click", async () => {
     try {
-      ensureUser();
-      const payload = {
-        track_id: nodes.audioTrack.value,
-        minutes: Number(nodes.audioMinutes.value),
-      };
-      const data = await request(`/api/tools/audio/${state.userId}/start`, {
+      const userId = await ensureDemoUser();
+      const data = await api(`/api/tools/audio/${userId}/start`, {
         method: "POST",
-        body: payload,
+        body: {
+          track_id: nodes.audioTrack.value,
+          minutes: Number(nodes.audioMinutes.value),
+        },
       });
-      appendLog("Started audio", data);
+      logActivity("audio started", data);
     } catch (error) {
-      showError("start audio", error);
+      logActivity("audio start failed", { error: String(error) }, true);
     }
   });
 
   nodes.completeBreathingBtn.addEventListener("click", async () => {
     try {
-      ensureUser();
-      const payload = { cycles: Number(nodes.breathingCycles.value) };
-      const data = await request(`/api/tools/breathing/${state.userId}/complete`, {
+      const userId = await ensureDemoUser();
+      const data = await api(`/api/tools/breathing/${userId}/complete`, {
         method: "POST",
-        body: payload,
+        body: { cycles: Number(nodes.breathingCycles.value) },
       });
-      appendLog("Completed breathing", data);
+      logActivity("breathing completed", data);
     } catch (error) {
-      showError("breathing", error);
+      logActivity("breathing failed", { error: String(error) }, true);
     }
   });
 
   nodes.startMeditationBtn.addEventListener("click", async () => {
     try {
-      ensureUser();
-      const payload = { meditation_id: nodes.meditationId.value };
-      const data = await request(`/api/tools/meditation/${state.userId}/start`, {
+      const userId = await ensureDemoUser();
+      const data = await api(`/api/tools/meditation/${userId}/start`, {
         method: "POST",
-        body: payload,
+        body: { meditation_id: nodes.meditationId.value },
       });
-      appendLog("Started meditation", data);
+      logActivity("meditation started", data);
     } catch (error) {
-      showError("meditation", error);
+      logActivity("meditation failed", { error: String(error) }, true);
     }
   });
 
@@ -415,50 +698,49 @@ function bindEvents() {
   nodes.journalForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     try {
-      ensureUser();
-      const payload = {
-        mood: nodes.journalMood.value,
-        energy: Number(nodes.journalEnergy.value),
-        note: nodes.journalNote.value,
-      };
-      const data = await request(`/api/tools/journal/${state.userId}/entries`, {
+      const userId = await ensureDemoUser();
+      const data = await api(`/api/tools/journal/${userId}/entries`, {
         method: "POST",
-        body: payload,
+        body: {
+          mood: nodes.journalMood.value,
+          energy: Number(nodes.journalEnergy.value),
+          note: nodes.journalNote.value,
+        },
       });
-      appendLog("Saved journal entry", data);
+      logActivity("journal saved", data);
     } catch (error) {
-      showError("journal", error);
+      logActivity("journal save failed", { error: String(error) }, true);
     }
   });
 
   nodes.loadTrendBtn.addEventListener("click", async () => {
     try {
-      ensureUser();
-      const data = await request(`/api/tools/journal/${state.userId}/trend?days=7`);
+      const userId = await ensureDemoUser();
+      const data = await api(`/api/tools/journal/${userId}/trend?days=7`);
       nodes.trendView.textContent = JSON.stringify(data, null, 2);
-      appendLog("Loaded journal trend", data);
+      logActivity("journal trend loaded", data);
     } catch (error) {
-      showError("journal trend", error);
+      logActivity("journal trend failed", { error: String(error) }, true);
     }
   });
 
   nodes.startCoachBtn.addEventListener("click", async () => {
     try {
-      ensureUser();
-      const payload = {
-        style_id: nodes.coachStyle.value,
-        subscription_active: nodes.coachSubscription.checked,
-      };
-      const data = await request(`/api/coach/${state.userId}/start`, {
+      const userId = await ensureDemoUser();
+      await ensureDemoAssessment();
+      const data = await api(`/api/coach/${userId}/start`, {
         method: "POST",
-        body: payload,
+        body: {
+          style_id: nodes.coachStyle.value,
+          subscription_active: nodes.coachSubscription.checked,
+        },
       });
       state.coachSessionId = data.session?.session_id || "";
       nodes.coachReply.textContent = JSON.stringify(data, null, 2);
       maybeShowCrisisBanner({ mode: "coaching" });
-      appendLog("Started coach session", data);
+      logActivity("coach session started", data);
     } catch (error) {
-      showError("start coach", error);
+      logActivity("coach start failed", { error: String(error) }, true);
     }
   });
 
@@ -466,51 +748,71 @@ function bindEvents() {
     event.preventDefault();
     try {
       if (!state.coachSessionId) {
-        throw new Error("Start a coach session first.");
+        throw new Error("请先开始会话");
       }
-      const payload = { user_message: nodes.coachMessage.value };
-      const data = await request(`/api/coach/${state.coachSessionId}/chat`, {
+      const data = await api(`/api/coach/${state.coachSessionId}/chat`, {
         method: "POST",
-        body: payload,
+        body: {
+          user_message: nodes.coachMessage.value,
+        },
       });
       nodes.coachReply.textContent = JSON.stringify(data, null, 2);
       maybeShowCrisisBanner(data);
-      appendLog("Coach chat", data);
+      logActivity("coach chat", data);
       if (data.halted) {
         state.coachSessionId = "";
       }
     } catch (error) {
-      showError("coach chat", error);
+      logActivity("coach chat failed", { error: String(error) }, true);
     }
   });
 
   nodes.endCoachBtn.addEventListener("click", async () => {
     try {
       if (!state.coachSessionId) {
-        throw new Error("No active coach session.");
+        throw new Error("当前没有活跃会话");
       }
-      const data = await request(`/api/coach/${state.coachSessionId}/end`, {
-        method: "POST",
-      });
+      const data = await api(`/api/coach/${state.coachSessionId}/end`, { method: "POST" });
       state.coachSessionId = "";
       nodes.coachReply.textContent = JSON.stringify(data, null, 2);
       maybeShowCrisisBanner({ mode: "coaching" });
-      appendLog("Ended coach session", data);
+      logActivity("coach session ended", data);
     } catch (error) {
-      showError("end coach", error);
+      logActivity("coach end failed", { error: String(error) }, true);
+    }
+  });
+
+  nodes.checkAdminUsersBtn.addEventListener("click", async () => {
+    try {
+      const data = await api("/api/admin/users");
+      nodes.adminUsersResult.textContent = JSON.stringify(data, null, 2);
+      logActivity("admin users endpoint", data);
+    } catch (error) {
+      const content = { error: String(error), note: "Expected 501 not implemented in this phase." };
+      nodes.adminUsersResult.textContent = JSON.stringify(content, null, 2);
+      logActivity("admin users endpoint response", content, true);
     }
   });
 }
 
-function init() {
+async function init() {
   nodes.apiBase.value = defaultApiBase();
   state.apiBase = normalizeBase(nodes.apiBase.value);
-  setLang("zh");
+
   renderHotlines();
+  bindNavigation();
   bindEvents();
-  appendLog("Frontend initialized", {
+  switchModule("home");
+
+  const restored = await restoreSession();
+  if (!restored) {
+    setAuthState(false);
+  }
+
+  logActivity("frontend initialized", {
     apiBase: state.apiBase,
-    note: "Non-medical coaching prototype UI",
+    auth_restored: restored,
+    safety_boundary: "non-medical coaching only",
   });
 }
 

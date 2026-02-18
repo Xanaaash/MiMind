@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
+from modules.admin.models import AdminSession
 from modules.assessment.models import AssessmentScoreSet, AssessmentSubmission, ReassessmentSchedule
 from modules.billing.models import SubscriptionRecord
 from modules.coach.models import CoachSession
@@ -34,6 +35,7 @@ class InMemoryStore:
     model_invocations: List[ModelInvocationRecord] = field(default_factory=list)
     subscriptions: Dict[str, SubscriptionRecord] = field(default_factory=dict)
     processed_webhooks: set = field(default_factory=set)
+    admin_sessions: Dict[str, AdminSession] = field(default_factory=dict)
 
     def save_user(self, user: User) -> None:
         self.users[user.user_id] = user
@@ -78,6 +80,9 @@ class InMemoryStore:
 
     def save_subscription(self, subscription: SubscriptionRecord) -> None:
         self.subscriptions[subscription.user_id] = subscription
+
+    def save_admin_session(self, session: AdminSession) -> None:
+        self.admin_sessions[session.session_id] = session
 
     def mark_webhook_processed(self, event_id: str) -> None:
         self.processed_webhooks.add(event_id)
@@ -125,6 +130,14 @@ class InMemoryStore:
 
     def get_subscription(self, user_id: str) -> Optional[SubscriptionRecord]:
         return self.subscriptions.get(user_id)
+
+    def get_admin_session(self, session_id: str) -> Optional[AdminSession]:
+        return self.admin_sessions.get(session_id)
+
+    def revoke_admin_session(self, session_id: str) -> None:
+        session = self.admin_sessions.get(session_id)
+        if session is not None:
+            session.revoked = True
 
     def list_model_invocations(self) -> List[ModelInvocationRecord]:
         return list(self.model_invocations)

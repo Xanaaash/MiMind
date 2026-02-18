@@ -7,6 +7,7 @@ from datetime import date, datetime
 from threading import Lock
 from typing import Any, Dict, List, Optional
 
+from modules.admin.models import AdminSession
 from modules.assessment.models import AssessmentScoreSet, AssessmentSubmission, ReassessmentSchedule
 from modules.storage.in_memory import InMemoryStore
 from modules.tests.models import TestResult
@@ -46,6 +47,15 @@ class SQLiteStore(InMemoryStore):
                 email TEXT NOT NULL,
                 locale TEXT NOT NULL,
                 created_at TEXT NOT NULL
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS admin_sessions (
+                session_id TEXT PRIMARY KEY,
+                username TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                expires_at TEXT NOT NULL,
+                revoked INTEGER NOT NULL
             )
             """,
             """
@@ -484,6 +494,66 @@ class SQLiteStore(InMemoryStore):
             summary=json.loads(row["summary_json"]),
             created_at=datetime.fromisoformat(row["created_at"]),
         )
+
+    def save_admin_session(self, session: AdminSession) -> None:
+        super().save_admin_session(session)
+        with self._lock:
+            self._connection.execute(
+                """
+                INSERT INTO admin_sessions (session_id, username, created_at, expires_at, revoked)
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(session_id) DO UPDATE SET
+                    username = excluded.username,
+                    created_at = excluded.created_at,
+                    expires_at = excluded.expires_at,
+                    revoked = excluded.revoked
+                """,
+                (
+                    session.session_id,
+                    session.username,
+                    session.created_at.isoformat(),
+                    session.expires_at.isoformat(),
+                    int(session.revoked),
+                ),
+            )
+            self._connection.commit()
+
+    def get_admin_session(self, session_id: str) -> Optional[AdminSession]:
+        in_memory = super().get_admin_session(session_id)
+        if in_memory is not None:
+            return in_memory
+
+        with self._lock:
+            row = self._connection.execute(
+                """
+                SELECT session_id, username, created_at, expires_at, revoked
+                FROM admin_sessions
+                WHERE session_id = ?
+                """,
+                (session_id,),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        session = AdminSession(
+            session_id=row["session_id"],
+            username=row["username"],
+            created_at=datetime.fromisoformat(row["created_at"]),
+            expires_at=datetime.fromisoformat(row["expires_at"]),
+            revoked=bool(row["revoked"]),
+        )
+        super().save_admin_session(session)
+        return session
+
+    def revoke_admin_session(self, session_id: str) -> None:
+        super().revoke_admin_session(session_id)
+        with self._lock:
+            self._connection.execute(
+                "UPDATE admin_sessions SET revoked = 1 WHERE session_id = ?",
+                (session_id,),
+            )
+            self._connection.commit()
 
     def erase_user_data(self, user_id: str) -> Dict[str, int]:
         with self._lock:

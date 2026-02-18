@@ -1,5 +1,7 @@
-from fastapi import Body, FastAPI, HTTPException, Query
+from fastapi import Body, FastAPI, HTTPException, Query, Request, Response
+from fastapi.responses import JSONResponse
 
+from modules.api.admin_endpoints import AdminAPI
 from modules.api.billing_endpoints import BillingAPI
 from modules.api.compliance_endpoints import DataGovernanceAPI
 from modules.api.coach_endpoints import CoachAPI
@@ -14,6 +16,7 @@ from modules.onboarding.service import OnboardingService
 from modules.storage import build_application_store
 
 store = build_application_store()
+admin_api = AdminAPI(store=store)
 onboarding_api = OnboardingAPI(service=OnboardingService(store))
 interactive_tests_api = InteractiveTestsAPI(store=store)
 coach_api = CoachAPI(store=store)
@@ -41,6 +44,52 @@ def _unwrap(status: int, body: dict) -> dict:
 @app.get("/healthz")
 def healthz() -> dict:
     return {"status": "ok"}
+
+
+@app.post("/api/admin/login")
+def admin_login(response: Response, payload: dict = Body(...)) -> dict:
+    status, body, session_id = admin_api.post_login(payload)
+    if status >= 400:
+        raise HTTPException(status_code=status, detail=body.get("error", "request failed"))
+
+    if session_id:
+        service = admin_api.service
+        response.set_cookie(
+            key=service.cookie_name(),
+            value=session_id,
+            max_age=service.cookie_max_age_seconds(),
+            httponly=True,
+            samesite=service.cookie_samesite(),
+            secure=service.cookie_secure(),
+            path=service.cookie_path(),
+        )
+    return body.get("data", {})
+
+
+@app.post("/api/admin/logout")
+def admin_logout(request: Request, response: Response) -> dict:
+    session_id = request.cookies.get(admin_api.service.cookie_name())
+    status, body = admin_api.post_logout(session_id=session_id)
+    response.delete_cookie(key=admin_api.service.cookie_name(), path=admin_api.service.cookie_path())
+    return _unwrap(status, body)
+
+
+@app.get("/api/admin/session")
+def admin_session(request: Request) -> dict:
+    session_id = request.cookies.get(admin_api.service.cookie_name())
+    status, body = admin_api.get_session(session_id=session_id)
+    return _unwrap(status, body)
+
+
+@app.get("/api/admin/users")
+def admin_users(request: Request) -> JSONResponse:
+    session_id = request.cookies.get(admin_api.service.cookie_name())
+    status, body = admin_api.get_users(session_id=session_id)
+    if status == 501:
+        return JSONResponse(status_code=501, content=body.get("error", {}))
+    if status >= 400:
+        raise HTTPException(status_code=status, detail=body.get("error", "request failed"))
+    return JSONResponse(status_code=200, content=body.get("data", {}))
 
 
 @app.post("/api/register")
