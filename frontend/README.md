@@ -1,26 +1,36 @@
-# Frontend Prototype (Warm Experience)
+# Admin Frontend Console
 
 ## Run
-
-1. Start full web app (API + frontend on same origin):
 
 ```bash
 scripts/run-web-app.sh
 ```
 
-2. Open:
+Open `http://127.0.0.1:8000`.
 
-```text
-http://127.0.0.1:8000
+## Admin auth
+
+- Username is fixed: `admin`
+- Password comes from env var `ADMIN_PASSWORD`
+- Session uses HttpOnly cookie `mc_admin_session`
+
+Example:
+
+```bash
+export ADMIN_PASSWORD="change-me-now"
+scripts/run-web-app.sh
+```
+
+Optional session TTL (hours, default `8`):
+
+```bash
+export ADMIN_SESSION_TTL_HOURS="8"
 ```
 
 ## Notes
 
-- UI includes bilingual switch (ZH/EN), non-medical boundary copy, and crisis resources panel.
-- Core flows available in one page:
-  - register
-  - baseline assessment sample
-  - tools (audio, breathing, meditation)
-  - journal + 7-day trend
-  - coach session start/chat/end
-- API base is editable in the top bar for alternate environments.
+- UI is login-gated and module-driven (sidebar on desktop, top tabs on mobile).
+- Homepage includes both entry cards:
+  - Clinical Scales Center
+  - Interactive Tests Center
+- Full user-management UI is deferred. Reserved endpoint `/api/admin/users` currently returns not-implemented response.
