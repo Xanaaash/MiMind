@@ -328,6 +328,17 @@
     "reward_title": "Well done!",
     "reward_desc": "{{count}} pomodoros completed today"
   },
+  "nd_disclaimer": {
+    "title": "Important: This Is Not a Clinical Diagnosis",
+    "p1": "This test is adapted from psychological scales and is designed to help you explore your cognitive and behavioral traits — your brain's \"default settings.\"",
+    "p2": "MiMind is not a medical institution. Test results must NOT be used as a clinical diagnosis for ADHD, Autism Spectrum, or any other neurodevelopmental condition.",
+    "p3": "Results are for self-understanding only and do not represent any medical conclusion.",
+    "seek_help": "If you feel these traits significantly impact your work, studies, or relationships, we recommend seeking evaluation from a qualified psychiatrist.",
+    "accept": "I understand, continue",
+    "decline": "Not now",
+    "banner_title": "Trait Exploration — Not a Clinical Diagnosis",
+    "banner_body": "These results help you understand your cognitive and behavioral patterns. They cannot replace professional evaluation. Consult a psychiatrist for further guidance."
+  },
   "pwa": {
     "install_title": "Install MiMind",
     "install_desc": "Quick access anytime — crisis hotlines available offline",
