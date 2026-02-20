@@ -1,61 +1,90 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { getAudioLibrary, getMeditationLibrary, startAudio, startMeditation } from '../../api/tools';
-import { useAuthStore } from '../../stores/auth';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  AMBIENT_SOUNDS,
+  playAmbient,
+  stopAmbient,
+  setVolume,
+  setTimer,
+  isPlaying,
+  getCurrentSound,
+  type AmbientSoundId,
+} from '../../utils/ambientAudio';
 import Card from '../../components/Card/Card';
-import Button from '../../components/Button/Button';
-import Loading from '../../components/Loading/Loading';
+
+const TIMER_OPTIONS = [0, 5, 15, 30, 60];
 
 export default function ToolsHub() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const userId = useAuthStore((s) => s.userId);
 
-  const [audioTracks, setAudioTracks] = useState<Array<{ id: string; name: string }>>([]);
-  const [meditations, setMeditations] = useState<Array<{ id: string; name: string }>>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedAudio, setSelectedAudio] = useState('');
-  const [audioMinutes, setAudioMinutes] = useState(10);
-  const [selectedMeditation, setSelectedMeditation] = useState('');
-  const [actionLoading, setActionLoading] = useState('');
+  const [playing, setPlaying] = useState(false);
+  const [activeSound, setActiveSound] = useState<AmbientSoundId | null>(null);
+  const [volume, setVolumeState] = useState(0.7);
+  const [timerMin, setTimerMin] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
+  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    Promise.all([getAudioLibrary(), getMeditationLibrary()])
-      .then(([audio, med]) => {
-        const tracks = Object.entries(audio).map(([id, v]) => ({ id, name: v.name }));
-        const meds = Object.entries(med).map(([id, v]) => ({ id, name: v.name }));
-        setAudioTracks(tracks);
-        setMeditations(meds);
-        if (tracks.length) setSelectedAudio(tracks[0].id);
-        if (meds.length) setSelectedMeditation(meds[0].id);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    return () => {
+      stopAmbient();
+      if (tickRef.current) clearInterval(tickRef.current);
+    };
   }, []);
 
-  const handleStartAudio = async () => {
-    if (!userId || !selectedAudio) return;
-    setActionLoading('audio');
-    try {
-      await startAudio(userId, selectedAudio, audioMinutes);
-    } finally {
-      setActionLoading('');
+  useEffect(() => {
+    if (playing) {
+      const start = Date.now();
+      tickRef.current = setInterval(() => {
+        setElapsed(Math.floor((Date.now() - start) / 1000));
+      }, 1000);
+    } else {
+      if (tickRef.current) clearInterval(tickRef.current);
+      setElapsed(0);
     }
-  };
+    return () => { if (tickRef.current) clearInterval(tickRef.current); };
+  }, [playing]);
 
-  const handleStartMeditation = async () => {
-    if (!userId || !selectedMeditation) return;
-    setActionLoading('meditation');
-    try {
-      await startMeditation(userId, selectedMeditation);
-    } finally {
-      setActionLoading('');
+  const handleToggle = useCallback((soundId: AmbientSoundId) => {
+    if (isPlaying() && getCurrentSound() === soundId) {
+      stopAmbient();
+      setPlaying(false);
+      setActiveSound(null);
+    } else {
+      playAmbient(soundId, volume);
+      setPlaying(true);
+      setActiveSound(soundId);
+      if (timerMin > 0) {
+        setTimer(timerMin, () => {
+          setPlaying(false);
+          setActiveSound(null);
+        });
+      }
     }
-  };
+  }, [volume, timerMin]);
 
-  if (loading) return <Loading text={t('common.loading')} />;
+  const handleVolumeChange = useCallback((v: number) => {
+    setVolumeState(v);
+    setVolume(v);
+  }, []);
+
+  const handleTimerChange = useCallback((min: number) => {
+    setTimerMin(min);
+    if (isPlaying() && min > 0) {
+      setTimer(min, () => {
+        setPlaying(false);
+        setActiveSound(null);
+      });
+    }
+  }, []);
+
+  const formatTime = (sec: number) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  };
 
   return (
     <div>
@@ -64,72 +93,145 @@ export default function ToolsHub() {
         <p className="text-muted mt-1 mb-8">{t('tools.subtitle')}</p>
       </motion.div>
 
-      <div className="grid md:grid-cols-3 gap-6">
-        {/* White Noise */}
-        <Card>
-          <div className="w-12 h-12 rounded-xl bg-calm-soft flex items-center justify-center text-2xl mb-4">🎧</div>
-          <h3 className="font-heading font-bold text-lg mb-1">{t('tools.audio_title')}</h3>
-          <p className="text-muted text-sm mb-4">{t('tools.audio_desc')}</p>
-          <select
-            value={selectedAudio}
-            onChange={(e) => setSelectedAudio(e.target.value)}
-            className="w-full border border-line rounded-xl px-3 py-2 mb-3 bg-white/90"
-          >
-            {audioTracks.map((t) => (
-              <option key={t.id} value={t.id}>{t.name}</option>
-            ))}
-          </select>
-          <div className="flex items-center gap-2 mb-4">
-            <input
-              type="range"
-              min={1}
-              max={120}
-              value={audioMinutes}
-              onChange={(e) => setAudioMinutes(Number(e.target.value))}
-              className="flex-1 accent-calm"
-            />
-            <span className="text-sm text-muted w-16 text-right">{audioMinutes} {t('tools.minutes')}</span>
+      {/* Ambient Sound Player */}
+      <Card className="mb-8">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-10 h-10 rounded-xl bg-calm-soft flex items-center justify-center text-xl">🎧</div>
+          <div>
+            <h3 className="font-heading font-bold text-lg">{t('tools.audio_title')}</h3>
+            <p className="text-muted text-sm">{t('tools.audio_desc')}</p>
           </div>
-          <Button
-            size="sm"
-            className="w-full"
-            onClick={handleStartAudio}
-            loading={actionLoading === 'audio'}
-          >
-            {t('tools.start')}
-          </Button>
-        </Card>
+        </div>
 
+        {/* Sound grid */}
+        <div className="grid grid-cols-5 gap-3 mb-6">
+          {AMBIENT_SOUNDS.map((s) => {
+            const isActive = activeSound === s.id && playing;
+            return (
+              <button
+                key={s.id}
+                onClick={() => handleToggle(s.id)}
+                className={`
+                  relative flex flex-col items-center gap-2 py-4 rounded-2xl border-2 transition-all cursor-pointer
+                  ${isActive
+                    ? 'border-accent bg-accent-soft scale-105 shadow-md'
+                    : `border-line ${s.color} hover:border-accent/30 hover:shadow-sm`
+                  }
+                `}
+              >
+                <span className="text-3xl">{s.emoji}</span>
+                <span className="text-xs font-semibold">{t(s.nameKey)}</span>
+                <AnimatePresence>
+                  {isActive && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-accent rounded-full flex items-center justify-center"
+                    >
+                      <span className="text-white text-[10px]">▶</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Controls */}
+        <AnimatePresence>
+          {playing && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              {/* Elapsed */}
+              <div className="text-center mb-4">
+                <span className="font-mono text-2xl font-bold text-accent">{formatTime(elapsed)}</span>
+                {timerMin > 0 && (
+                  <span className="text-muted text-sm ml-2">/ {timerMin}:00</span>
+                )}
+              </div>
+
+              {/* Volume */}
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-sm text-muted w-8">🔈</span>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={volume}
+                  onChange={(e) => handleVolumeChange(Number(e.target.value))}
+                  className="flex-1 accent-accent h-2"
+                />
+                <span className="text-sm text-muted w-8">🔊</span>
+                <span className="text-sm font-medium text-muted w-10 text-right">
+                  {Math.round(volume * 100)}%
+                </span>
+              </div>
+
+              {/* Timer */}
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-sm text-muted">⏱️</span>
+                {TIMER_OPTIONS.map((min) => (
+                  <button
+                    key={min}
+                    onClick={() => handleTimerChange(min)}
+                    className={`
+                      px-3 py-1 rounded-lg text-xs font-medium transition-colors
+                      ${timerMin === min
+                        ? 'bg-accent text-white'
+                        : 'bg-cream text-muted hover:bg-accent-soft'
+                      }
+                    `}
+                  >
+                    {min === 0
+                      ? (t('tools.audio_title') === '白噪音' ? '不限' : '∞')
+                      : `${min} ${t('tools.minutes')}`
+                    }
+                  </button>
+                ))}
+              </div>
+
+              {/* Stop */}
+              <button
+                onClick={() => { stopAmbient(); setPlaying(false); setActiveSound(null); }}
+                className="w-full py-2.5 rounded-xl bg-danger-soft text-danger font-semibold text-sm hover:bg-danger hover:text-white transition-colors"
+              >
+                {t('tools.stop')}
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </Card>
+
+      {/* Other tools */}
+      <div className="grid md:grid-cols-2 gap-6">
         {/* Breathing */}
         <Card hoverable onClick={() => navigate('/tools/breathing')}>
-          <div className="w-12 h-12 rounded-xl bg-safe-soft flex items-center justify-center text-2xl mb-4">🌬️</div>
-          <h3 className="font-heading font-bold text-lg mb-1">{t('tools.breathing_title')}</h3>
-          <p className="text-muted text-sm mb-4">{t('tools.breathing_desc')}</p>
-          <p className="text-accent font-semibold text-sm">{t('tools.start')} →</p>
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-safe-soft flex items-center justify-center text-3xl">🌬️</div>
+            <div>
+              <h3 className="font-heading font-bold text-lg">{t('tools.breathing_title')}</h3>
+              <p className="text-muted text-sm mt-1">{t('tools.breathing_desc')}</p>
+              <p className="text-accent font-semibold text-sm mt-2">{t('tools.start')} →</p>
+            </div>
+          </div>
         </Card>
 
         {/* Meditation */}
-        <Card>
-          <div className="w-12 h-12 rounded-xl bg-accent-soft flex items-center justify-center text-2xl mb-4">🧘</div>
-          <h3 className="font-heading font-bold text-lg mb-1">{t('tools.meditation_title')}</h3>
-          <p className="text-muted text-sm mb-4">{t('tools.meditation_desc')}</p>
-          <select
-            value={selectedMeditation}
-            onChange={(e) => setSelectedMeditation(e.target.value)}
-            className="w-full border border-line rounded-xl px-3 py-2 mb-4 bg-white/90"
-          >
-            {meditations.map((m) => (
-              <option key={m.id} value={m.id}>{m.name}</option>
-            ))}
-          </select>
-          <Button
-            size="sm"
-            className="w-full"
-            onClick={handleStartMeditation}
-            loading={actionLoading === 'meditation'}
-          >
-            {t('tools.start')}
-          </Button>
+        <Card hoverable onClick={() => navigate('/tools/meditation')}>
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-accent-soft flex items-center justify-center text-3xl">🧘</div>
+            <div>
+              <h3 className="font-heading font-bold text-lg">{t('tools.meditation_title')}</h3>
+              <p className="text-muted text-sm mt-1">{t('tools.meditation_desc')}</p>
+              <p className="text-accent font-semibold text-sm mt-2">{t('tools.start')} →</p>
+            </div>
+          </div>
         </Card>
       </div>
     </div>

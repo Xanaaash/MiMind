@@ -7,6 +7,19 @@ export interface User {
 
 export type TriageChannel = 'GREEN' | 'YELLOW' | 'RED';
 
+export interface AuthSessionPayload {
+  authenticated: boolean;
+  user_id?: string;
+  email?: string;
+  channel?: TriageChannel;
+  expires_at?: string;
+  user?: {
+    user_id: string;
+    email: string;
+    locale: string;
+  };
+}
+
 export interface TriageDecision {
   channel: TriageChannel;
   reasons: string[];
