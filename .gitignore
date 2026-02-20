@@ -15,3 +15,7 @@ data/
 # Node.js / Frontend
 node_modules/
 frontend/user/dist/
+
+# Autodev worktrees & sessions
+.worktrees/
+.autodev/sessions/*.env
