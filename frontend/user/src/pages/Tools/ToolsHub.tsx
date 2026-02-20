@@ -255,6 +255,7 @@ export default function ToolsHub() {
                   step={0.01}
                   value={volume}
                   onChange={(e) => handleVolumeChange(Number(e.target.value))}
+                  aria-label="Audio volume"
                   className="flex-1 accent-accent h-2"
                 />
                 <span className="text-sm text-muted w-8">🔊</span>

@@ -179,6 +179,7 @@ export default function BreathingExercise() {
                 max={10}
                 value={totalCycles}
                 onChange={(e) => setTotalCycles(Number(e.target.value))}
+                aria-label={t('tools.cycles')}
                 className="w-32 accent-accent"
               />
               <span className="font-bold text-lg w-8">{totalCycles}</span>

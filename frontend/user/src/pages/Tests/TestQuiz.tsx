@@ -113,6 +113,7 @@ export default function TestQuiz() {
               max={range.max}
               value={answers[question.question_id] ?? 0}
               onChange={(e) => setAnswers((prev) => ({ ...prev, [question.question_id]: Number(e.target.value) }))}
+              aria-label={question.text[lang] || question.text['zh-CN'] || question.text['en-US'] || question.question_id}
               className="w-full accent-warn h-2"
             />
             <div className="flex justify-between text-sm text-muted">

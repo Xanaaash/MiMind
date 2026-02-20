@@ -266,6 +266,7 @@ export default function Onboarding() {
                   key={String(value)}
                   type="button"
                   onClick={() => setCssrsAnswer(value)}
+                  aria-pressed={answer === value}
                   className={`text-left px-4 py-3 rounded-xl border-2 transition-all ${
                     answer === value ? 'border-accent bg-accent-soft text-accent' : 'border-line hover:border-accent/30'
                   }`}
@@ -281,6 +282,7 @@ export default function Onboarding() {
                   key={value}
                   type="button"
                   onClick={() => setLikertAnswer(value)}
+                  aria-pressed={answer === value}
                   className={`text-left px-4 py-3 rounded-xl border-2 transition-all ${
                     answer === value ? 'border-accent bg-accent-soft text-accent' : 'border-line hover:border-accent/30'
                   }`}

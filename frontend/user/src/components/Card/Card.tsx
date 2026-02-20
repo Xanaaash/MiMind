@@ -17,8 +17,23 @@ export default function Card({
   hoverable,
   padding = 'md',
   className = '',
+  onClick,
+  onKeyDown,
+  role,
+  tabIndex,
   ...rest
 }: CardProps) {
+  const interactive = hoverable && typeof onClick === 'function';
+
+  const handleKeyDown: HTMLAttributes<HTMLDivElement>['onKeyDown'] = (event) => {
+    onKeyDown?.(event);
+    if (event.defaultPrevented) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      event.currentTarget.click();
+    }
+  };
+
   return (
     <div
       className={`
@@ -27,6 +42,10 @@ export default function Card({
         ${paddingClasses[padding]}
         ${className}
       `}
+      onClick={onClick}
+      role={interactive ? role ?? 'button' : role}
+      tabIndex={interactive ? tabIndex ?? 0 : tabIndex}
+      onKeyDown={interactive ? handleKeyDown : onKeyDown}
       {...rest}
     >
       {children}

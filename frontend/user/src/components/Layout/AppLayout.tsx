@@ -53,7 +53,7 @@ export default function AppLayout() {
           </NavLink>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1" aria-label="Primary navigation">
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.path}
@@ -84,12 +84,14 @@ export default function AppLayout() {
             <button
               onClick={toggleLang}
               className="text-sm text-muted hover:text-ink px-2 py-1 rounded-lg hover:bg-cream transition-colors"
+              aria-label="Switch language"
             >
               {i18n.language === 'zh-CN' ? 'EN' : '中文'}
             </button>
             <button
               onClick={() => { logout(); navigate('/'); }}
               className="text-sm text-muted hover:text-accent px-2 py-1 rounded-lg hover:bg-cream transition-colors"
+              aria-label="Log out"
             >
               {t('auth.login') === '登录' ? '退出' : 'Logout'}
             </button>
@@ -97,6 +99,8 @@ export default function AppLayout() {
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
               className="md:hidden text-xl p-1"
               aria-label="Menu"
+              aria-expanded={mobileNavOpen}
+              aria-controls="mobile-nav-menu"
             >
               ☰
             </button>
@@ -105,7 +109,11 @@ export default function AppLayout() {
 
         {/* Mobile nav dropdown */}
         {mobileNavOpen && (
-          <nav className="md:hidden border-t border-line bg-panel px-4 py-3 grid grid-cols-4 gap-2">
+          <nav
+            id="mobile-nav-menu"
+            className="md:hidden border-t border-line bg-panel px-4 py-3 grid grid-cols-4 gap-2"
+            aria-label="Mobile navigation"
+          >
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.path}

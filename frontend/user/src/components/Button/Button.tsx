@@ -35,6 +35,7 @@ export default function Button({
 }: ButtonProps) {
   return (
     <button
+      type={rest.type ?? 'button'}
       className={`
         inline-flex items-center justify-center gap-2 font-semibold
         transition-all duration-200 cursor-pointer

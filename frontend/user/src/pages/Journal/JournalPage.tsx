@@ -119,6 +119,7 @@ export default function JournalPage() {
             max={10}
             value={energy}
             onChange={(e) => setEnergy(Number(e.target.value))}
+            aria-label={t('journal.energy_label')}
             className="flex-1 accent-accent h-2"
           />
           <span className="text-muted text-sm">10</span>

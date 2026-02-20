@@ -343,6 +343,7 @@ export default function ScaleQuiz() {
                             key={value}
                             type="button"
                             onClick={() => setAnswer(questionId, value)}
+                            aria-pressed={answers[questionId] === value}
                             className={`
                               text-left px-4 py-3 rounded-xl border-2 transition-all font-medium
                               ${answers[questionId] === value
@@ -373,6 +374,7 @@ export default function ScaleQuiz() {
                       key={String(val)}
                       type="button"
                       onClick={() => setAnswer(question.question_id, val)}
+                      aria-pressed={answers[question.question_id] === val}
                       className={`
                         text-left px-5 py-4 rounded-xl border-2 transition-all font-medium
                         ${answers[question.question_id] === val
@@ -392,6 +394,7 @@ export default function ScaleQuiz() {
                       key={value}
                       type="button"
                       onClick={() => setAnswer(question.question_id, value)}
+                      aria-pressed={answers[question.question_id] === value}
                       className={`
                         text-left px-5 py-4 rounded-xl border-2 transition-all font-medium
                         ${answers[question.question_id] === value
@@ -411,6 +414,7 @@ export default function ScaleQuiz() {
                   max={4}
                   value={Number(answers[question.question_id] ?? 0)}
                   onChange={(e) => setAnswer(question.question_id, Number(e.target.value))}
+                  aria-label={question.text[lang] || question.text['zh-CN'] || question.text['en-US'] || question.question_id}
                   className="w-full accent-accent"
                 />
               )}
