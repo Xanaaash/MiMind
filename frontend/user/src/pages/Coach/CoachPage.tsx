@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '../../stores/auth';
 import { useCoachStore } from '../../stores/coach';
 import * as coachApi from '../../api/coach';
-import { submitAssessment } from '../../api/auth';
 import Button from '../../components/Button/Button';
 import CrisisBanner from '../../components/CrisisBanner/CrisisBanner';
 
@@ -12,13 +11,6 @@ const STYLES = [
   { id: 'warm_guide', nameKey: 'coach.style_warm', descKey: 'coach.style_warm_desc', icon: '🤗', color: 'bg-accent-soft' },
   { id: 'rational_analysis', nameKey: 'coach.style_rational', descKey: 'coach.style_rational_desc', icon: '🧠', color: 'bg-calm-soft' },
 ];
-
-const BASELINE_RESPONSES = {
-  phq9: Array(9).fill(0),
-  gad7: Array(7).fill(0),
-  pss10: Array(10).fill(0),
-  cssrs: { q1: false, q2: false, q3: false, q4: false, q5: false, q6: false },
-};
 
 export default function CoachPage() {
   const { t } = useTranslation();
@@ -39,7 +31,6 @@ export default function CoachPage() {
     if (!userId) return;
     store.setLoading(true);
     try {
-      await submitAssessment(userId, { responses: BASELINE_RESPONSES }).catch(() => {});
       const data = await coachApi.startSession(userId, styleId, true);
       store.setSession(data.session.session_id, styleId);
       if (data.coach_message) {

@@ -3,9 +3,17 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../../stores/auth';
-import { adminLogin, register } from '../../api/auth';
+import { adminLogin, getEntitlements, register } from '../../api/auth';
 import { toast } from '../../stores/toast';
+import type { TriageChannel } from '../../types';
 import Button from '../../components/Button/Button';
+
+function toChannel(value: unknown): TriageChannel | null {
+  if (value === 'GREEN' || value === 'YELLOW' || value === 'RED') {
+    return value;
+  }
+  return null;
+}
 
 export default function Auth() {
   const { t } = useTranslation();
@@ -25,19 +33,28 @@ export default function Auth() {
 
       const email = `${username}@mindcoach.ai`;
       let userId = localStorage.getItem('mc_user_id');
+      let resolvedChannel: TriageChannel | null = null;
 
       if (!userId) {
         const data = await register(email, 'zh-CN', '2026.02');
         userId = data.user_id;
-        const triage = data.triage as { channel?: string } | undefined;
-        if (triage?.channel) {
-          setChannel(triage.channel as 'GREEN' | 'YELLOW' | 'RED');
+        const triage = data.triage as { channel?: unknown } | undefined;
+        resolvedChannel = toChannel(triage?.channel);
+      }
+
+      if (!resolvedChannel && userId) {
+        try {
+          const entitlements = await getEntitlements(userId);
+          resolvedChannel = toChannel(entitlements.channel);
+        } catch {
+          resolvedChannel = null;
         }
       }
 
       setUser(userId!, email, 'zh-CN');
+      setChannel(resolvedChannel);
       toast.success(t('auth.login') === '登录' ? '登录成功' : 'Login successful');
-      navigate('/home');
+      navigate(resolvedChannel ? '/home' : '/onboarding');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     } finally {
