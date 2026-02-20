@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #fff9f2;
+  --color-cream: #fff0df;
+  --color-ink: #3d2a26;
+  --color-muted: #785c55;
+  --color-accent: #c6674f;
+  --color-accent-soft: #f5d5bf;
+  --color-accent-hover: #b55a44;
+  --color-safe: #4a9d6e;
+  --color-safe-soft: #d4eddf;
+  --color-warn: #d4a843;
+  --color-warn-soft: #fdf0d0;
+  --color-danger: #c0392b;
+  --color-danger-soft: #fce4e1;
+  --color-calm: #5b8db8;
+  --color-calm-soft: #dce8f3;
+  --color-line: rgba(103, 71, 63, 0.15);
+  --color-panel: rgba(255, 252, 246, 0.92);
+  --color-overlay: rgba(61, 42, 38, 0.5);
+
+  --font-heading: "Fraunces", serif;
+  --font-body: "Nunito Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  --shadow-sm: 0 2px 8px rgba(114, 80, 69, 0.08);
+  --shadow-md: 0 6px 20px rgba(114, 80, 69, 0.12);
+  --shadow-lg: 0 12px 32px rgba(114, 80, 69, 0.16);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    color: var(--color-ink);
+    background: radial-gradient(circle at 10% 20%, #ffe4d1 0%, transparent 26%),
+      radial-gradient(circle at 90% 5%, #f8dbc8 0%, transparent 35%),
+      linear-gradient(145deg, #fff9f2 0%, #ffeede 50%, #f6decb 100%);
+    min-height: 100vh;
+  }
+}
