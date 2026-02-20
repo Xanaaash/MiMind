@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { getCatalog } from '../../api/scales';
 import { submitAssessment } from '../../api/auth';
 import { useAuthStore } from '../../stores/auth';
 import { toast } from '../../stores/toast';
+import { markAssessmentComplete } from '../../components/AssessmentGate/AssessmentGate';
 import type { ScaleCatalogItem, ScaleQuestion, TriageChannel } from '../../types';
 import Button from '../../components/Button/Button';
 import Loading from '../../components/Loading/Loading';
@@ -77,6 +78,8 @@ function isScaleCore(scaleId: RequiredScaleId): boolean {
 export default function Onboarding() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnTo = searchParams.get('returnTo');
   const { userId, channel, setChannel } = useAuthStore();
 
   const [catalog, setCatalog] = useState<Record<string, ScaleCatalogItem> | null>(null);
@@ -92,10 +95,10 @@ export default function Onboarding() {
       navigate('/auth');
       return;
     }
-    if (channel) {
+    if (channel && !returnTo) {
       navigate('/home');
     }
-  }, [userId, channel, navigate]);
+  }, [userId, channel, returnTo, navigate]);
 
   useEffect(() => {
     getCatalog()
@@ -210,8 +213,9 @@ export default function Onboarding() {
       }
 
       setChannel(nextChannel);
+      markAssessmentComplete();
       toast.success(t('onboarding.submit_success'));
-      navigate('/home');
+      navigate(returnTo || '/home');
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
       toast.error(message);

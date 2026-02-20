@@ -92,6 +92,23 @@
     "share": "Share Results",
     "back_to_list": "Back to List"
   },
+  "coach_gate": {
+    "title": "Complete a quick assessment before starting AI Coach",
+    "missing_desc": "To provide you with safe and personalized support, we need to understand your current state. The following scales take just a few minutes.",
+    "expired_desc": "Your last assessment was over 30 days ago. Please update your baseline data to ensure AI Coach safety.",
+    "mandatory": "Required Scales (Safety Baseline)",
+    "optional": "Optional Scales (Recommended)",
+    "scale_phq9": "PHQ-9 Mood Screening",
+    "scale_phq9_desc": "Quick check on your mood over the past two weeks",
+    "scale_gad7": "GAD-7 Anxiety Screening",
+    "scale_gad7_desc": "Assess your anxiety level over the past two weeks",
+    "scale_cssrs": "Safety Risk Assessment",
+    "scale_cssrs_desc": "Required safety triage items to ensure your wellbeing",
+    "scale_pss10": "PSS-10 Perceived Stress",
+    "scale_pss10_desc": "Understand your recent stress level for better coaching",
+    "start_assessment": "Start Assessment",
+    "time_estimate": "Takes about 5-8 minutes"
+  },
   "coach": {
     "title": "AI Mental Coach",
     "subtitle": "Choose a counseling style you prefer and start today's conversation",

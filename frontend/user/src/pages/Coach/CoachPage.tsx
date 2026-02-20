@@ -6,6 +6,7 @@ import { useCoachStore } from '../../stores/coach';
 import * as coachApi from '../../api/coach';
 import Button from '../../components/Button/Button';
 import CrisisBanner from '../../components/CrisisBanner/CrisisBanner';
+import AssessmentGate, { isAssessmentExpired } from '../../components/AssessmentGate/AssessmentGate';
 
 const STYLES = [
   { id: 'warm_guide', nameKey: 'coach.style_warm', descKey: 'coach.style_warm_desc', icon: '🤗', color: 'bg-accent-soft' },
@@ -21,11 +22,21 @@ export default function CoachPage() {
   const [crisisMessage, setCrisisMessage] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const needsAssessment = !channel;
+  const assessmentExpired = channel && isAssessmentExpired();
   const isRestricted = channel === 'YELLOW' || channel === 'RED';
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [store.messages]);
+
+  if (needsAssessment) {
+    return <AssessmentGate reason="missing" />;
+  }
+
+  if (assessmentExpired) {
+    return <AssessmentGate reason="expired" />;
+  }
 
   const handleStart = async (styleId: string) => {
     if (!userId) return;
