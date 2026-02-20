@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -5,6 +6,8 @@ import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Responsi
 import Button from '../../components/Button/Button';
 import NeurodiversityBanner from '../../components/Neurodiversity/NeurodiversityBanner';
 import type { NeuroScoreResult } from '../../data/neuroScales';
+import { canShare, downloadShareCard, shareImage } from '../../utils/shareCard';
+import { buildNeuroArchetype, generateNeuroShareCard, type NeuroSharePreset } from '../../utils/neuroShareCard';
 
 const LEVEL_COLORS: Record<string, string> = {
   low: '#4a9d6e',
@@ -18,6 +21,7 @@ export default function NeuroResult() {
   const location = useLocation();
   const { scaleId } = useParams<{ scaleId: string }>();
   const result = (location.state as { result?: NeuroScoreResult })?.result;
+  const [sharePreset, setSharePreset] = useState<NeuroSharePreset>('xiaohongshu');
 
   if (!result) {
     return (
@@ -31,12 +35,46 @@ export default function NeuroResult() {
   }
 
   const levelColor = LEVEL_COLORS[result.level] ?? '#a89890';
+  const archetype = buildNeuroArchetype(scaleId ?? '', result.level);
 
   const radarData = result.dimensions.map((d) => ({
     subject: t(d.nameKey),
     value: d.max > 0 ? (d.score / d.max) * 100 : 0,
     fullMark: 100,
   }));
+
+  const sharePayload = {
+    scaleId: scaleId ?? 'neuro',
+    levelLabel: t(result.levelKey),
+    summary: t(result.summaryKey),
+    total: result.total,
+    maxTotal: result.maxTotal,
+    dimensions: result.dimensions.map((dimension) => ({
+      label: t(dimension.nameKey),
+      score: dimension.score,
+      max: dimension.max,
+      color: dimension.color,
+    })),
+    archetypeTitle: archetype.title,
+    archetypeTags: archetype.tags,
+  };
+
+  const handleDownload = () => {
+    const canvas = generateNeuroShareCard(sharePayload, sharePreset);
+    downloadShareCard(canvas, `mimind-neuro-${scaleId ?? 'profile'}-${sharePreset}`);
+  };
+
+  const handleNativeShare = async () => {
+    if (!canShare()) {
+      return;
+    }
+    const canvas = generateNeuroShareCard(sharePayload, sharePreset);
+    try {
+      await shareImage(canvas, `neuro-${scaleId ?? 'profile'}`);
+    } catch {
+      // User cancellation or unsupported file sharing is non-fatal here.
+    }
+  };
 
   return (
     <div>
@@ -141,6 +179,48 @@ export default function NeuroResult() {
       >
         <h3 className="font-heading font-bold text-sm mb-2">💡 {t('neuro.interpretation')}</h3>
         <p className="text-sm text-muted leading-relaxed">{t(result.summaryKey)}</p>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.45 }}
+        className="bg-panel border border-line rounded-2xl p-5 mb-6"
+      >
+        <h3 className="font-heading font-bold text-sm mb-2">{t('neuro.share_title')}</h3>
+        <p className="text-xs text-muted mb-4">{t('neuro.share_subtitle')}</p>
+
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {([
+            ['xiaohongshu', t('neuro.share_preset_xiaohongshu')],
+            ['instagram', t('neuro.share_preset_instagram')],
+            ['tiktok', t('neuro.share_preset_tiktok')],
+          ] as Array<[NeuroSharePreset, string]>).map(([preset, label]) => (
+            <button
+              key={preset}
+              type="button"
+              onClick={() => setSharePreset(preset)}
+              className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-colors ${
+                sharePreset === preset
+                  ? 'bg-accent text-white border-accent'
+                  : 'bg-paper text-muted border-line hover:border-accent/30'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex gap-3">
+          <Button onClick={handleDownload} className="flex-1">
+            {t('neuro.share_download')}
+          </Button>
+          {canShare() ? (
+            <Button variant="ghost" onClick={handleNativeShare} className="flex-1">
+              {t('neuro.share_native')}
+            </Button>
+          ) : null}
+        </div>
       </motion.div>
 
       {/* Actions */}
