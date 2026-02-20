@@ -116,7 +116,7 @@
 
 - [✅] **T-401** Dockerfile（后端 + 前端构建 + Nginx 静态服务）
 - [✅] **T-402** docker-compose.yml（一键启动全栈：backend + frontend + db）
-- [ ] **T-403** CI pipeline（GitHub Actions：lint → test → build → deploy）
+- [🔒 codex-0220b] **T-403** CI pipeline（GitHub Actions：lint → test → build → deploy）
 - [ ] **T-404** 环境变量文档（`.env.example` + 说明所有必需变量）
 - [ ] **T-405** 生产部署指南文档（`docs/deployment.md`）
 
