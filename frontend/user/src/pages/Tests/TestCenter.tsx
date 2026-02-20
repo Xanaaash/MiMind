@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { getCatalog } from '../../api/tests';
 import type { TestCatalogItem } from '../../types';
 import Card from '../../components/Card/Card';
-import Loading from '../../components/Loading/Loading';
+import Skeleton from '../../components/Skeleton/Skeleton';
 
 const TEST_ICONS: Record<string, string> = {
   mbti: '🎭',
@@ -31,7 +31,26 @@ export default function TestCenter() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <Loading text={t('common.loading')} />;
+  if (loading) {
+    return (
+      <div aria-busy className="space-y-8">
+        <div>
+          <Skeleton className="h-10 w-56 mb-3" />
+          <Skeleton className="h-5 w-72" />
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <Card key={idx}>
+              <Skeleton className="w-12 h-12 mb-3" />
+              <Skeleton className="h-6 w-40 mb-3" />
+              <Skeleton className="h-4 w-24 mb-4" />
+              <Skeleton className="h-4 w-28" />
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

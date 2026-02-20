@@ -7,7 +7,7 @@ import { toast } from '../../stores/toast';
 import type { BillingPlan, SubscriptionRecord } from '../../types';
 import Button from '../../components/Button/Button';
 import Card from '../../components/Card/Card';
-import Loading from '../../components/Loading/Loading';
+import Skeleton from '../../components/Skeleton/Skeleton';
 
 const PLAN_STYLES: Record<string, { icon: string; color: string; popular?: boolean }> = {
   free: { icon: '🆓', color: 'bg-cream' },
@@ -46,7 +46,28 @@ export default function BillingPage() {
     } finally { setActionLoading(''); }
   };
 
-  if (loading) return <Loading text={t('common.loading')} />;
+  if (loading) {
+    return (
+      <div aria-busy className="space-y-8">
+        <div>
+          <Skeleton className="h-10 w-52 mb-3" />
+          <Skeleton className="h-5 w-72" />
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {Array.from({ length: 3 }).map((_, idx) => (
+            <Card key={idx}>
+              <Skeleton className="w-12 h-12 mb-4" />
+              <Skeleton className="h-7 w-28 mb-4" />
+              <Skeleton className="h-4 w-44 mb-2" />
+              <Skeleton className="h-4 w-40 mb-2" />
+              <Skeleton className="h-4 w-36 mb-6" />
+              <Skeleton className="h-10 w-full" />
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
