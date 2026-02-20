@@ -127,6 +127,11 @@
     "style_mindful_desc": "学习当下觉察，以非评判的态度观察内心",
     "style_action": "行动教练",
     "style_action_desc": "目标明确、快速行动，制定可执行的计划",
+    "history_link": "会话历史",
+    "history_title": "会话历史",
+    "history_subtitle": "查看你过往对话的摘要记录",
+    "history_empty": "还没有历史会话。完成一次教练对话后会显示在这里。",
+    "back_to_chat": "返回教练对话",
     "session_ended": "本次对话已结束",
     "restricted": "根据你当前的评估结果，AI 教练功能暂时不可用。建议你先咨询专业心理健康人士。",
     "safety_pause": "检测到可能的安全风险，对话已暂停。请查看以下资源。"

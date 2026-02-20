@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '../../stores/auth';
 import { useCoachStore } from '../../stores/coach';
@@ -7,6 +8,7 @@ import * as coachApi from '../../api/coach';
 import Button from '../../components/Button/Button';
 import CrisisBanner from '../../components/CrisisBanner/CrisisBanner';
 import AssessmentGate, { isAssessmentExpired } from '../../components/AssessmentGate/AssessmentGate';
+import { saveCoachHistory } from '../../utils/coachHistory';
 
 const STYLES = [
   { id: 'warm_guide', nameKey: 'coach.style_warm', descKey: 'coach.style_warm_desc', icon: '🤗', color: 'bg-accent-soft' },
@@ -31,6 +33,7 @@ function useVisualViewportHeight() {
 
 export default function CoachPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const userId = useAuthStore((s) => s.userId);
   const channel = useAuthStore((s) => s.channel);
   const store = useCoachStore();
@@ -139,11 +142,20 @@ export default function CoachPage() {
 
   const handleEnd = async () => {
     if (!store.sessionId) return;
+    const endedSessionId = store.sessionId;
     if (typingTimerRef.current) {
       clearInterval(typingTimerRef.current);
       typingTimerRef.current = null;
     }
-    await coachApi.endSession(store.sessionId);
+    const data = await coachApi.endSession(store.sessionId);
+    if (userId && data.summary) {
+      saveCoachHistory(userId, {
+        session_id: endedSessionId,
+        style_id: store.styleId ?? 'warm_guide',
+        summary: data.summary,
+        ended_at: new Date().toISOString(),
+      });
+    }
     store.endSession();
   };
 
@@ -161,7 +173,15 @@ export default function CoachPage() {
     return (
       <div className="max-w-2xl mx-auto px-1 sm:px-0">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <h1 className="font-heading text-2xl sm:text-3xl font-bold">{t('coach.title')}</h1>
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="font-heading text-2xl sm:text-3xl font-bold">{t('coach.title')}</h1>
+            <button
+              onClick={() => navigate('/coach/history')}
+              className="text-sm text-accent font-semibold hover:underline"
+            >
+              {t('coach.history_link')}
+            </button>
+          </div>
           <p className="text-muted mt-1 mb-2 text-sm sm:text-base">{t('coach.subtitle')}</p>
           <p className="text-xs text-muted mb-6 sm:mb-8 bg-warn-soft rounded-xl px-3 sm:px-4 py-2">
             ⚠️ {t('coach.disclaimer')}
@@ -212,9 +232,14 @@ export default function CoachPage() {
           <h2 className="font-heading font-bold text-base sm:text-lg truncate">{t('coach.title')}</h2>
           <p className="text-[10px] sm:text-xs text-muted truncate">{t('coach.disclaimer')}</p>
         </div>
-        <Button variant="ghost" size="sm" onClick={handleEnd} className="shrink-0 ml-2">
-          {t('coach.end_session')}
-        </Button>
+        <div className="flex items-center gap-2 ml-2 shrink-0">
+          <Link to="/coach/history" className="text-xs text-accent font-semibold hover:underline">
+            {t('coach.history_link')}
+          </Link>
+          <Button variant="ghost" size="sm" onClick={handleEnd} className="shrink-0">
+            {t('coach.end_session')}
+          </Button>
+        </div>
       </div>
 
       <CrisisBanner visible={!!crisisMessage} message={crisisMessage} />

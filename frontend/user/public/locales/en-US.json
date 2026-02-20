@@ -127,6 +127,11 @@
     "style_mindful_desc": "Learn present-moment awareness with non-judgmental observation",
     "style_action": "Action Coach",
     "style_action_desc": "Goal-oriented with quick action and executable plans",
+    "history_link": "Session History",
+    "history_title": "Session History",
+    "history_subtitle": "Review summaries from your previous coaching conversations",
+    "history_empty": "No past sessions yet. Complete a coaching session and it will appear here.",
+    "back_to_chat": "Back to Coach",
     "session_ended": "This session has ended",
     "restricted": "Based on your current assessment, the AI Coach is temporarily unavailable. We recommend consulting a mental health professional.",
     "safety_pause": "A potential safety concern has been detected. The conversation has been paused. Please review the resources below."
