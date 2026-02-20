@@ -107,7 +107,7 @@
 - [✅] **T-301** 前端用户端单元测试（Vitest — 至少覆盖 stores、api client、utils）
 - [✅] **T-302** 前端组件测试（React Testing Library — 核心组件 Button/Card/Modal/CrisisBanner）
 - [ ] **T-303** 前端 E2E 冒烟测试（Playwright — 注册→量表→结果→教练完整流程）
-- [ ] **T-304** 后端安全测试补充（安全红线全覆盖回归测试）
+- [🔒 codex-0220b] **T-304** 后端安全测试补充（安全红线全覆盖回归测试）
 - [ ] **T-305** 性能基准测试（首屏加载 <2s、教练响应 <3s、量表提交 <1s）
 
 ---
