@@ -2,7 +2,7 @@ import os
 from dataclasses import dataclass
 
 
-_DEFAULT_DEV_PASSWORD = "dev-admin-please-change"
+_DEFAULT_DEV_PASSWORD = "admin"
 
 
 @dataclass(frozen=True)

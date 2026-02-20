@@ -44,10 +44,7 @@ export default function Landing() {
             {i18n.language === 'zh-CN' ? 'EN' : '中文'}
           </button>
           <Link to="/auth">
-            <Button variant="ghost" size="sm">{t('auth.login')}</Button>
-          </Link>
-          <Link to="/auth?mode=register">
-            <Button size="sm">{t('auth.register')}</Button>
+            <Button size="sm">{t('auth.login')}</Button>
           </Link>
         </div>
       </header>
@@ -77,7 +74,7 @@ export default function Landing() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
           >
-            <Link to="/auth?mode=register">
+            <Link to="/auth">
               <Button size="lg">{t('landing.cta_start')}</Button>
             </Link>
             <a href="#features">
