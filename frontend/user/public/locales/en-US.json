@@ -376,6 +376,8 @@
   },
   "nd_disclaimer": {
     "title": "Important: This Is Not a Clinical Diagnosis",
+    "legal_review_badge": "Legal Review Placeholder: Pending Counsel Sign-Off",
+    "legal_review_note": "Final compliance wording must be approved by legal counsel before release (placeholder marker).",
     "p1": "This test is adapted from psychological scales and is designed to help you explore your cognitive and behavioral traits — your brain's \"default settings.\"",
     "p2": "MiMind is not a medical institution. Test results must NOT be used as a clinical diagnosis for ADHD, Autism Spectrum, or any other neurodevelopmental condition.",
     "p3": "Results are for self-understanding only and do not represent any medical conclusion.",

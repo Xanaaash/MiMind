@@ -9,6 +9,7 @@ export default function NeurodiversityBanner() {
       <div>
         <p className="text-sm font-semibold text-warn">{t('nd_disclaimer.banner_title')}</p>
         <p className="text-xs text-muted mt-0.5 leading-relaxed">{t('nd_disclaimer.banner_body')}</p>
+        <p className="text-[11px] font-semibold text-warn mt-1">{t('nd_disclaimer.legal_review_badge')}</p>
       </div>
     </div>
   );

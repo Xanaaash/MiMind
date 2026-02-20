@@ -40,6 +40,8 @@ describe('neurodiversity translations', () => {
       'neuro.level_moderate',
       'neuro.level_high',
       'nd_disclaimer.title',
+      'nd_disclaimer.legal_review_badge',
+      'nd_disclaimer.legal_review_note',
       'nd_disclaimer.p1',
       'nd_disclaimer.p2',
       'nd_disclaimer.seek_help',
