@@ -4,93 +4,118 @@ from backend.tests.bootstrap import configure_import_path
 
 configure_import_path()
 
-from modules.api.coach_endpoints import CoachAPI
-from modules.api.endpoints import OnboardingAPI
-from modules.api.safety_endpoints import SafetyAPI
-from modules.onboarding.service import OnboardingService
-from modules.safety.detector_service import SafetyDetectorService
-from modules.storage.in_memory import InMemoryStore
+from modules.assessment.scoring_service import score_submission
+from modules.safety.emergency.service import EmergencyService
+from modules.safety.hotline.resolver import FALLBACK_HOTLINE, HOTLINE_BY_LOCALE, HotlineResolver
+from modules.safety.nlu.classifier import NLUClassifier
+from modules.safety.policy.engine import SafetyPolicyEngine
+from modules.safety.semantic.evaluator import SemanticRiskEvaluator
+from modules.triage.models import DialogueRiskSignal, RiskLevel, TriageChannel
+from modules.triage.triage_service import TriageService
 
 
 class CrisisRegressionTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.store = InMemoryStore()
-        self.onboarding_api = OnboardingAPI(service=OnboardingService(self.store))
-        self.safety_api = SafetyAPI(store=self.store)
-        self.coach_api = CoachAPI(store=self.store)
-        self.detector = SafetyDetectorService()
+        self.policy = SafetyPolicyEngine()
+        self.hotline = HotlineResolver()
+        self.emergency = EmergencyService()
+        self.nlu = NLUClassifier()
+        self.semantic = SemanticRiskEvaluator()
+        self.triage = TriageService()
 
-        _, body = self.onboarding_api.post_register(
-            {
-                "email": "crisis-regression@example.com",
-                "locale": "en-US",
-                "policy_version": "2026.02",
-            }
+    @staticmethod
+    def _green_scores():
+        responses = {
+            "phq9": [0] * 9,
+            "gad7": [0] * 7,
+            "pss10": [0] * 10,
+            "cssrs": {"q1": False, "q2": False},
+        }
+        return score_submission(responses)
+
+    def test_four_level_policy_regression(self) -> None:
+        low = self.policy.resolve(RiskLevel.LOW)
+        medium = self.policy.resolve(RiskLevel.MEDIUM)
+        high = self.policy.resolve(RiskLevel.HIGH)
+        extreme = self.policy.resolve(RiskLevel.EXTREME)
+
+        self.assertEqual(low.mode, "monitor")
+        self.assertFalse(low.stop_coaching)
+        self.assertFalse(low.show_hotline)
+
+        self.assertEqual(medium.mode, "safety_pause")
+        self.assertFalse(medium.stop_coaching)
+        self.assertTrue(medium.show_hotline)
+
+        self.assertEqual(high.mode, "crisis_stop")
+        self.assertTrue(high.stop_coaching)
+        self.assertTrue(high.notify_ops)
+        self.assertFalse(high.notify_emergency_contact)
+
+        self.assertEqual(extreme.mode, "extreme_emergency")
+        self.assertTrue(extreme.stop_coaching)
+        self.assertTrue(extreme.notify_ops)
+        self.assertTrue(extreme.notify_emergency_contact)
+
+    def test_hotline_locale_resolution_and_fallback(self) -> None:
+        self.assertEqual(self.hotline.resolve("en-US"), HOTLINE_BY_LOCALE["en-US"])
+        self.assertEqual(self.hotline.resolve("zh-CN"), HOTLINE_BY_LOCALE["zh-CN"])
+        self.assertEqual(self.hotline.resolve("fr-FR"), FALLBACK_HOTLINE)
+
+        cache = self.hotline.local_cache_payload()
+        self.assertIn("default", cache)
+        self.assertEqual(cache["default"], FALLBACK_HOTLINE)
+
+    def test_emergency_contact_requires_extreme_and_legal_policy(self) -> None:
+        self.assertFalse(
+            self.emergency.should_notify_emergency_contact(RiskLevel.EXTREME, legal_policy_enabled=False)
         )
-        self.user_id = body["data"]["user_id"]
+        self.assertFalse(
+            self.emergency.should_notify_emergency_contact(RiskLevel.HIGH, legal_policy_enabled=True)
+        )
+        self.assertTrue(
+            self.emergency.should_notify_emergency_contact(RiskLevel.EXTREME, legal_policy_enabled=True)
+        )
 
-    def test_high_risk_recall_regression_set(self) -> None:
+    def test_dialogue_high_risk_overrides_green_scale(self) -> None:
+        decision = self.triage.evaluate(
+            self._green_scores(),
+            dialogue_risk=DialogueRiskSignal(
+                level=RiskLevel.HIGH,
+                text="I want to hurt myself tonight",
+                is_joke=False,
+            ),
+        )
+        self.assertEqual(decision.channel, TriageChannel.RED)
+        self.assertTrue(decision.halt_coaching)
+        self.assertTrue(decision.show_hotline)
+
+    def test_joke_disclaimer_still_results_in_red_channel(self) -> None:
+        decision = self.triage.evaluate(
+            self._green_scores(),
+            dialogue_risk=DialogueRiskSignal(
+                level=RiskLevel.HIGH,
+                text="I want to die, just kidding",
+                is_joke=True,
+            ),
+        )
+        self.assertEqual(decision.channel, TriageChannel.RED)
+        self.assertTrue(decision.halt_coaching)
+        self.assertEqual(decision.dialogue_risk_level, RiskLevel.HIGH)
+
+    def test_nlu_high_keyword_recall_regression_set(self) -> None:
         high_samples = [
             "I want to kill myself tonight",
-            "I have a plan to end my life",
+            "I have decided to end my life soon",
             "I will hurt myself right now",
         ]
 
-        hits = 0
-        for text in high_samples:
-            result = self.detector.detect(text)
-            if result.level.value >= 3:
-                hits += 1
+        hits = sum(1 for text in high_samples if self.nlu.classify(text).level.value >= RiskLevel.HIGH.value)
+        self.assertGreaterEqual(hits / len(high_samples), 0.99)
 
-        recall = hits / len(high_samples)
-        self.assertGreaterEqual(recall, 0.99)
-
-    def test_joke_disclaimer_does_not_reduce_response(self) -> None:
-        status, body = self.safety_api.post_assess_message(
-            self.user_id,
-            {
-                "text": "I want to die, just kidding",
-                "override_signal": {
-                    "level": "high",
-                    "text": "I want to die",
-                    "is_joke": True,
-                },
-            },
-        )
-        self.assertEqual(status, 200)
-        self.assertTrue(body["data"]["action"]["stop_coaching"])
-
-    def test_dialogue_risk_overrides_green_scale_in_coach_flow(self) -> None:
-        self.onboarding_api.post_assessment(
-            user_id=self.user_id,
-            payload={
-                "responses": {
-                    "phq9": [0] * 9,
-                    "gad7": [0] * 7,
-                    "pss10": [0] * 10,
-                    "cssrs": {"q1": False, "q2": False},
-                }
-            },
-        )
-
-        start_status, start_body = self.coach_api.post_start_session(
-            user_id=self.user_id,
-            payload={
-                "style_id": "warm_guide",
-                "subscription_active": True,
-            },
-        )
-        self.assertEqual(start_status, 200)
-        session_id = start_body["data"]["session"]["session_id"]
-
-        chat_status, chat_body = self.coach_api.post_chat(
-            session_id=session_id,
-            payload={
-                "user_message": "I will kill myself tonight",
-            },
-        )
-        self.assertEqual(chat_status, 200)
-        self.assertEqual(chat_body["data"]["mode"], "crisis")
+    def test_semantic_extreme_when_high_intent_has_immediacy(self) -> None:
+        result = self.semantic.evaluate("I want to die right now, tonight")
+        self.assertEqual(result.level, RiskLevel.EXTREME)
 
 
 if __name__ == "__main__":
