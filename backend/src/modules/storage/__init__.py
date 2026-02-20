@@ -8,7 +8,7 @@ from modules.storage.sqlite_store import SQLiteStore
 
 def build_application_store() -> InMemoryStore:
     """Build the default runtime store with persistent relational backing."""
-    db_path = os.getenv("MINDCOACH_DB_PATH", "data/mindcoach.sqlite3")
+    db_path = os.getenv("MIMIND_DB_PATH", os.getenv("MINDCOACH_DB_PATH", "data/mimind.sqlite3"))
     return SQLiteStore(db_path=db_path)
 
 

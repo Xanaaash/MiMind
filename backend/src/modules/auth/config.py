@@ -2,7 +2,7 @@ import os
 from dataclasses import dataclass
 
 
-_DEFAULT_DEV_JWT_SECRET = "mindcoach-dev-user-jwt-secret"
+_DEFAULT_DEV_JWT_SECRET = "mimind-dev-user-jwt-secret"
 
 
 @dataclass(frozen=True)

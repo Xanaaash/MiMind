@@ -16,7 +16,7 @@ export default function SafetyPage() {
     <div className="min-h-screen flex flex-col">
       <header className="px-6 py-4 flex items-center justify-between max-w-4xl mx-auto w-full">
         <Link to="/" className="font-heading text-xl font-bold text-accent">
-          MindCoach AI
+          MiMind
         </Link>
       </header>
 

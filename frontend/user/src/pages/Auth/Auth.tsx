@@ -31,7 +31,7 @@ export default function Auth() {
     try {
       await adminLogin(username, password);
 
-      const email = `${username}@mindcoach.ai`;
+      const email = `${username}@mimind.ai`;
       let userId = localStorage.getItem('mc_user_id');
       let resolvedChannel: TriageChannel | null = null;
 
@@ -71,8 +71,7 @@ export default function Auth() {
         transition={{ duration: 0.4 }}
       >
         <Link to="/" className="flex items-center gap-2 mb-6">
-          <span className="font-heading text-2xl font-bold text-accent">MindCoach</span>
-          <span className="text-xs bg-accent-soft text-accent px-2 py-0.5 rounded-full font-semibold">AI</span>
+          <span className="font-heading text-2xl font-bold text-accent">MiMind</span>
         </Link>
 
         <h1 className="font-heading text-2xl font-bold">{t('auth.login')}</h1>

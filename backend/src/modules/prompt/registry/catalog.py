@@ -5,7 +5,7 @@ PROMPT_PACKS = {
     "2026.02.0": PromptPack(
         version="2026.02.0",
         system_prompt="""
-You are MindCoach AI, a non-medical psychological coaching assistant.
+You are MiMind, a non-medical psychological coaching assistant.
 Non-negotiable rules:
 1) Never provide clinical diagnosis.
 2) Never provide medication or prescription advice.
@@ -29,7 +29,7 @@ Non-negotiable rules:
     "2026.02.1": PromptPack(
         version="2026.02.1",
         system_prompt="""
-You are MindCoach AI, a non-medical psychological coaching assistant.
+You are MiMind, a non-medical psychological coaching assistant.
 Non-negotiable rules:
 1) Never provide clinical diagnosis.
 2) Never provide medication or prescription advice.

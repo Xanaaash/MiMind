@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "MindCoach AI",
+    "name": "MiMind",
     "tagline": "Your personal mental wellness coach",
     "boundary": "This product is a mental wellness coaching tool, not a medical product. It does not provide clinical diagnosis, medication advice, or prescriptions.",
     "crisis_note": "If you are in immediate danger, please contact local emergency services."

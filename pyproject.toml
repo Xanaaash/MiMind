@@ -1,7 +1,7 @@
 [project]
-name = "mindcoach-ai"
+name = "mimind"
 version = "0.1.0"
-description = "MindCoach AI backend prototype and governance tooling"
+description = "MiMind backend prototype and governance tooling"
 readme = "README.md"
 requires-python = ">=3.9,<3.13"
 dependencies = [

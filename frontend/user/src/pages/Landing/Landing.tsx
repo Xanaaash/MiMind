@@ -33,7 +33,7 @@ export default function Landing() {
       {/* Header */}
       <header className="px-6 py-4 flex items-center justify-between max-w-6xl mx-auto w-full">
         <div className="flex items-center gap-2">
-          <span className="font-heading text-2xl font-bold text-accent">MindCoach</span>
+          <span className="font-heading text-2xl font-bold text-accent">MiMind</span>
           <span className="text-xs bg-accent-soft text-accent px-2 py-0.5 rounded-full font-semibold">AI</span>
         </div>
         <div className="flex items-center gap-3">

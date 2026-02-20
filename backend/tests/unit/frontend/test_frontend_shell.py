@@ -10,7 +10,7 @@ def test_frontend_root_serves_html() -> None:
 
     assert response.status_code == 200
     assert "text/html" in response.headers.get("content-type", "")
-    assert "MindCoach AI" in response.text
+    assert "MiMind" in response.text
 
 
 def test_frontend_contains_constitution_boundary_copy() -> None:

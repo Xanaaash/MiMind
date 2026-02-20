@@ -22,7 +22,7 @@ $ARGUMENTS
    - `data-model.md` - 数据模型
    - `contracts/` - API 契约（如适用）
 4. 执行 **Constitution Check**：对照 `.specify/memory/constitution.md` 验证计划合规
-5. 确保 MindCoach 红线与安全机制在架构中体现
+5. 确保 MiMind 红线与安全机制在架构中体现
 
 ## 输出
 

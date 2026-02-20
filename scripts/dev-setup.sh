@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "=== MindCoach AI dev setup ==="
+echo "=== MiMind dev setup ==="
 
 if ! command -v uv >/dev/null 2>&1; then
   echo "uv not found. Install uv first: https://docs.astral.sh/uv/"

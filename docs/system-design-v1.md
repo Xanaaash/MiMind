@@ -1,8 +1,8 @@
-# MindCoach AI System Design (V1)
+# MiMind System Design (V1)
 
 ## 1. Product Boundary
 
-MindCoach AI is a psychological coaching platform, not a medical diagnosis or treatment system.
+MiMind is a psychological coaching platform, not a medical diagnosis or treatment system.
 All runtime outputs must comply with constitutional redlines:
 
 - No diagnosis claims

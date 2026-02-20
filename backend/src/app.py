@@ -29,9 +29,9 @@ prompt_api = PromptRegistryAPI()
 observability_api = ObservabilityAPI(store=store)
 
 app = FastAPI(
-    title="MindCoach AI Prototype API",
+    title="MiMind Prototype API",
     version="0.1.0",
-    description="Constitution-aligned prototype backend for MindCoach AI",
+    description="Constitution-aligned prototype backend for MiMind",
 )
 
 

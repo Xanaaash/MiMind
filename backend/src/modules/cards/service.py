@@ -16,5 +16,5 @@ class ShareCardService:
             "title": definition.display_name,
             "subtitle": f"My result: {primary}" if primary else "My latest result",
             "result_id": result.result_id,
-            "share_text": f"I completed {definition.display_name} on MindCoach AI.",
+            "share_text": f"I completed {definition.display_name} on MiMind.",
         }

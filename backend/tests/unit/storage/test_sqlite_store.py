@@ -16,7 +16,7 @@ from modules.user.models import User
 class SQLiteStorePersistenceTests(unittest.TestCase):
     def test_scale_artifacts_persist_across_store_instances(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
-            db_path = f"{temp_dir}/mindcoach.db"
+            db_path = f"{temp_dir}/mimind.db"
 
             store_one = SQLiteStore(db_path=db_path)
             user = User(user_id="u-scale", email="scale@example.com", locale="en-US")
@@ -76,7 +76,7 @@ class SQLiteStorePersistenceTests(unittest.TestCase):
 
     def test_test_results_persist_across_store_instances(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
-            db_path = f"{temp_dir}/mindcoach.db"
+            db_path = f"{temp_dir}/mimind.db"
 
             store_one = SQLiteStore(db_path=db_path)
             result = TestResult(
@@ -107,7 +107,7 @@ class SQLiteStorePersistenceTests(unittest.TestCase):
 
     def test_erase_user_data_removes_persisted_rows(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
-            db_path = f"{temp_dir}/mindcoach.db"
+            db_path = f"{temp_dir}/mimind.db"
 
             store = SQLiteStore(db_path=db_path)
             store.save_user(User(user_id="u-erase", email="erase@example.com", locale="en-US"))

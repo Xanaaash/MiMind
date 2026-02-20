@@ -43,7 +43,7 @@ export default function AppLayout() {
       <header className="sticky top-0 z-30 bg-panel/80 backdrop-blur-md border-b border-line">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <NavLink to="/home" className="flex items-center gap-2">
-            <span className="font-heading text-xl font-bold text-accent">MindCoach</span>
+            <span className="font-heading text-xl font-bold text-accent">MiMind</span>
             <span className="text-xs bg-accent-soft text-accent px-2 py-0.5 rounded-full font-semibold">AI</span>
           </NavLink>
 

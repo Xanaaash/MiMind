@@ -334,7 +334,7 @@ write_if_missing "$SPECS_DIR/003-ai-coach-core/spec.md" <<'EOF_SPEC_003'
 
 As a green-channel user, I can start a coaching conversation with a selected style.
 
-**Why this priority**: Core differentiating value of MindCoach AI.
+**Why this priority**: Core differentiating value of MiMind.
 
 **Independent Test**: Create a green user, choose style, complete one session and get summary.
 

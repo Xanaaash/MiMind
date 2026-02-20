@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# MindCoach AI - 环境配置脚本
+# MiMind - 环境配置脚本
 # 用于安装 uv 和 Specify CLI（当网络可用时运行）
 
 set -e
 
-echo "=== MindCoach AI 环境配置 ==="
+echo "=== MiMind 环境配置 ==="
 
 # 1. 安装 uv
 if command -v uv &>/dev/null; then

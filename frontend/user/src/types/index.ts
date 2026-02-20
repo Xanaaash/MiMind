@@ -9,13 +9,13 @@ export type TriageChannel = 'GREEN' | 'YELLOW' | 'RED';
 
 export interface AuthSessionPayload {
   authenticated: boolean;
+  user?: User;
   user_id?: string;
   email?: string;
   channel?: TriageChannel;
   access_token?: string;
   refresh_token?: string;
   expires_at?: string;
-  user?: User;
 }
 
 export interface TriageDecision {

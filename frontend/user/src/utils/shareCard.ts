@@ -28,7 +28,7 @@ export function generateShareCard(
   ctx.fillStyle = '#3d2a26';
   ctx.font = 'bold 48px Fraunces, serif';
   ctx.textAlign = 'center';
-  ctx.fillText('MindCoach AI', 375, 120);
+  ctx.fillText('MiMind', 375, 120);
 
   // Test name
   ctx.font = 'bold 40px Fraunces, serif';
@@ -64,7 +64,7 @@ export function generateShareCard(
   ctx.fillStyle = '#785c55';
   ctx.font = '24px Nunito Sans, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('扫码或搜索 MindCoach AI 开始你的探索', 375, 1240);
+  ctx.fillText('扫码或搜索 MiMind 开始你的探索', 375, 1240);
   ctx.fillStyle = '#c6674f';
   ctx.font = 'bold 22px Nunito Sans, sans-serif';
   ctx.fillText('非医疗产品 · 心理教练工具', 375, 1290);
@@ -91,7 +91,7 @@ export async function shareImage(canvas: HTMLCanvasElement, title: string) {
 
   if (navigator.share) {
     await navigator.share({
-      title: `MindCoach AI - ${title}`,
+      title: `MiMind - ${title}`,
       files: [file],
     });
   }

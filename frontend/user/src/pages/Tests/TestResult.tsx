@@ -81,7 +81,7 @@ export default function TestResult() {
           <img src={sharePreview} alt="Share card" className="max-w-xs mx-auto rounded-xl shadow-md" />
           <div className="flex gap-3 justify-center mt-4">
             <Button size="sm" onClick={() => {
-              if (canvasRef.current) downloadShareCard(canvasRef.current, `mindcoach-${testId}`);
+              if (canvasRef.current) downloadShareCard(canvasRef.current, `mimind-${testId}`);
             }}>
               下载图片
             </Button>
