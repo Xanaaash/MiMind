@@ -4,6 +4,7 @@ import AppLayout from './components/Layout/AppLayout';
 
 const Landing = lazy(() => import('./pages/Landing/Landing'));
 const Auth = lazy(() => import('./pages/Auth/Auth'));
+const Onboarding = lazy(() => import('./pages/Onboarding/Onboarding'));
 const Home = lazy(() => import('./pages/Home/Home'));
 const ScaleCenter = lazy(() => import('./pages/Scales/ScaleCenter'));
 const ScaleQuiz = lazy(() => import('./pages/Scales/ScaleQuiz'));
@@ -22,6 +23,7 @@ const SafetyPage = lazy(() => import('./pages/Landing/SafetyPage'));
 export const routes: RouteObject[] = [
   { path: '/', element: <Landing /> },
   { path: '/auth', element: <Auth /> },
+  { path: '/onboarding', element: <Onboarding /> },
   { path: '/safety', element: <SafetyPage /> },
   {
     element: <AppLayout />,

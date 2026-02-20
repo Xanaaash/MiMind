@@ -53,6 +53,21 @@
     "go_login": "去登录",
     "go_register": "去注册"
   },
+  "onboarding": {
+    "title": "开始首次基础评估",
+    "subtitle": "请先完成基础量表，我们会生成你的分流通道。",
+    "note": "包含 PHQ-9 / GAD-7 基础筛查，以及必要风险题项用于安全分流。",
+    "core_scale": "基础量表",
+    "safety_scale": "安全分流题项",
+    "yes": "是 / Yes",
+    "no": "否 / No",
+    "submit": "完成评估并进入首页",
+    "submit_success": "评估已完成，已为你生成分流结果",
+    "errors": {
+      "incomplete": "请先完成当前题目再继续",
+      "no_channel": "未获取到分流结果，请稍后重试"
+    }
+  },
   "scales": {
     "title": "心理量表中心",
     "subtitle": "通过专业量表，科学了解你的心理健康状态",

@@ -11,7 +11,7 @@ interface AuthState {
   isInitialized: boolean;
 
   setUser: (userId: string, email: string, locale: string) => void;
-  setChannel: (channel: TriageChannel) => void;
+  setChannel: (channel: TriageChannel | null) => void;
   setLoading: (loading: boolean) => void;
   setInitialized: (initialized: boolean) => void;
   logout: () => void;
@@ -34,7 +34,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   setChannel: (channel) => {
-    localStorage.setItem('mc_channel', channel);
+    if (channel) {
+      localStorage.setItem('mc_channel', channel);
+    } else {
+      localStorage.removeItem('mc_channel');
+    }
     set({ channel });
   },
 

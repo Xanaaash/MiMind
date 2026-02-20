@@ -53,6 +53,21 @@
     "go_login": "Log in",
     "go_register": "Sign up"
   },
+  "onboarding": {
+    "title": "Complete Your Initial Screening",
+    "subtitle": "Please finish the baseline scales first so we can assign your triage channel.",
+    "note": "Includes PHQ-9 / GAD-7 baseline screening and required risk items for safe triage.",
+    "core_scale": "Baseline scales",
+    "safety_scale": "Safety triage items",
+    "yes": "Yes",
+    "no": "No",
+    "submit": "Finish and enter home",
+    "submit_success": "Assessment completed. Your triage channel is now available.",
+    "errors": {
+      "incomplete": "Please answer the current question before continuing.",
+      "no_channel": "Unable to get triage result. Please retry."
+    }
+  },
   "scales": {
     "title": "Assessment Center",
     "subtitle": "Understand your mental health with professional scales",

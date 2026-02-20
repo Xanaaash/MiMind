@@ -5,6 +5,14 @@ export interface User {
   created_at: string;
 }
 
+export interface AuthSessionPayload {
+  authenticated: boolean;
+  user?: User;
+  access_token?: string;
+  refresh_token?: string;
+  expires_at?: string;
+}
+
 export type TriageChannel = 'GREEN' | 'YELLOW' | 'RED';
 
 export interface AuthSessionPayload {

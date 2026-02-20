@@ -16,22 +16,26 @@ const NAV_ITEMS = [
 
 export default function AppLayout() {
   const { t, i18n } = useTranslation();
-  const { isAuthenticated, logout } = useAuthStore();
+  const { isAuthenticated, channel, logout } = useAuthStore();
   const navigate = useNavigate();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/auth');
+      return;
     }
-  }, [isAuthenticated, navigate]);
+    if (!channel) {
+      navigate('/onboarding');
+    }
+  }, [isAuthenticated, channel, navigate]);
 
   const toggleLang = () => {
     const next = i18n.language === 'zh-CN' ? 'en-US' : 'zh-CN';
     i18n.changeLanguage(next);
   };
 
-  if (!isAuthenticated) return null;
+  if (!isAuthenticated || !channel) return null;
 
   return (
     <div className="min-h-screen flex flex-col">
