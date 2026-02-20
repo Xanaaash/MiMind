@@ -19,10 +19,14 @@ const JournalPage = lazy(() => import('./pages/Journal/JournalPage'));
 const BillingPage = lazy(() => import('./pages/Billing/BillingPage'));
 const ProfilePage = lazy(() => import('./pages/Profile/ProfilePage'));
 const SafetyPage = lazy(() => import('./pages/Landing/SafetyPage'));
+const PrivacyPage = lazy(() => import('./pages/Legal/PrivacyPage'));
+const TermsPage = lazy(() => import('./pages/Legal/TermsPage'));
 
 export const routes: RouteObject[] = [
   { path: '/', element: <Landing /> },
   { path: '/auth', element: <Auth /> },
+  { path: '/privacy', element: <PrivacyPage /> },
+  { path: '/terms', element: <TermsPage /> },
   { path: '/onboarding', element: <Onboarding /> },
   { path: '/safety', element: <SafetyPage /> },
   {

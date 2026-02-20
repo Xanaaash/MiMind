@@ -106,7 +106,17 @@ export default function Auth() {
           </Button>
         </form>
 
-        <p className="text-xs text-muted text-center mt-6">{t('app.boundary')}</p>
+        <p className="text-xs text-muted text-center mt-6 leading-relaxed">
+          {t('auth.agree_policy')}{' '}
+          <Link to="/privacy" className="text-accent hover:underline">
+            {t('auth.privacy_policy')}
+          </Link>{' '}
+          {t('auth.and')}{' '}
+          <Link to="/terms" className="text-accent hover:underline">
+            {t('auth.terms')}
+          </Link>
+        </p>
+        <p className="text-xs text-muted text-center mt-3">{t('app.boundary')}</p>
       </motion.div>
     </div>
   );
