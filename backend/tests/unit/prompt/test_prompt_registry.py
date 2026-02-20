@@ -36,10 +36,16 @@ class PromptRegistryUnitTests(unittest.TestCase):
         registry.activate("2026.02.0")
         style_old = get_style_prompt("warm_guide")
         self.assertIn("avoid directive language", style_old["prompt"])
+        deep_old = get_style_prompt("deep_exploration")
+        self.assertIn("pattern", deep_old["prompt"].lower())
 
         registry.activate("2026.02.1")
         style_new = get_style_prompt("warm_guide")
         self.assertIn("gentle next-step question", style_new["prompt"])
+        mindful_new = get_style_prompt("mindfulness_guide")
+        action_new = get_style_prompt("action_coach")
+        self.assertIn("ground", mindful_new["prompt"].lower())
+        self.assertIn("step", action_new["prompt"].lower())
 
         system_prompt = get_system_prompt().lower()
         self.assertIn("never provide clinical diagnosis", system_prompt)

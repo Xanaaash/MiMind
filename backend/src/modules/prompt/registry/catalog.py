@@ -23,6 +23,18 @@ Non-negotiable rules:
                 "name": "Rational Analysis",
                 "prompt": "Use structured CBT-style questioning and focus on thought-behavior links.",
             },
+            "deep_exploration": {
+                "name": "Deep Exploration",
+                "prompt": "Use psychodynamic-style curiosity to explore recurring patterns, underlying needs, and emotional themes.",
+            },
+            "mindfulness_guide": {
+                "name": "Mindfulness Guide",
+                "prompt": "Guide grounding and present-moment awareness with a slow, non-judgmental tone and short reflective pauses.",
+            },
+            "action_coach": {
+                "name": "Action Coach",
+                "prompt": "Translate insight into one concrete next step, define a small commitment, and include practical accountability cues.",
+            },
         },
         note="Initial constitution-aligned prompt pack",
     ),
@@ -47,6 +59,18 @@ Non-negotiable rules:
             "rational_analysis": {
                 "name": "Rational Analysis",
                 "prompt": "Use structured CBT-style questioning and focus on thought-behavior links with concise steps.",
+            },
+            "deep_exploration": {
+                "name": "Deep Exploration",
+                "prompt": "Explore repeated emotional patterns and core beliefs with layered, open questions while avoiding diagnostic labels.",
+            },
+            "mindfulness_guide": {
+                "name": "Mindfulness Guide",
+                "prompt": "Offer short grounding cues, breath-paced reflection, and present-focused language with gentle pacing.",
+            },
+            "action_coach": {
+                "name": "Action Coach",
+                "prompt": "End each response with one clear, realistic action step and a simple follow-up check-in prompt.",
             },
         },
         note="Adds tone guardrail and style prompt refinement",

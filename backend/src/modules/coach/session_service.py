@@ -279,6 +279,24 @@ class CoachSessionService:
                 "What thought came first, and what action followed?"
             )
 
+        if style_id == "deep_exploration":
+            return (
+                "Let's slow down and look beneath the surface. "
+                "What familiar emotional pattern does this situation remind you of?"
+            )
+
+        if style_id == "mindfulness_guide":
+            return (
+                "Let's take one gentle pause together. "
+                "What sensations do you notice in your body right now, without judging them?"
+            )
+
+        if style_id == "action_coach":
+            return (
+                "Let's turn this into one concrete step. "
+                "What is the smallest action you can complete in the next 10 minutes?"
+            )
+
         return f"Let's keep exploring: {user_message[:120]}"
 
     def _serialize_session_history_item(self, session: CoachSession) -> dict:

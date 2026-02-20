@@ -24,8 +24,14 @@ class PromptStackUnitTests(unittest.TestCase):
     def test_style_prompt_registry_returns_expected_styles(self) -> None:
         warm = get_style_prompt("warm_guide")
         rational = get_style_prompt("rational_analysis")
+        deep = get_style_prompt("deep_exploration")
+        mindful = get_style_prompt("mindfulness_guide")
+        action = get_style_prompt("action_coach")
         self.assertIn("empathic", warm["prompt"].lower())
         self.assertIn("cbt", rational["prompt"].lower())
+        self.assertIn("pattern", deep["prompt"].lower())
+        self.assertIn("ground", mindful["prompt"].lower())
+        self.assertIn("step", action["prompt"].lower())
 
     def test_context_prompt_includes_recent_memory(self) -> None:
         from modules.user.models import User

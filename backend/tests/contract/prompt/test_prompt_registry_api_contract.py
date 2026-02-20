@@ -18,6 +18,9 @@ class PromptRegistryAPIContractTests(unittest.TestCase):
         self.assertEqual(list_status, 200)
         self.assertIn("2026.02.0", list_body["data"])
         self.assertIn("2026.02.1", list_body["data"])
+        self.assertIn("deep_exploration", list_body["data"]["2026.02.1"]["style_ids"])
+        self.assertIn("mindfulness_guide", list_body["data"]["2026.02.1"]["style_ids"])
+        self.assertIn("action_coach", list_body["data"]["2026.02.1"]["style_ids"])
 
         active_status, active_body = self.api.get_active()
         self.assertEqual(active_status, 200)

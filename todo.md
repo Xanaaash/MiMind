@@ -91,7 +91,7 @@
 
 ### 2.4 AI 教练后端
 
-- [🔒 codex-0220b] **T-231** 补全 3 种咨询风格 Prompt Pack（深度探索、正念引导、行动教练）
+- [✅] **T-231** 补全 3 种咨询风格 Prompt Pack（深度探索、正念引导、行动教练）
 - [✅] **T-232** 教练会话历史 API（列表 + 单条摘要）
 - [✅] **T-233** OpenAI/Claude streaming 响应支持（SSE endpoint）
 
