@@ -20,7 +20,7 @@
 ### 1.1 用户认证 & Onboarding
 
 - [🔒 codex-0220a] **T-101** 用户端真实密码注册/登录流程（后端新增 `/api/auth/login` + JWT/session）
-- [🔒 codex-0220b] **T-102** Onboarding 引导流程：注册后引导填写基础量表（PHQ-9、GAD-7），完成分流
+- [✅] **T-102** Onboarding 引导流程：注册后引导填写基础量表（PHQ-9、GAD-7），完成分流
 - [ ] **T-103** 隐私政策页 `/privacy` + 服务条款页 `/terms`（中英文）
 - [ ] **T-104** 忘记密码 / 重置密码流程
 
