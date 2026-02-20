@@ -324,6 +324,18 @@ export default function ToolsHub() {
           </div>
         </Card>
 
+        {/* Pomodoro */}
+        <Card hoverable onClick={() => navigate('/tools/pomodoro')}>
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-warn-soft flex items-center justify-center text-3xl">🍅</div>
+            <div>
+              <h3 className="font-heading font-bold text-lg">{t('tools.pomo_title')}</h3>
+              <p className="text-muted text-sm mt-1">{t('tools.pomo_desc')}</p>
+              <p className="text-accent font-semibold text-sm mt-2">{t('tools.start')} →</p>
+            </div>
+          </div>
+        </Card>
+
         {/* Meditation */}
         <Card hoverable onClick={() => navigate('/tools/meditation')}>
           <div className="flex items-center gap-4">

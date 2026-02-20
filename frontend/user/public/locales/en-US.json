@@ -200,6 +200,8 @@
     "meditation_track_focus_desc": "Bring attention back to body sensations and reduce mental noise.",
     "meditation_track_sleep_title": "Sleep Wind Down (20 min)",
     "meditation_track_sleep_desc": "Slow your nervous system and transition into restful sleep.",
+    "pomo_title": "Focus Timer",
+    "pomo_desc": "Pomodoro + micro-rewards to get you moving",
     "back_to_tools": "Back to Tools",
     "start": "Start",
     "stop": "Stop",
@@ -308,6 +310,23 @@
     "grounding_done": "Exercise complete. You did great.",
     "grounding_reset": "Start over",
     "disclaimer": "This tool is for self-regulation only and cannot replace professional help. If you feel severely distressed, please contact a professional."
+  },
+  "pomo": {
+    "back": "Back to Tools",
+    "today": "today",
+    "title": "Focus Timer",
+    "subtitle": "Break tasks into small bites — reward yourself after each session",
+    "ready": "Ready",
+    "phase_work": "Focus",
+    "phase_break": "Break",
+    "start": "Start Focus",
+    "stop": "Stop",
+    "tasks_title": "Task Breakdown",
+    "tasks_hint": "Split your big task into small 5-min steps",
+    "task_placeholder": "Write a small step...",
+    "no_tasks": "No tasks yet — break one down",
+    "reward_title": "Well done!",
+    "reward_desc": "{{count}} pomodoros completed today"
   },
   "common": {
     "loading": "Loading...",
