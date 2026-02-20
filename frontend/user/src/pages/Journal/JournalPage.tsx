@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { createJournalEntry, getJournalTrend } from '../../api/tools';
 import { useAuthStore } from '../../stores/auth';
+import { toast } from '../../stores/toast';
 import Button from '../../components/Button/Button';
 import Card from '../../components/Card/Card';
 
@@ -25,7 +26,6 @@ export default function JournalPage() {
   const [energy, setEnergy] = useState(5);
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
   const [trendData, setTrendData] = useState<Array<{ date: string; energy: number }>>([]);
 
   useEffect(() => {
@@ -47,9 +47,8 @@ export default function JournalPage() {
     setSaving(true);
     try {
       await createJournalEntry(userId, mood, energy, note);
-      setSaved(true);
       setNote('');
-      setTimeout(() => setSaved(false), 2000);
+      toast.success(t('journal.save') === '保存' ? '日记已保存' : 'Entry saved');
       const data = await getJournalTrend(userId, 7);
       if (data.entries) {
         setTrendData(data.entries.map((e) => ({
@@ -125,7 +124,7 @@ export default function JournalPage() {
           onClick={handleSave}
           loading={saving}
         >
-          {saved ? '✓ ' : ''}{t('journal.save')}
+          {t('journal.save')}
         </Button>
       </Card>
 

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { getPlans, startTrial, getSubscription } from '../../api/billing';
 import { useAuthStore } from '../../stores/auth';
+import { toast } from '../../stores/toast';
 import type { BillingPlan, SubscriptionRecord } from '../../types';
 import Button from '../../components/Button/Button';
 import Card from '../../components/Card/Card';
@@ -39,8 +40,10 @@ export default function BillingPage() {
     try {
       const sub = await startTrial(userId);
       setSubscription(sub);
-    } catch { /* no-op */ }
-    finally { setActionLoading(''); }
+      toast.success(t('billing.trial'));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed');
+    } finally { setActionLoading(''); }
   };
 
   if (loading) return <Loading text={t('common.loading')} />;
