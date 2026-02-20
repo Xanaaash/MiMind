@@ -1,5 +1,7 @@
+import json
+
 from fastapi import Body, FastAPI, HTTPException, Query, Request, Response
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 from modules.api.admin_endpoints import AdminAPI
 from modules.api.billing_endpoints import BillingAPI
@@ -228,6 +230,53 @@ def start_coach_session(user_id: str, payload: dict = Body(...)) -> dict:
 def chat_with_coach(session_id: str, payload: dict = Body(...)) -> dict:
     status, body = coach_api.post_chat(session_id=session_id, payload=payload)
     return _unwrap(status, body)
+
+
+@app.post("/api/coach/{session_id}/chat/stream")
+def stream_chat_with_coach(session_id: str, payload: dict = Body(...)) -> StreamingResponse:
+    status, body = coach_api.post_chat_stream(session_id=session_id, payload=payload)
+    if status >= 400:
+        raise HTTPException(status_code=status, detail=body.get("error", "request failed"))
+
+    data = body.get("data", {})
+    coach_message = str(data.get("coach_message", ""))
+
+    def _sse_event(event: str, content: dict) -> str:
+        return f"event: {event}\ndata: {json.dumps(content, ensure_ascii=False)}\n\n"
+
+    def _stream():
+        yield _sse_event(
+            "meta",
+            {
+                "mode": data.get("mode"),
+                "halted": data.get("halted"),
+            },
+        )
+
+        chunk_size = 4
+        for index in range(0, len(coach_message), chunk_size):
+            chunk = coach_message[index:index + chunk_size]
+            yield _sse_event(
+                "token",
+                {
+                    "delta": chunk,
+                    "index": index // chunk_size,
+                },
+            )
+
+        yield _sse_event(
+            "done",
+            {
+                "coach_message": coach_message,
+                "triage": data.get("triage"),
+                "safety": data.get("safety"),
+                "model": data.get("model"),
+                "mode": data.get("mode"),
+                "halted": data.get("halted"),
+            },
+        )
+
+    return StreamingResponse(_stream(), media_type="text/event-stream")
 
 
 @app.post("/api/coach/{session_id}/end")

@@ -70,6 +70,19 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         )
         self.assertEqual(chat.status_code, 200)
 
+        with self.client.stream(
+            "POST",
+            f"/api/coach/{session_id}/chat/stream",
+            json={"user_message": "Please help me with a small plan for today."},
+        ) as stream_response:
+            self.assertEqual(stream_response.status_code, 200)
+            self.assertIn("text/event-stream", stream_response.headers.get("content-type", ""))
+            stream_body = "".join(stream_response.iter_text())
+
+        self.assertIn("event: meta", stream_body)
+        self.assertIn("event: token", stream_body)
+        self.assertIn("event: done", stream_body)
+
         end = self.client.post(f"/api/coach/{session_id}/end")
         self.assertEqual(end.status_code, 200)
 

@@ -78,6 +78,16 @@ class CoachAPIContractTests(unittest.TestCase):
         self.assertIn("provider", chat_body["data"]["model"])
         self.assertIn("task_type", chat_body["data"]["model"])
 
+        stream_status, stream_body = self.coach_api.post_chat_stream(
+            session_id=session_id,
+            payload={
+                "user_message": "Can we continue with one practical step?",
+            },
+        )
+        self.assertEqual(stream_status, 200)
+        self.assertIn("coach_message", stream_body["data"])
+        self.assertIn("mode", stream_body["data"])
+
         end_status, end_body = self.coach_api.post_end_session(session_id)
         self.assertEqual(end_status, 200)
         self.assertIn("summary", end_body["data"])

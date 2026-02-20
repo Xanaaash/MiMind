@@ -45,6 +45,9 @@ class CoachAPI:
         except ValueError as error:
             return 400, {"error": str(error)}
 
+    def post_chat_stream(self, session_id: str, payload: Dict[str, Any]) -> Tuple[int, Dict[str, Any]]:
+        return self.post_chat(session_id=session_id, payload=payload)
+
     def post_end_session(self, session_id: str) -> Tuple[int, Dict[str, Any]]:
         try:
             data = self._service.end_session(session_id=session_id)
