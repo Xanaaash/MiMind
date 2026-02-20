@@ -7,7 +7,22 @@ services:
     ports:
       - "8080:8080"
     environment:
-      MIMIND_DB_PATH: /app/data/mimind.sqlite3
+      MIMIND_DB_PATH: ${MIMIND_DB_PATH:-/app/data/mimind.sqlite3}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET:-mimind-dev-user-jwt-secret}
+      AUTH_ACCESS_TTL_MINUTES: ${AUTH_ACCESS_TTL_MINUTES:-15}
+      AUTH_REFRESH_TTL_HOURS: ${AUTH_REFRESH_TTL_HOURS:-168}
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-false}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      OPENAI_COACH_MODEL: ${OPENAI_COACH_MODEL:-gpt-4o-mini}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      MINDCOACH_PROVIDER_SAFETY_NLU: ${MINDCOACH_PROVIDER_SAFETY_NLU:-local}
+      MINDCOACH_PROVIDER_SAFETY_SEMANTIC: ${MINDCOACH_PROVIDER_SAFETY_SEMANTIC:-local}
+      MINDCOACH_PROVIDER_COACH: ${MINDCOACH_PROVIDER_COACH:-local}
+      MINDCOACH_MEMORY_EMBEDDER: ${MINDCOACH_MEMORY_EMBEDDER:-local}
+      MINDCOACH_MEMORY_RERANKER: ${MINDCOACH_MEMORY_RERANKER:-local}
+      MINDCOACH_PROMPT_PACK: ${MINDCOACH_PROMPT_PACK:-}
     volumes:
       - app_data:/app/data
     depends_on:
@@ -25,9 +40,9 @@ services:
     image: postgres:16-alpine
     container_name: mimind-db
     environment:
-      POSTGRES_DB: mimind
-      POSTGRES_USER: mimind
-      POSTGRES_PASSWORD: mimind_dev
+      POSTGRES_DB: ${POSTGRES_DB:-mimind}
+      POSTGRES_USER: ${POSTGRES_USER:-mimind}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mimind_dev}
     ports:
       - "5432:5432"
     volumes:

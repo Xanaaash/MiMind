@@ -69,3 +69,13 @@
 - 服务说明：
   - `app`：运行 `FastAPI + Nginx`（前端静态托管 + `/api` 反代）
   - `db`：PostgreSQL 16（为后续数据库迁移任务预留）
+
+## 环境变量（T-404）
+
+- 示例文件：`.env.example`
+- 使用方式：`cp .env.example .env` 后按环境修改
+- 生产环境至少应配置：
+  - `ADMIN_PASSWORD`
+  - `AUTH_JWT_SECRET`
+- 当模型 provider 使用 `openai` 时，还需配置：
+  - `OPENAI_API_KEY`
