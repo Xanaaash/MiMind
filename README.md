@@ -80,3 +80,5 @@
   - `AUTH_JWT_SECRET`
 - 当模型 provider 使用 `openai` 时，还需配置：
   - `OPENAI_API_KEY`
+- 音频资源托管可选配置：
+  - `MEDIA_ASSET_BASE_URL`（默认 `/audio`，可替换为 CDN / 对象存储前缀）

@@ -115,17 +115,22 @@ export interface CoachStyle {
 }
 
 export interface AudioTrack {
-  trackId: string;
   name: string;
   category: string;
   duration_seconds: number;
+  hosting: string;
+  stream_url: string | null;
+  asset_base_url: string;
 }
 
 export interface MeditationItem {
-  meditationId: string;
   name: string;
   category: string;
   duration_seconds: number;
+  minutes: number;
+  hosting: string;
+  audio_url: string;
+  asset_base_url: string;
 }
 
 export interface JournalEntry {

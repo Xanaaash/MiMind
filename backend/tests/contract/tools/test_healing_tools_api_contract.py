@@ -31,6 +31,9 @@ class HealingToolsAPIContractTests(unittest.TestCase):
     def test_tools_and_journal_contract(self) -> None:
         _, audio_body = self.tools_api.get_audio_library()
         self.assertIn("rain", audio_body["data"])
+        self.assertIn("ocean", audio_body["data"])
+        self.assertEqual(audio_body["data"]["rain"]["hosting"], "embedded-web-audio")
+        self.assertIn("asset_base_url", audio_body["data"]["rain"])
 
         audio_status, audio_start = self.tools_api.post_start_audio(
             self.user_id,
@@ -41,6 +44,7 @@ class HealingToolsAPIContractTests(unittest.TestCase):
         )
         self.assertEqual(audio_status, 200)
         self.assertEqual(audio_start["data"]["duration_minutes"], 15)
+        self.assertIsNone(audio_start["data"]["track"]["stream_url"])
 
         breathing_status, breathing_body = self.tools_api.post_breathing_session(
             self.user_id,
@@ -59,6 +63,8 @@ class HealingToolsAPIContractTests(unittest.TestCase):
         )
         self.assertEqual(meditation_status, 200)
         self.assertEqual(meditation_body["data"]["meditation_id"], "calm-10")
+        self.assertIn("/audio/meditation/calm-reset.m4a", meditation_body["data"]["session"]["audio_url"])
+        self.assertEqual(meditation_body["data"]["session"]["duration_seconds"], 600)
 
         journal_status, journal_body = self.tools_api.post_journal_entry(
             self.user_id,

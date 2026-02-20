@@ -59,6 +59,24 @@ class ToolsAndJournalUnitTests(unittest.TestCase):
         self.assertEqual(stats["total_usage_count"], 3)
         self.assertEqual(stats["total_duration_seconds"], 938)
 
+    def test_audio_library_exposes_hosting_metadata(self) -> None:
+        audio = AudioToolService(self.store)
+        library = audio.list_tracks()
+
+        self.assertIn("campfire", library)
+        self.assertEqual(library["rain"]["hosting"], "embedded-web-audio")
+        self.assertIn("asset_base_url", library["rain"])
+        self.assertIsNone(library["rain"]["stream_url"])
+
+    def test_meditation_library_exposes_audio_urls(self) -> None:
+        meditation = MeditationToolService(self.store)
+        sessions = meditation.list_sessions()
+
+        self.assertIn("calm-10", sessions)
+        self.assertEqual(sessions["calm-10"]["duration_seconds"], 600)
+        self.assertIn("/audio/meditation/calm-reset.m4a", sessions["calm-10"]["audio_url"])
+        self.assertEqual(sessions["calm-10"]["hosting"], "cdn-or-embedded-static")
+
 
 if __name__ == "__main__":
     unittest.main()

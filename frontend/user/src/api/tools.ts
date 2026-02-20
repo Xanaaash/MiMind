@@ -2,7 +2,7 @@ import { api } from './client';
 import type { AudioTrack, MeditationItem, JournalEntry, JournalTrend, ToolUsageStats } from '../types';
 
 export function getAudioLibrary() {
-  return api.get<Record<string, { name: string; category: string; duration_seconds: number }>>('/api/tools/audio/library');
+  return api.get<Record<string, AudioTrack>>('/api/tools/audio/library');
 }
 
 export function startAudio(userId: string, trackId: string, minutes: number) {
@@ -14,7 +14,7 @@ export function completeBreathing(userId: string, cycles: number) {
 }
 
 export function getMeditationLibrary() {
-  return api.get<Record<string, { name: string; category: string; duration_seconds: number }>>('/api/tools/meditation/library');
+  return api.get<Record<string, MeditationItem>>('/api/tools/meditation/library');
 }
 
 export function startMeditation(userId: string, meditationId: string) {
