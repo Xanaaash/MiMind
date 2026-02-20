@@ -6,6 +6,7 @@ import { routes } from './router';
 import Loading from './components/Loading/Loading';
 import ToastContainer from './components/Toast/Toast';
 import GlobalErrorBoundary from './components/ErrorBoundary/GlobalErrorBoundary';
+import InstallPrompt from './components/PWA/InstallPrompt';
 
 const LANG_MAP: Record<string, string> = {
   'zh-CN': 'zh-Hans',
@@ -41,6 +42,7 @@ export default function App() {
         </Suspense>
       </GlobalErrorBoundary>
       <ToastContainer />
+      <InstallPrompt />
     </>
   );
 }

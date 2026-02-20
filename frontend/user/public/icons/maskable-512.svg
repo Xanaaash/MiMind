@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#faf8f5"/>
+  <circle cx="256" cy="210" r="80" fill="none" stroke="#c97b63" stroke-width="12"/>
+  <path d="M196 274 C196 340 256 384 256 384 C256 384 316 340 316 274" fill="none" stroke="#c97b63" stroke-width="12" stroke-linecap="round"/>
+  <text x="256" y="440" text-anchor="middle" font-family="sans-serif" font-size="48" font-weight="700" fill="#5c4a42">MiMind</text>
+</svg>

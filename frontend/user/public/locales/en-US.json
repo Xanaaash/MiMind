@@ -328,6 +328,12 @@
     "reward_title": "Well done!",
     "reward_desc": "{{count}} pomodoros completed today"
   },
+  "pwa": {
+    "install_title": "Install MiMind",
+    "install_desc": "Quick access anytime — crisis hotlines available offline",
+    "install_btn": "Install",
+    "dismiss": "Not now"
+  },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",
