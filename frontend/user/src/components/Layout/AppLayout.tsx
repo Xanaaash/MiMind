@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { path: '/home', labelKey: 'nav.home', icon: '🏠' },
   { path: '/scales', labelKey: 'nav.scales', icon: '📋' },
   { path: '/tests', labelKey: 'nav.tests', icon: '🧩' },
+  { path: '/neurodiversity', labelKey: 'nav.neuro', icon: '🧠' },
   { path: '/coach', labelKey: 'nav.coach', icon: '💬' },
   { path: '/tools', labelKey: 'nav.tools', icon: '🌿' },
   { path: '/journal', labelKey: 'nav.journal', icon: '📝' },

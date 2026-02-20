@@ -25,6 +25,9 @@ const ProfilePage = lazy(() => import('./pages/Profile/ProfilePage'));
 const SafetyPage = lazy(() => import('./pages/Landing/SafetyPage'));
 const PrivacyPage = lazy(() => import('./pages/Legal/PrivacyPage'));
 const TermsPage = lazy(() => import('./pages/Legal/TermsPage'));
+const NeuroHub = lazy(() => import('./pages/Neurodiversity/NeuroHub'));
+const NeuroQuiz = lazy(() => import('./pages/Neurodiversity/NeuroQuiz'));
+const NeuroResult = lazy(() => import('./pages/Neurodiversity/NeuroResult'));
 const NotFoundPage = lazy(() => import('./pages/Error/NotFoundPage'));
 
 export const routes: RouteObject[] = [
@@ -51,6 +54,9 @@ export const routes: RouteObject[] = [
       { path: '/tools/sensory-relief', element: <SensoryRelief /> },
       { path: '/tools/pomodoro', element: <PomodoroTimer /> },
       { path: '/tools/meditation', element: <MeditationPlayer /> },
+      { path: '/neurodiversity', element: <NeuroHub /> },
+      { path: '/neurodiversity/:scaleId', element: <NeuroQuiz /> },
+      { path: '/neurodiversity/:scaleId/result', element: <NeuroResult /> },
       { path: '/journal', element: <JournalPage /> },
       { path: '/billing', element: <BillingPage /> },
       { path: '/profile', element: <ProfilePage /> },
