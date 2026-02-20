@@ -16,6 +16,7 @@ const CoachPage = lazy(() => import('./pages/Coach/CoachPage'));
 const CoachHistoryPage = lazy(() => import('./pages/Coach/CoachHistoryPage'));
 const ToolsHub = lazy(() => import('./pages/Tools/ToolsHub'));
 const BreathingExercise = lazy(() => import('./pages/Tools/BreathingExercise'));
+const SensoryRelief = lazy(() => import('./pages/Tools/SensoryRelief'));
 const JournalPage = lazy(() => import('./pages/Journal/JournalPage'));
 const BillingPage = lazy(() => import('./pages/Billing/BillingPage'));
 const ProfilePage = lazy(() => import('./pages/Profile/ProfilePage'));
@@ -45,6 +46,7 @@ export const routes: RouteObject[] = [
       { path: '/coach/history', element: <CoachHistoryPage /> },
       { path: '/tools', element: <ToolsHub /> },
       { path: '/tools/breathing', element: <BreathingExercise /> },
+      { path: '/tools/sensory-relief', element: <SensoryRelief /> },
       { path: '/journal', element: <JournalPage /> },
       { path: '/billing', element: <BillingPage /> },
       { path: '/profile', element: <ProfilePage /> },

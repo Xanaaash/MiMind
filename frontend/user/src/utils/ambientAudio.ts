@@ -1,4 +1,4 @@
-export type AmbientSoundId = 'rain' | 'ocean' | 'forest' | 'campfire' | 'cafe';
+export type AmbientSoundId = 'rain' | 'ocean' | 'forest' | 'campfire' | 'cafe' | 'pink_noise' | 'brown_noise';
 
 export interface AmbientSound {
   id: AmbientSoundId;
@@ -13,6 +13,11 @@ export const AMBIENT_SOUNDS: AmbientSound[] = [
   { id: 'forest', emoji: '🌲', nameKey: 'tools.sound_forest', color: 'bg-safe-soft' },
   { id: 'campfire', emoji: '🔥', nameKey: 'tools.sound_campfire', color: 'bg-warn-soft' },
   { id: 'cafe', emoji: '☕', nameKey: 'tools.sound_cafe', color: 'bg-accent-soft' },
+];
+
+export const SENSORY_SOUNDS: AmbientSound[] = [
+  { id: 'pink_noise', emoji: '🩷', nameKey: 'tools.sound_pink_noise', color: 'bg-accent-soft' },
+  { id: 'brown_noise', emoji: '🤎', nameKey: 'tools.sound_brown_noise', color: 'bg-warn-soft' },
 ];
 
 let ctx: AudioContext | null = null;
@@ -324,12 +329,40 @@ function buildCafe(ac: AudioContext, master: GainNode) {
   activeSources.push(chatter, ambient);
 }
 
+function buildPinkNoise(ac: AudioContext, master: GainNode) {
+  const src = ac.createBufferSource();
+  src.buffer = createNoiseBuffer(6, 'pink');
+  src.loop = true;
+  const lp = ac.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 8000;
+  src.connect(lp).connect(master);
+  src.start();
+  activeNodes.push(lp);
+  activeSources.push(src);
+}
+
+function buildBrownNoise(ac: AudioContext, master: GainNode) {
+  const src = ac.createBufferSource();
+  src.buffer = createNoiseBuffer(6, 'brown');
+  src.loop = true;
+  const lp = ac.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 600;
+  src.connect(lp).connect(master);
+  src.start();
+  activeNodes.push(lp);
+  activeSources.push(src);
+}
+
 const builders: Record<AmbientSoundId, (ac: AudioContext, master: GainNode) => void> = {
   rain: buildRain,
   ocean: buildOcean,
   forest: buildForest,
   campfire: buildCampfire,
   cafe: buildCafe,
+  pink_noise: buildPinkNoise,
+  brown_noise: buildBrownNoise,
 };
 
 export function playAmbient(soundId: AmbientSoundId, volume = 0.7) {

@@ -210,6 +210,18 @@ export default function ToolsHub() {
 
       {/* Other tools */}
       <div className="grid md:grid-cols-2 gap-6">
+        {/* Sensory Relief */}
+        <Card hoverable onClick={() => navigate('/tools/sensory-relief')}>
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-calm-soft flex items-center justify-center text-3xl">🛡️</div>
+            <div>
+              <h3 className="font-heading font-bold text-lg">{t('tools.sensory_title')}</h3>
+              <p className="text-muted text-sm mt-1">{t('tools.sensory_desc')}</p>
+              <p className="text-accent font-semibold text-sm mt-2">{t('tools.start')} →</p>
+            </div>
+          </div>
+        </Card>
+
         {/* Breathing */}
         <Card hoverable onClick={() => navigate('/tools/breathing')}>
           <div className="flex items-center gap-4">
