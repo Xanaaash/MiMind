@@ -74,6 +74,13 @@
     "start": "开始测评",
     "items": "题",
     "progress": "第 {{current}} 题 / 共 {{total}} 题",
+    "section_progress": "第 {{current}} 组 / 共 {{total}} 组",
+    "answered_progress": "已完成 {{answered}} / {{total}} 题",
+    "group_range": "题目 {{start}} - {{end}}",
+    "group_answered": "本组已完成 {{answered}} / {{total}} 题",
+    "resume_hint": "SCL-90 进度会自动保存在当前设备",
+    "draft_restored": "已恢复你上次的 SCL-90 作答进度",
+    "clear_progress": "清空进度",
     "prev": "上一题",
     "next": "下一题",
     "submit": "提交",
@@ -83,7 +90,10 @@
     "paywall_title": "解锁完整量表报告",
     "paywall_subtitle": "当前方案仅支持填写量表。订阅后可查看完整得分解读与趋势。",
     "unlock_reports": "去订阅解锁",
-    "back_to_list": "返回量表列表"
+    "back_to_list": "返回量表列表",
+    "errors": {
+      "complete_section": "请先完成本组全部题目再继续"
+    }
   },
   "tests": {
     "title": "互动测试中心",
