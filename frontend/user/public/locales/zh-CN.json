@@ -186,6 +186,12 @@
     "crisis_message": "你的安全是最重要的。请联系专业人士获取帮助。",
     "acknowledge": "我已知晓以上资源"
   },
+  "not_found": {
+    "title": "这条路径迷路啦",
+    "subtitle": "页面可能已移动或链接有误，你可以先返回首页继续使用。",
+    "back_home": "回到首页",
+    "safety": "查看安全资源"
+  },
   "common": {
     "loading": "加载中...",
     "error": "出错了",

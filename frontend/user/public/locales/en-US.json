@@ -186,6 +186,12 @@
     "crisis_message": "Your safety is the most important thing. Please reach out to a professional for help.",
     "acknowledge": "I have noted the above resources"
   },
+  "not_found": {
+    "title": "This page went missing",
+    "subtitle": "The page may have moved or the link is invalid. You can return home and continue from there.",
+    "back_home": "Back to Home",
+    "safety": "Safety Resources"
+  },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",

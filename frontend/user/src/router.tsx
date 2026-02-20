@@ -21,6 +21,7 @@ const ProfilePage = lazy(() => import('./pages/Profile/ProfilePage'));
 const SafetyPage = lazy(() => import('./pages/Landing/SafetyPage'));
 const PrivacyPage = lazy(() => import('./pages/Legal/PrivacyPage'));
 const TermsPage = lazy(() => import('./pages/Legal/TermsPage'));
+const NotFoundPage = lazy(() => import('./pages/Error/NotFoundPage'));
 
 export const routes: RouteObject[] = [
   { path: '/', element: <Landing /> },
@@ -47,4 +48,5 @@ export const routes: RouteObject[] = [
       { path: '/profile', element: <ProfilePage /> },
     ],
   },
+  { path: '*', element: <NotFoundPage /> },
 ];
