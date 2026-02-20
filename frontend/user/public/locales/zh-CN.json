@@ -92,6 +92,23 @@
     "share": "分享结果",
     "back_to_list": "返回测试列表"
   },
+  "coach_gate": {
+    "title": "开始使用 AI 教练前，先完成一次基础评估",
+    "missing_desc": "为了给你更安全、更精准的陪伴，我们需要先了解你当前的状态。以下量表仅需几分钟即可完成。",
+    "expired_desc": "你上次的评估已超过 30 天，为了确保 AI 教练的安全性，请更新一下你的基础数据。",
+    "mandatory": "必做量表（安全基线）",
+    "optional": "选做量表（建议完成）",
+    "scale_phq9": "PHQ-9 情绪状态筛查",
+    "scale_phq9_desc": "快速了解你近两周的情绪状态",
+    "scale_gad7": "GAD-7 焦虑状态筛查",
+    "scale_gad7_desc": "评估你近两周的焦虑水平",
+    "scale_cssrs": "安全风险评估",
+    "scale_cssrs_desc": "必要的安全分流题项，保障你的使用安全",
+    "scale_pss10": "PSS-10 压力感知",
+    "scale_pss10_desc": "了解你近期的压力水平，帮教练更好地理解你",
+    "start_assessment": "开始评估",
+    "time_estimate": "约 5-8 分钟即可完成"
+  },
   "coach": {
     "title": "AI 心理教练",
     "subtitle": "选择一种你喜欢的咨询风格，开始今天的对话",
