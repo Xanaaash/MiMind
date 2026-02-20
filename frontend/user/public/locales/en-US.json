@@ -80,6 +80,9 @@
     "result_title": "Results",
     "score": "Score",
     "severity": "Severity",
+    "paywall_title": "Unlock Full Assessment Reports",
+    "paywall_subtitle": "Your current plan includes submissions only. Subscribe to view full score interpretation and insights.",
+    "unlock_reports": "Upgrade to Unlock",
     "back_to_list": "Back to List"
   },
   "tests": {

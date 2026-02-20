@@ -1,5 +1,5 @@
 import { api } from './client';
-import type { BillingPlan, SubscriptionRecord } from '../types';
+import type { BillingEntitlements, BillingPlan, SubscriptionRecord } from '../types';
 
 export function getPlans() {
   return api.get<BillingPlan[]>('/api/billing/plans');
@@ -18,5 +18,5 @@ export function getSubscription(userId: string) {
 }
 
 export function getEntitlements(userId: string) {
-  return api.get<unknown>(`/api/billing/${userId}/entitlements`);
+  return api.get<BillingEntitlements>(`/api/billing/${userId}/entitlements`);
 }

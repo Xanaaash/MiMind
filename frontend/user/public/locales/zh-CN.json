@@ -80,6 +80,9 @@
     "result_title": "测评结果",
     "score": "得分",
     "severity": "程度",
+    "paywall_title": "解锁完整量表报告",
+    "paywall_subtitle": "当前方案仅支持填写量表。订阅后可查看完整得分解读与趋势。",
+    "unlock_reports": "去订阅解锁",
     "back_to_list": "返回量表列表"
   },
   "tests": {

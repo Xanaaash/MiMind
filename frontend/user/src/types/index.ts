@@ -157,6 +157,16 @@ export interface SubscriptionRecord {
   ai_used_in_cycle: number;
 }
 
+export interface BillingEntitlements {
+  channel: TriageChannel;
+  ai_coaching_enabled: boolean;
+  assessment_reports_enabled: boolean;
+  healing_tools_enabled: boolean;
+  plan_id: string;
+  ai_quota_remaining: number;
+  suggest_medical_follow_up: boolean;
+}
+
 export interface Hotline {
   label: string;
   number: string;
