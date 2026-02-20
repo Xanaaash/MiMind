@@ -28,8 +28,12 @@ type Step = {
 };
 
 function toChannel(value: unknown): TriageChannel | null {
-  if (value === 'GREEN' || value === 'YELLOW' || value === 'RED') {
-    return value;
+  if (typeof value !== 'string') {
+    return null;
+  }
+  const normalized = value.trim().toUpperCase();
+  if (normalized === 'GREEN' || normalized === 'YELLOW' || normalized === 'RED') {
+    return normalized as TriageChannel;
   }
   return null;
 }
