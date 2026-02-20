@@ -52,3 +52,11 @@
   - `uv run ruff check .`
   - `uv run mypy`
   - `scripts/run-backend-tests.sh`
+
+## Docker（T-401）
+
+- 构建镜像：`docker build -t mimind:latest .`
+- 运行容器：`docker run --rm -p 8080:8080 mimind:latest`
+- 访问地址：
+  - 前端（Nginx 静态服务）：`http://127.0.0.1:8080`
+  - 后端健康检查（经 Nginx 反代）：`http://127.0.0.1:8080/healthz`

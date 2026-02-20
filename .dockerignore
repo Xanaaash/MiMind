@@ -1,0 +1,17 @@
+.git
+.github
+.worktrees
+.autodev
+.cursor
+.specify
+.venv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+data/
+frontend/user/node_modules/
+frontend/user/dist/
+frontend/admin/node_modules/
+frontend/admin/dist/
