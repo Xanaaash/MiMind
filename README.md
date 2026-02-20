@@ -60,3 +60,12 @@
 - 访问地址：
   - 前端（Nginx 静态服务）：`http://127.0.0.1:8080`
   - 后端健康检查（经 Nginx 反代）：`http://127.0.0.1:8080/healthz`
+
+## Docker Compose（T-402）
+
+- 一键启动：`docker compose up -d --build`
+- 查看状态：`docker compose ps`
+- 停止并清理：`docker compose down`
+- 服务说明：
+  - `app`：运行 `FastAPI + Nginx`（前端静态托管 + `/api` 反代）
+  - `db`：PostgreSQL 16（为后续数据库迁移任务预留）
