@@ -74,6 +74,13 @@
     "start": "Start Assessment",
     "items": "items",
     "progress": "Question {{current}} of {{total}}",
+    "section_progress": "Section {{current}} of {{total}}",
+    "answered_progress": "{{answered}} of {{total}} answered",
+    "group_range": "Questions {{start}} - {{end}}",
+    "group_answered": "{{answered}} of {{total}} answered in this section",
+    "resume_hint": "SCL-90 progress is saved automatically on this device.",
+    "draft_restored": "Restored your previous SCL-90 progress.",
+    "clear_progress": "Clear Progress",
     "prev": "Previous",
     "next": "Next",
     "submit": "Submit",
@@ -83,7 +90,10 @@
     "paywall_title": "Unlock Full Assessment Reports",
     "paywall_subtitle": "Your current plan includes submissions only. Subscribe to view full score interpretation and insights.",
     "unlock_reports": "Upgrade to Unlock",
-    "back_to_list": "Back to List"
+    "back_to_list": "Back to List",
+    "errors": {
+      "complete_section": "Please finish all questions in this section before continuing."
+    }
   },
   "tests": {
     "title": "Interactive Tests",
