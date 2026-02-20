@@ -21,6 +21,7 @@ export default function CoachPage() {
   const [input, setInput] = useState('');
   const [crisisMessage, setCrisisMessage] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const typingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const needsAssessment = !channel;
   const assessmentExpired = channel && isAssessmentExpired();
@@ -29,6 +30,33 @@ export default function CoachPage() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [store.messages]);
+
+  useEffect(() => {
+    return () => {
+      if (typingTimerRef.current) {
+        clearInterval(typingTimerRef.current);
+      }
+    };
+  }, []);
+
+  const typeCoachMessage = (text: string) => {
+    if (typingTimerRef.current) {
+      clearInterval(typingTimerRef.current);
+    }
+
+    const targetIndex = store.addMessage('coach', '');
+    const chunkSize = text.length > 180 ? 4 : text.length > 90 ? 2 : 1;
+    let cursor = 0;
+
+    typingTimerRef.current = setInterval(() => {
+      cursor = Math.min(text.length, cursor + chunkSize);
+      store.updateMessage(targetIndex, text.slice(0, cursor));
+      if (cursor >= text.length && typingTimerRef.current) {
+        clearInterval(typingTimerRef.current);
+        typingTimerRef.current = null;
+      }
+    }, 18);
+  };
 
   if (needsAssessment) {
     return <AssessmentGate reason="missing" />;
@@ -45,7 +73,7 @@ export default function CoachPage() {
       const data = await coachApi.startSession(userId, styleId, true);
       store.setSession(data.session.session_id, styleId);
       if (data.coach_message) {
-        store.addMessage('coach', data.coach_message);
+        typeCoachMessage(data.coach_message);
       }
     } finally {
       store.setLoading(false);
@@ -62,7 +90,7 @@ export default function CoachPage() {
     try {
       const data = await coachApi.chat(store.sessionId, msg);
       if (data.coach_message) {
-        store.addMessage('coach', data.coach_message);
+        typeCoachMessage(data.coach_message);
       }
       if (data.halted) {
         store.setHalted(true);
@@ -78,6 +106,10 @@ export default function CoachPage() {
 
   const handleEnd = async () => {
     if (!store.sessionId) return;
+    if (typingTimerRef.current) {
+      clearInterval(typingTimerRef.current);
+      typingTimerRef.current = null;
+    }
     await coachApi.endSession(store.sessionId);
     store.endSession();
   };
