@@ -122,6 +122,17 @@ export default function Landing() {
       </section>
 
       <SafetyDisclaimer />
+      <footer className="px-6 pb-8">
+        <div className="max-w-6xl mx-auto text-center text-xs text-muted">
+          <Link to="/privacy" className="hover:text-accent hover:underline">
+            {t('auth.privacy_policy')}
+          </Link>
+          <span className="mx-2">·</span>
+          <Link to="/terms" className="hover:text-accent hover:underline">
+            {t('auth.terms')}
+          </Link>
+        </div>
+      </footer>
     </div>
   );
 }
