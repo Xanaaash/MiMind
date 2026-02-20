@@ -1,0 +1,37 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="120" y1="60" x2="1080" y2="570" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7EE"/>
+      <stop offset="0.52" stop-color="#FFE8D5"/>
+      <stop offset="1" stop-color="#F7D7BE"/>
+    </linearGradient>
+    <linearGradient id="pill" x1="0" y1="0" x2="490" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C6674F"/>
+      <stop offset="1" stop-color="#D78264"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1070" cy="100" r="180" fill="#C6674F" fill-opacity="0.10"/>
+  <circle cx="120" cy="570" r="130" fill="#A65A47" fill-opacity="0.10"/>
+  <circle cx="860" cy="510" r="110" fill="#2A6B73" fill-opacity="0.12"/>
+
+  <rect x="80" y="88" width="1040" height="454" rx="36" fill="#FFFDF9" fill-opacity="0.76" stroke="#EBCDB5" stroke-width="2"/>
+
+  <text x="140" y="180" fill="#3D2A26" font-family="Fraunces, Georgia, serif" font-size="68" font-weight="700">MiMind</text>
+  <text x="140" y="248" fill="#B05640" font-family="Nunito Sans, Arial, sans-serif" font-size="40" font-weight="700">AI 心理教练与疗愈工具平台</text>
+  <text x="140" y="306" fill="#6F5A53" font-family="Nunito Sans, Arial, sans-serif" font-size="30" font-weight="600">量表评估 · 互动测试 · AI 对话 · 呼吸与冥想</text>
+
+  <rect x="140" y="360" width="490" height="72" rx="36" fill="url(#pill)"/>
+  <text x="385" y="407" text-anchor="middle" fill="#FFFFFF" font-family="Nunito Sans, Arial, sans-serif" font-size="32" font-weight="700">mimind.app</text>
+
+  <g transform="translate(760 356)">
+    <rect x="0" y="0" width="300" height="178" rx="24" fill="#FFFFFF" fill-opacity="0.88" stroke="#E5C9B2"/>
+    <circle cx="54" cy="50" r="12" fill="#7CC0A2"/>
+    <text x="82" y="58" fill="#47615E" font-family="Nunito Sans, Arial, sans-serif" font-size="20" font-weight="700">Assessment</text>
+    <circle cx="54" cy="92" r="12" fill="#6DA9D8"/>
+    <text x="82" y="100" fill="#47615E" font-family="Nunito Sans, Arial, sans-serif" font-size="20" font-weight="700">AI Coach</text>
+    <circle cx="54" cy="134" r="12" fill="#E39F73"/>
+    <text x="82" y="142" fill="#47615E" font-family="Nunito Sans, Arial, sans-serif" font-size="20" font-weight="700">Healing Tools</text>
+  </g>
+</svg>
