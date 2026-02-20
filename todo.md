@@ -59,7 +59,7 @@
 
 - [🔒 codex-0220b] **T-151** 分享卡片适配多种测试类型（MBTI 特定设计、Big Five 雷达图风格）
 - [ ] **T-152** Open Graph / Twitter Card 元数据（分享链接预览）
-- [ ] **T-153** PWA manifest + Service Worker（离线缓存危机热线 + 安装到桌面）
+- [🔒 cursor-0220i] **T-153** PWA manifest + Service Worker（离线缓存危机热线 + 安装到桌面）
 
 ### 1.7 无障碍 & 国际化
 
