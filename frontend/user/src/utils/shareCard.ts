@@ -1,74 +1,284 @@
-export function generateShareCard(
-  testName: string,
-  summary: Record<string, unknown>,
-): HTMLCanvasElement {
-  const canvas = document.createElement('canvas');
-  canvas.width = 750;
-  canvas.height = 1334;
-  const ctx = canvas.getContext('2d')!;
+const CARD_WIDTH = 750;
+const CARD_HEIGHT = 1334;
 
-  // Background gradient
-  const grad = ctx.createLinearGradient(0, 0, 750, 1334);
+type NumericMap = Record<string, number>;
+
+function normalizeTestId(testName: string) {
+  return testName.trim().toLowerCase();
+}
+
+function resolveTestTitle(testName: string) {
+  const id = normalizeTestId(testName);
+  if (id === 'mbti') return 'MBTI';
+  if (id === '16p') return '16 Personalities';
+  if (id === 'big5') return 'Big Five';
+  return testName.toUpperCase();
+}
+
+function drawBaseBackground(ctx: CanvasRenderingContext2D, title: string, subtitle: string, accent = '#c6674f') {
+  const grad = ctx.createLinearGradient(0, 0, CARD_WIDTH, CARD_HEIGHT);
   grad.addColorStop(0, '#fff9f2');
-  grad.addColorStop(0.5, '#ffeede');
-  grad.addColorStop(1, '#f6decb');
+  grad.addColorStop(0.45, '#fff1e3');
+  grad.addColorStop(1, '#f4ddc8');
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 750, 1334);
+  ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-  // Accent circle decoration
-  ctx.fillStyle = 'rgba(198, 103, 79, 0.1)';
+  ctx.fillStyle = 'rgba(61, 42, 38, 0.06)';
   ctx.beginPath();
-  ctx.arc(600, 200, 250, 0, Math.PI * 2);
+  ctx.arc(620, 180, 220, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.arc(150, 1100, 200, 0, Math.PI * 2);
+  ctx.arc(120, 1160, 180, 0, Math.PI * 2);
   ctx.fill();
 
-  // Title
   ctx.fillStyle = '#3d2a26';
-  ctx.font = 'bold 48px Fraunces, serif';
   ctx.textAlign = 'center';
-  ctx.fillText('MiMind', 375, 120);
+  ctx.font = 'bold 52px Fraunces, serif';
+  ctx.fillText('MiMind', CARD_WIDTH / 2, 118);
 
-  // Test name
-  ctx.font = 'bold 40px Fraunces, serif';
-  ctx.fillStyle = '#c6674f';
-  ctx.fillText(testName, 375, 220);
+  ctx.font = 'bold 44px Fraunces, serif';
+  ctx.fillStyle = accent;
+  ctx.fillText(title, CARD_WIDTH / 2, 204);
 
-  // Divider
-  ctx.strokeStyle = 'rgba(103, 71, 63, 0.2)';
+  ctx.font = '600 24px Nunito Sans, sans-serif';
+  ctx.fillStyle = '#785c55';
+  ctx.fillText(subtitle, CARD_WIDTH / 2, 246);
+
+  ctx.strokeStyle = 'rgba(103, 71, 63, 0.22)';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(150, 270);
-  ctx.lineTo(600, 270);
+  ctx.moveTo(130, 280);
+  ctx.lineTo(620, 280);
   ctx.stroke();
+}
 
-  // Summary entries
-  ctx.textAlign = 'left';
-  ctx.font = '600 28px Nunito Sans, sans-serif';
-  const entries = Object.entries(summary).filter(([, v]) => v !== null && v !== undefined);
-  let y = 340;
-  for (const [key, value] of entries.slice(0, 10)) {
-    ctx.fillStyle = '#785c55';
-    ctx.fillText(key, 100, y);
-    ctx.fillStyle = '#3d2a26';
-    ctx.font = 'bold 28px Nunito Sans, sans-serif';
-    ctx.fillText(String(value), 500, y);
-    ctx.font = '600 28px Nunito Sans, sans-serif';
-    y += 55;
-  }
+function drawFooter(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = 'rgba(198, 103, 79, 0.16)';
+  ctx.fillRect(0, 1180, CARD_WIDTH, 154);
 
-  // Footer
-  ctx.fillStyle = 'rgba(198, 103, 79, 0.15)';
-  ctx.fillRect(0, 1180, 750, 154);
+  ctx.textAlign = 'center';
   ctx.fillStyle = '#785c55';
   ctx.font = '24px Nunito Sans, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('扫码或搜索 MiMind 开始你的探索', 375, 1240);
+  ctx.fillText('Share your profile, grow with clarity', CARD_WIDTH / 2, 1240);
+
   ctx.fillStyle = '#c6674f';
   ctx.font = 'bold 22px Nunito Sans, sans-serif';
-  ctx.fillText('非医疗产品 · 心理教练工具', 375, 1290);
+  ctx.fillText('Mental wellness coaching tool', CARD_WIDTH / 2, 1290);
+}
 
+function toNumericMap(value: unknown): NumericMap {
+  if (!value || typeof value !== 'object') return {};
+  const output: NumericMap = {};
+  for (const [key, raw] of Object.entries(value)) {
+    if (typeof raw === 'number' && Number.isFinite(raw)) {
+      output[key] = raw;
+    }
+  }
+  return output;
+}
+
+function formatValue(value: unknown): string {
+  if (value === null || value === undefined) return '-';
+  if (typeof value === 'number' || typeof value === 'string' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (Array.isArray(value)) return value.map((item) => formatValue(item)).join(', ');
+  if (typeof value === 'object') {
+    const pairs = Object.entries(value)
+      .slice(0, 3)
+      .map(([k, v]) => `${k}:${formatValue(v)}`);
+    return pairs.join(' | ');
+  }
+  return '-';
+}
+
+function drawGenericCard(ctx: CanvasRenderingContext2D, testName: string, summary: Record<string, unknown>) {
+  drawBaseBackground(ctx, resolveTestTitle(testName), 'Personal Insight Snapshot');
+
+  const entries = Object.entries(summary).filter(([, value]) => value !== null && value !== undefined).slice(0, 12);
+  ctx.textAlign = 'left';
+  let y = 348;
+
+  for (const [key, value] of entries) {
+    ctx.fillStyle = '#785c55';
+    ctx.font = '600 24px Nunito Sans, sans-serif';
+    ctx.fillText(key, 88, y);
+
+    ctx.fillStyle = '#3d2a26';
+    ctx.font = 'bold 24px Nunito Sans, sans-serif';
+    ctx.fillText(formatValue(value), 370, y);
+    y += 64;
+  }
+}
+
+function drawMbtiCard(ctx: CanvasRenderingContext2D, testName: string, summary: Record<string, unknown>) {
+  drawBaseBackground(ctx, resolveTestTitle(testName), 'Personality Axis Portrait', '#b3543f');
+
+  const mbtiType = typeof summary.type === 'string' ? summary.type : '----';
+  const strengths = toNumericMap(summary.dimension_strength);
+  const axes = [
+    ['E', 'I'],
+    ['S', 'N'],
+    ['T', 'F'],
+    ['J', 'P'],
+  ] as const;
+
+  ctx.fillStyle = '#fff6ee';
+  ctx.strokeStyle = 'rgba(179, 84, 63, 0.2)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(86, 330, 578, 218, 28);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#785c55';
+  ctx.font = '600 24px Nunito Sans, sans-serif';
+  ctx.fillText('TYPE', CARD_WIDTH / 2, 386);
+  ctx.fillStyle = '#b3543f';
+  ctx.font = 'bold 106px Fraunces, serif';
+  ctx.fillText(mbtiType, CARD_WIDTH / 2, 506);
+
+  let y = 630;
+  for (const [left, right] of axes) {
+    const leftValue = strengths[left] ?? 0;
+    const rightValue = strengths[right] ?? 0;
+    const total = leftValue + rightValue;
+    const ratio = total > 0 ? leftValue / total : 0.5;
+
+    ctx.fillStyle = '#785c55';
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 26px Nunito Sans, sans-serif';
+    ctx.fillText(`${left}  /  ${right}`, 88, y + 12);
+
+    ctx.fillStyle = 'rgba(198, 103, 79, 0.18)';
+    ctx.beginPath();
+    ctx.roundRect(205, y - 16, 420, 30, 14);
+    ctx.fill();
+
+    ctx.fillStyle = '#c6674f';
+    ctx.beginPath();
+    ctx.roundRect(205, y - 16, 420 * ratio, 30, 14);
+    ctx.fill();
+
+    const winner = leftValue >= rightValue ? left : right;
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#3d2a26';
+    ctx.font = '600 24px Nunito Sans, sans-serif';
+    ctx.fillText(`${winner} ${Math.max(leftValue, rightValue).toFixed(0)}`, 650, y + 12);
+    y += 90;
+  }
+}
+
+function drawBigFiveCard(ctx: CanvasRenderingContext2D, testName: string, summary: Record<string, unknown>) {
+  drawBaseBackground(ctx, resolveTestTitle(testName), 'OCEAN Radar Profile', '#3c8a90');
+
+  const rawScores = toNumericMap(summary.scores);
+  const traits = ['O', 'C', 'E', 'A', 'N'];
+  const labels: Record<string, string> = {
+    O: 'Openness',
+    C: 'Conscientiousness',
+    E: 'Extraversion',
+    A: 'Agreeableness',
+    N: 'Neuroticism',
+  };
+  const scores = traits.map((trait) => rawScores[trait] ?? rawScores[trait.toLowerCase()] ?? 0);
+
+  const cx = CARD_WIDTH / 2;
+  const cy = 660;
+  const radius = 220;
+
+  ctx.strokeStyle = 'rgba(60, 138, 144, 0.24)';
+  ctx.lineWidth = 2;
+  for (let layer = 1; layer <= 5; layer += 1) {
+    const r = (radius / 5) * layer;
+    ctx.beginPath();
+    for (let i = 0; i < traits.length; i += 1) {
+      const angle = -Math.PI / 2 + (i * 2 * Math.PI) / traits.length;
+      const x = cx + Math.cos(angle) * r;
+      const y = cy + Math.sin(angle) * r;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  for (let i = 0; i < traits.length; i += 1) {
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / traits.length;
+    const x = cx + Math.cos(angle) * radius;
+    const y = cy + Math.sin(angle) * radius;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+
+    const labelX = cx + Math.cos(angle) * (radius + 54);
+    const labelY = cy + Math.sin(angle) * (radius + 54);
+    ctx.fillStyle = '#4a6365';
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 20px Nunito Sans, sans-serif';
+    ctx.fillText(traits[i], labelX, labelY);
+  }
+
+  ctx.beginPath();
+  for (let i = 0; i < traits.length; i += 1) {
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / traits.length;
+    const normalized = Math.max(0, Math.min(scores[i], 100)) / 100;
+    const x = cx + Math.cos(angle) * radius * normalized;
+    const y = cy + Math.sin(angle) * radius * normalized;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(60, 138, 144, 0.35)';
+  ctx.strokeStyle = '#3c8a90';
+  ctx.lineWidth = 3;
+  ctx.fill();
+  ctx.stroke();
+
+  const dominant = typeof summary.dominant_trait === 'string' ? summary.dominant_trait.toUpperCase() : null;
+  if (dominant && labels[dominant]) {
+    ctx.fillStyle = '#3c8a90';
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 28px Nunito Sans, sans-serif';
+    ctx.fillText(`Dominant: ${labels[dominant]}`, cx, 968);
+  }
+
+  let y = 1018;
+  for (let i = 0; i < traits.length; i += 1) {
+    ctx.fillStyle = '#5b7375';
+    ctx.textAlign = 'left';
+    ctx.font = '600 21px Nunito Sans, sans-serif';
+    ctx.fillText(labels[traits[i]], 112, y);
+
+    ctx.fillStyle = '#234b4f';
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 22px Nunito Sans, sans-serif';
+    ctx.fillText(String(Math.round(scores[i])), 640, y);
+    y += 44;
+  }
+}
+
+export function generateShareCard(testName: string, summary: Record<string, unknown>): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = CARD_WIDTH;
+  canvas.height = CARD_HEIGHT;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    return canvas;
+  }
+
+  const id = normalizeTestId(testName);
+  if (id === 'mbti' || id === '16p') {
+    drawMbtiCard(ctx, testName, summary);
+  } else if (id === 'big5') {
+    drawBigFiveCard(ctx, testName, summary);
+  } else {
+    drawGenericCard(ctx, testName, summary);
+  }
+
+  drawFooter(ctx);
   return canvas;
 }
 
