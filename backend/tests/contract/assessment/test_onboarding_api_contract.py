@@ -56,6 +56,28 @@ class OnboardingAPIContractTests(unittest.TestCase):
         self.assertIn("triage", body["data"])
         self.assertIn("reassessment_due", body["data"])
 
+    def test_reassessment_schedule_contract_returns_due_dates(self) -> None:
+        register_status, register_body = self.api.post_register(
+            {
+                "email": "user3@example.com",
+                "locale": "en-US",
+                "policy_version": "2026.02",
+            }
+        )
+        self.assertEqual(register_status, 201)
+        user_id = register_body["data"]["user_id"]
+
+        assessment_status, _ = self.api.post_assessment(
+            user_id=user_id,
+            payload={"responses": self._base_responses()},
+        )
+        self.assertEqual(assessment_status, 200)
+
+        schedule_status, schedule_body = self.api.get_reassessment_schedule(user_id)
+        self.assertEqual(schedule_status, 200)
+        self.assertIn("due_dates", schedule_body["data"])
+        self.assertIn("phq9", schedule_body["data"]["due_dates"])
+
     def test_entitlement_contract_blocks_ai_for_non_green(self) -> None:
         _, register_body = self.api.post_register(
             {

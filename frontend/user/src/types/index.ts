@@ -173,6 +173,10 @@ export interface BillingEntitlements {
   suggest_medical_follow_up: boolean;
 }
 
+export interface ReassessmentSchedulePayload {
+  due_dates: Record<string, string>;
+}
+
 export interface Hotline {
   label: string;
   number: string;

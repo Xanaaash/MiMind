@@ -1,7 +1,9 @@
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../../stores/auth';
+import { getReassessmentSchedule } from '../../api/auth';
 import Card from '../../components/Card/Card';
 
 const MODULES = [
@@ -19,12 +21,84 @@ const CHANNEL_CONFIG: Record<string, { label: string; color: string; bg: string;
   RED: { label: '请优先联系专业心理健康服务', color: 'text-danger', bg: 'bg-danger-soft', icon: '🔴' },
 };
 
+const SCALE_LABELS: Record<string, string> = {
+  phq9: 'PHQ-9',
+  gad7: 'GAD-7',
+  pss10: 'PSS-10',
+  cssrs: 'C-SSRS',
+  scl90: 'SCL-90',
+};
+
+type ReminderState = {
+  kind: 'overdue' | 'upcoming';
+  scaleIds: string[];
+  minDays: number;
+} | null;
+
+const REMINDER_WINDOW_DAYS = 3;
+
+function daysUntil(dateText: string): number {
+  const target = new Date(`${dateText}T00:00:00`);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.floor((target.getTime() - today.getTime()) / 86_400_000);
+}
+
 export default function Home() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { channel, email } = useAuthStore();
+  const { userId, channel, email } = useAuthStore();
+  const [reminder, setReminder] = useState<ReminderState>(null);
 
   const channelInfo = channel ? CHANNEL_CONFIG[channel] : null;
+  const reminderScaleText = useMemo(() => {
+    if (!reminder) return '';
+    return reminder.scaleIds.map((scaleId) => SCALE_LABELS[scaleId] ?? scaleId.toUpperCase()).join(', ');
+  }, [reminder]);
+
+  useEffect(() => {
+    if (!userId) {
+      setReminder(null);
+      return;
+    }
+
+    getReassessmentSchedule(userId)
+      .then((payload) => {
+        const entries = Object.entries(payload.due_dates).map(([scaleId, dueDate]) => ({
+          scaleId,
+          diffDays: daysUntil(dueDate),
+        }));
+
+        const overdue = entries
+          .filter((entry) => entry.diffDays <= 0)
+          .sort((a, b) => a.diffDays - b.diffDays);
+        if (overdue.length > 0) {
+          setReminder({
+            kind: 'overdue',
+            scaleIds: overdue.slice(0, 2).map((entry) => entry.scaleId),
+            minDays: overdue[0].diffDays,
+          });
+          return;
+        }
+
+        const upcoming = entries
+          .filter((entry) => entry.diffDays > 0 && entry.diffDays <= REMINDER_WINDOW_DAYS)
+          .sort((a, b) => a.diffDays - b.diffDays);
+        if (upcoming.length > 0) {
+          setReminder({
+            kind: 'upcoming',
+            scaleIds: upcoming.slice(0, 2).map((entry) => entry.scaleId),
+            minDays: upcoming[0].diffDays,
+          });
+          return;
+        }
+
+        setReminder(null);
+      })
+      .catch(() => {
+        setReminder(null);
+      });
+  }, [userId]);
 
   return (
     <div>
@@ -41,6 +115,40 @@ export default function Home() {
           {email ? `${email}` : t('app.tagline')}
         </p>
       </motion.div>
+
+      {reminder && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`border border-line rounded-2xl p-5 mb-8 flex items-start gap-3 ${
+            reminder.kind === 'overdue' ? 'bg-danger-soft' : 'bg-warn-soft'
+          }`}
+        >
+          <span className="text-2xl">{reminder.kind === 'overdue' ? '⏰' : '📅'}</span>
+          <div className="flex-1">
+            <p className="font-semibold">
+              {reminder.kind === 'overdue' ? t('home.reassessment_overdue_title') : t('home.reassessment_upcoming_title')}
+            </p>
+            <p className="text-sm text-muted mt-1">
+              {reminder.kind === 'overdue'
+                ? t('home.reassessment_overdue_body', {
+                    scales: reminderScaleText,
+                    days: Math.abs(reminder.minDays),
+                  })
+                : t('home.reassessment_upcoming_body', {
+                    scales: reminderScaleText,
+                    days: reminder.minDays,
+                  })}
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/scales')}
+            className="text-sm font-semibold text-accent hover:underline shrink-0"
+          >
+            {t('home.reassessment_cta')}
+          </button>
+        </motion.div>
+      )}
 
       {/* Triage channel banner */}
       {channelInfo && (

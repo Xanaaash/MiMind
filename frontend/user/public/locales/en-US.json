@@ -30,6 +30,13 @@
     "feature_tools": "Healing Tools",
     "feature_tools_desc": "White noise, breathing exercises, guided meditation for stress relief"
   },
+  "home": {
+    "reassessment_overdue_title": "Assessment Retest Overdue",
+    "reassessment_overdue_body": "{{scales}} are overdue by {{days}} days. Please retake soon to refresh your assessment.",
+    "reassessment_upcoming_title": "Assessment Retest Due Soon",
+    "reassessment_upcoming_body": "{{scales}} are due in {{days}} days. Consider retaking early.",
+    "reassessment_cta": "Retake Now"
+  },
   "auth": {
     "login": "Log In",
     "register": "Sign Up",

@@ -30,6 +30,13 @@
     "feature_tools": "疗愈工具",
     "feature_tools_desc": "白噪音、呼吸引导、正念冥想，随时为你减压放松"
   },
+  "home": {
+    "reassessment_overdue_title": "量表重测已到期",
+    "reassessment_overdue_body": "{{scales}} 已到期 {{days}} 天，请尽快重测以更新评估结果。",
+    "reassessment_upcoming_title": "量表重测即将到期",
+    "reassessment_upcoming_body": "{{scales}} 将在 {{days}} 天后到期，建议提前完成重测。",
+    "reassessment_cta": "去重测"
+  },
   "auth": {
     "login": "登录",
     "register": "注册",

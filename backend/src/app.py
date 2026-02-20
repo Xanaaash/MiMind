@@ -122,6 +122,12 @@ def get_entitlements(user_id: str) -> dict:
     return _unwrap(status, body)
 
 
+@app.get("/api/reassessment/{user_id}")
+def get_reassessment_schedule(user_id: str) -> dict:
+    status, body = onboarding_api.get_reassessment_schedule(user_id)
+    return _unwrap(status, body)
+
+
 @app.get("/api/tests/catalog")
 def get_tests_catalog() -> dict:
     status, body = interactive_tests_api.get_catalog()

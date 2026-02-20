@@ -1,5 +1,5 @@
 import { api } from './client';
-import type { AuthSessionPayload, User } from '../types';
+import type { AuthSessionPayload, ReassessmentSchedulePayload, User } from '../types';
 
 export function register(email: string, locale: string, policyVersion: string) {
   return api.post<{ user_id: string; triage?: unknown }>('/api/register', {
@@ -43,6 +43,10 @@ export function submitAssessment(userId: string, responses: Record<string, unkno
 
 export function getEntitlements(userId: string) {
   return api.get<{ channel: string; entitlements: unknown }>(`/api/entitlements/${userId}`);
+}
+
+export function getReassessmentSchedule(userId: string) {
+  return api.get<ReassessmentSchedulePayload>(`/api/reassessment/${userId}`);
 }
 
 export function adminLogin(username: string, password: string) {

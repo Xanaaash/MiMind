@@ -45,3 +45,10 @@ class OnboardingAPI:
             return 200, {"data": data}
         except ValueError as error:
             return 404, {"error": str(error)}
+
+    def get_reassessment_schedule(self, user_id: str) -> Tuple[int, Dict[str, Any]]:
+        try:
+            data = self._service.get_reassessment_schedule(user_id)
+            return 200, {"data": data}
+        except ValueError as error:
+            return 404, {"error": str(error)}

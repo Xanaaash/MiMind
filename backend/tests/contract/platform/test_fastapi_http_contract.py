@@ -117,6 +117,11 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         self.assertEqual(assessment.status_code, 200)
         self.assertEqual(assessment.json()["triage"]["channel"], "green")
 
+        reassessment = self.client.get(f"/api/reassessment/{user_id}")
+        self.assertEqual(reassessment.status_code, 200)
+        self.assertIn("due_dates", reassessment.json())
+        self.assertIn("phq9", reassessment.json()["due_dates"])
+
         entitlements = self.client.get(f"/api/billing/{user_id}/entitlements")
         self.assertEqual(entitlements.status_code, 200)
         self.assertEqual(entitlements.json()["plan_id"], "free")

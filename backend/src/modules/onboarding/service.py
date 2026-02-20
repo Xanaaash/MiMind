@@ -73,6 +73,18 @@ class OnboardingService:
             raise ValueError("Triage result not found for user")
         return self.entitlement_service.build_from_triage(triage)
 
+    def get_reassessment_schedule(self, user_id: str) -> dict:
+        if self.store.get_user(user_id) is None:
+            raise ValueError("Unknown user_id")
+
+        schedule = self.store.get_schedule(user_id)
+        if schedule is None:
+            raise ValueError("Reassessment schedule not found for user")
+
+        return {
+            "due_dates": schedule.to_dict(),
+        }
+
     @staticmethod
     def parse_dialogue_risk(payload: Optional[dict]) -> Optional[DialogueRiskSignal]:
         if payload is None:
