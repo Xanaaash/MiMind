@@ -69,6 +69,7 @@
 - 服务说明：
   - `app`：运行 `FastAPI + Nginx`（前端静态托管 + `/api` 反代）
   - `db`：PostgreSQL 16（为后续数据库迁移任务预留）
+- 生产部署细节：见 `docs/deployment.md`
 
 ## 环境变量（T-404）
 
