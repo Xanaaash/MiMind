@@ -7,7 +7,10 @@ configure_import_path()
 from modules.journal.context_adapter import build_journal_context_summary
 from modules.journal.service import JournalService
 from modules.storage.in_memory import InMemoryStore
+from modules.tools.audio.service import AudioToolService
 from modules.tools.breathing.service import BreathingToolService
+from modules.tools.meditation.service import MeditationToolService
+from modules.tools.stats.service import ToolUsageStatsService
 from modules.user.models import User
 
 
@@ -40,6 +43,21 @@ class ToolsAndJournalUnitTests(unittest.TestCase):
         self.assertEqual(summary["entry_count"], 1)
         self.assertEqual(summary["latest_mood"], "hopeful")
         self.assertEqual(summary["average_energy"], 8.0)
+
+    def test_tool_usage_stats_aggregates_usage_and_duration(self) -> None:
+        audio = AudioToolService(self.store)
+        breathing = BreathingToolService(self.store)
+        meditation = MeditationToolService(self.store)
+        stats_service = ToolUsageStatsService(self.store)
+
+        audio.start_playback(user_id=self.user_id, track_id="rain", minutes=5)
+        breathing.complete_session(user_id=self.user_id, cycles=2)
+        meditation.start_session(user_id=self.user_id, meditation_id="calm-10")
+
+        stats = stats_service.get_usage_stats(self.user_id)
+        self.assertEqual(stats["week_usage_count"], 3)
+        self.assertEqual(stats["total_usage_count"], 3)
+        self.assertEqual(stats["total_duration_seconds"], 938)
 
 
 if __name__ == "__main__":

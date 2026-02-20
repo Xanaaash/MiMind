@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from modules.storage.in_memory import InMemoryStore
 
 
@@ -29,12 +31,14 @@ class BreathingToolService:
 
     def complete_session(self, user_id: str, cycles: int) -> dict:
         pattern = self.build_478_pattern(cycles)
+        completed_at = datetime.now(timezone.utc)
         self._store.save_tool_event(
             user_id,
             {
                 "tool": "breathing",
                 "protocol": "4-7-8",
                 "cycles": cycles,
+                "completed_at": completed_at.isoformat(),
                 "total_seconds": pattern["total_seconds"],
             },
         )

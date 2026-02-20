@@ -1,5 +1,5 @@
 import { api } from './client';
-import type { AudioTrack, MeditationItem, JournalEntry, JournalTrend } from '../types';
+import type { AudioTrack, MeditationItem, JournalEntry, JournalTrend, ToolUsageStats } from '../types';
 
 export function getAudioLibrary() {
   return api.get<Record<string, { name: string; category: string; duration_seconds: number }>>('/api/tools/audio/library');
@@ -31,6 +31,10 @@ export function getJournalEntries(userId: string) {
 
 export function getJournalTrend(userId: string, days = 7) {
   return api.get<JournalTrend>(`/api/tools/journal/${userId}/trend?days=${days}`);
+}
+
+export function getToolUsageStats(userId: string) {
+  return api.get<ToolUsageStats>(`/api/tools/${userId}/stats`);
 }
 
 export type { AudioTrack, MeditationItem };

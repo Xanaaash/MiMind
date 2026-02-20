@@ -143,6 +143,21 @@ export interface JournalTrend {
   mood_distribution: Record<string, number>;
 }
 
+export interface ToolUsageByToolStats {
+  week_usage_count: number;
+  total_usage_count: number;
+  total_duration_seconds: number;
+}
+
+export interface ToolUsageStats {
+  week_start: string;
+  week_end: string;
+  week_usage_count: number;
+  total_usage_count: number;
+  total_duration_seconds: number;
+  by_tool: Record<string, ToolUsageByToolStats>;
+}
+
 export interface BillingPlan {
   plan_id: string;
   display_name: string;

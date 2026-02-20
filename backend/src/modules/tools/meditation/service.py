@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from modules.storage.in_memory import InMemoryStore
 
 
@@ -20,12 +22,14 @@ class MeditationToolService:
             raise ValueError("Unknown meditation_id")
 
         session = dict(MEDITATION_LIBRARY[meditation_id])
+        started_at = datetime.now(timezone.utc)
         self._store.save_tool_event(
             user_id,
             {
                 "tool": "meditation",
                 "meditation_id": meditation_id,
                 "minutes": session["minutes"],
+                "started_at": started_at.isoformat(),
             },
         )
 

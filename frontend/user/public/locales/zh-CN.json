@@ -195,7 +195,14 @@
     "inhale": "吸气",
     "hold": "屏气",
     "exhale": "呼气",
-    "complete": "练习完成"
+    "complete": "练习完成",
+    "stats_title": "工具使用统计",
+    "stats_subtitle": "查看你本周的疗愈工具使用情况",
+    "stats_week_usage": "本周使用",
+    "stats_total_duration": "累计时长",
+    "stats_sessions_unit": "次",
+    "stats_hour_short": "小时",
+    "stats_min_short": "分"
   },
   "journal": {
     "title": "情绪日记",

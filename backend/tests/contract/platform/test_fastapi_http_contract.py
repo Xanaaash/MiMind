@@ -122,6 +122,19 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         self.assertIn("due_dates", reassessment.json())
         self.assertIn("phq9", reassessment.json()["due_dates"])
 
+        breathing = self.client.post(
+            f"/api/tools/breathing/{user_id}/complete",
+            json={"cycles": 2},
+        )
+        self.assertEqual(breathing.status_code, 200)
+
+        usage_stats = self.client.get(f"/api/tools/{user_id}/stats")
+        self.assertEqual(usage_stats.status_code, 200)
+        usage_payload = usage_stats.json()
+        self.assertIn("week_usage_count", usage_payload)
+        self.assertIn("total_duration_seconds", usage_payload)
+        self.assertGreaterEqual(usage_payload["week_usage_count"], 1)
+
         entitlements = self.client.get(f"/api/billing/{user_id}/entitlements")
         self.assertEqual(entitlements.status_code, 200)
         self.assertEqual(entitlements.json()["plan_id"], "free")

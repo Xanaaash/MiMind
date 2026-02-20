@@ -75,6 +75,12 @@ class HealingToolsAPIContractTests(unittest.TestCase):
         self.assertEqual(trend_status, 200)
         self.assertEqual(trend_body["data"]["entry_count"], 1)
 
+        stats_status, stats_body = self.tools_api.get_usage_stats(self.user_id)
+        self.assertEqual(stats_status, 200)
+        self.assertEqual(stats_body["data"]["week_usage_count"], 3)
+        self.assertEqual(stats_body["data"]["total_usage_count"], 3)
+        self.assertGreater(stats_body["data"]["total_duration_seconds"], 0)
+
     def test_journal_context_is_available_to_coach_prompt(self) -> None:
         self.tools_api.post_journal_entry(
             self.user_id,

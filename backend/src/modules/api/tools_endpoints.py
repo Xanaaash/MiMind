@@ -5,6 +5,7 @@ from modules.storage.in_memory import InMemoryStore
 from modules.tools.audio.service import AudioToolService
 from modules.tools.breathing.service import BreathingToolService
 from modules.tools.meditation.service import MeditationToolService
+from modules.tools.stats.service import ToolUsageStatsService
 
 
 class HealingToolsAPI:
@@ -13,6 +14,7 @@ class HealingToolsAPI:
         self._audio = AudioToolService(self._store)
         self._breathing = BreathingToolService(self._store)
         self._meditation = MeditationToolService(self._store)
+        self._stats = ToolUsageStatsService(self._store)
         self._journal = JournalService(self._store)
 
     @property
@@ -69,3 +71,6 @@ class HealingToolsAPI:
             return 200, {"data": data}
         except ValueError as error:
             return 400, {"error": str(error)}
+
+    def get_usage_stats(self, user_id: str) -> Tuple[int, Dict[str, Any]]:
+        return 200, {"data": self._stats.get_usage_stats(user_id=user_id)}

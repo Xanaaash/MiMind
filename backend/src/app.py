@@ -284,6 +284,12 @@ def get_journal_trend(user_id: str, days: int = Query(7, ge=1, le=365)) -> dict:
     return _unwrap(status, body)
 
 
+@app.get("/api/tools/{user_id}/stats")
+def get_tools_usage_stats(user_id: str) -> dict:
+    status, body = healing_tools_api.get_usage_stats(user_id=user_id)
+    return _unwrap(status, body)
+
+
 @app.get("/api/billing/plans")
 def list_billing_plans() -> dict:
     status, body = billing_api.get_plans()

@@ -195,7 +195,14 @@
     "inhale": "Inhale",
     "hold": "Hold",
     "exhale": "Exhale",
-    "complete": "Exercise Complete"
+    "complete": "Exercise Complete",
+    "stats_title": "Usage Stats",
+    "stats_subtitle": "Track your healing tools activity this week",
+    "stats_week_usage": "This week",
+    "stats_total_duration": "Total time",
+    "stats_sessions_unit": "times",
+    "stats_hour_short": "h",
+    "stats_min_short": "m"
   },
   "journal": {
     "title": "Mood Journal",

@@ -31,6 +31,8 @@ class AudioToolService:
             {
                 "tool": "audio",
                 "track_id": track_id,
+                "minutes": minutes,
+                "occurred_at": started_at.isoformat(),
                 "started_at": started_at.isoformat(),
                 "ends_at": ends_at.isoformat(),
             },

@@ -128,6 +128,9 @@ class InMemoryStore:
     def list_journal_entries(self, user_id: str) -> List[JournalEntry]:
         return list(self.journal_entries.get(user_id, []))
 
+    def list_tool_events(self, user_id: str) -> List[dict]:
+        return list(self.tool_events.get(user_id, []))
+
     def get_subscription(self, user_id: str) -> Optional[SubscriptionRecord]:
         return self.subscriptions.get(user_id)
 
@@ -191,7 +194,7 @@ class InMemoryStore:
             },
             "tools": {
                 "journal_entries": [entry.to_dict() for entry in self.list_journal_entries(user_id)],
-                "tool_events": list(self.tool_events.get(user_id, [])),
+                "tool_events": self.list_tool_events(user_id),
             },
             "memory": {
                 "summaries": self.list_memory_summaries(user_id),
