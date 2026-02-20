@@ -7,6 +7,8 @@ import { adminLogin, getEntitlements, register } from '../../api/auth';
 import { toast } from '../../stores/toast';
 import type { TriageChannel } from '../../types';
 import Button from '../../components/Button/Button';
+import FieldError from '../../components/Form/FieldError';
+import { emailFormat, maxLength, minLength, required, runValidators } from '../../utils/validators';
 
 function toChannel(value: unknown): TriageChannel | null {
   if (value === 'GREEN' || value === 'YELLOW' || value === 'RED') {
@@ -23,15 +25,56 @@ export default function Auth() {
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('admin');
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
+
+  const validateUsername = (value: string): string | null => {
+    const normalized = value.trim();
+    const baseRuleError = runValidators(normalized, [
+      required(t('validation.required', { field: t('fields.account') })),
+      minLength(3, t('validation.min_length', { field: t('fields.account'), count: 3 })),
+      maxLength(64, t('validation.max_length', { field: t('fields.account'), count: 64 })),
+    ]);
+    if (baseRuleError) return baseRuleError;
+
+    if (normalized.includes('@')) {
+      return runValidators(normalized, [emailFormat(t('validation.email'))]);
+    }
+
+    if (!/^[a-zA-Z0-9._-]+$/.test(normalized)) {
+      return t('validation.account_chars');
+    }
+
+    return null;
+  };
+
+  const validatePassword = (value: string): string | null => {
+    return runValidators(value, [
+      required(t('validation.required', { field: t('fields.password') })),
+      minLength(4, t('validation.min_length', { field: t('fields.password'), count: 4 })),
+      maxLength(128, t('validation.max_length', { field: t('fields.password'), count: 128 })),
+    ]);
+  };
+
+  const validateForm = (): boolean => {
+    const nextErrors = {
+      username: validateUsername(username) ?? undefined,
+      password: validatePassword(password) ?? undefined,
+    };
+    setErrors(nextErrors);
+    return !nextErrors.username && !nextErrors.password;
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
     setLoading(true);
 
     try {
-      await adminLogin(username, password);
+      const normalized = username.trim();
+      const loginAccount = normalized.includes('@') ? normalized.split('@')[0] : normalized;
+      await adminLogin(loginAccount, password);
 
-      const email = `${username}@mimind.ai`;
+      const email = normalized.includes('@') ? normalized : `${normalized}@mimind.ai`;
       let userId = localStorage.getItem('mc_user_id');
       let resolvedChannel: TriageChannel | null = null;
 
@@ -83,10 +126,20 @@ export default function Auth() {
             <input
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setUsername(value);
+                if (errors.username) {
+                  setErrors((prev) => ({ ...prev, username: validateUsername(value) ?? undefined }));
+                }
+              }}
+              onBlur={() => setErrors((prev) => ({ ...prev, username: validateUsername(username) ?? undefined }))}
               required
-              className="border border-line rounded-xl px-4 py-3 bg-white/90 text-ink focus:outline-none focus:ring-2 focus:ring-accent/30 transition-shadow"
+              className={`border rounded-xl px-4 py-3 bg-white/90 text-ink focus:outline-none focus:ring-2 transition-shadow ${
+                errors.username ? 'border-danger focus:ring-danger/30' : 'border-line focus:ring-accent/30'
+              }`}
             />
+            <FieldError message={errors.username} />
           </label>
 
           <label className="grid gap-1.5">
@@ -94,10 +147,20 @@ export default function Auth() {
             <input
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setPassword(value);
+                if (errors.password) {
+                  setErrors((prev) => ({ ...prev, password: validatePassword(value) ?? undefined }));
+                }
+              }}
+              onBlur={() => setErrors((prev) => ({ ...prev, password: validatePassword(password) ?? undefined }))}
               required
-              className="border border-line rounded-xl px-4 py-3 bg-white/90 text-ink focus:outline-none focus:ring-2 focus:ring-accent/30 transition-shadow"
+              className={`border rounded-xl px-4 py-3 bg-white/90 text-ink focus:outline-none focus:ring-2 transition-shadow ${
+                errors.password ? 'border-danger focus:ring-danger/30' : 'border-line focus:ring-accent/30'
+              }`}
             />
+            <FieldError message={errors.password} />
           </label>
 
           <Button type="submit" loading={loading} className="w-full">

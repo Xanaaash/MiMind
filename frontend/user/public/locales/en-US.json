@@ -192,6 +192,18 @@
     "back_home": "Back to Home",
     "safety": "Safety Resources"
   },
+  "fields": {
+    "account": "account",
+    "password": "password",
+    "note": "journal note"
+  },
+  "validation": {
+    "required": "{{field}} is required",
+    "email": "Please enter a valid email address",
+    "min_length": "{{field}} must be at least {{count}} characters",
+    "max_length": "{{field}} must be at most {{count}} characters",
+    "account_chars": "Account can only contain letters, numbers, dot, underscore, and hyphen"
+  },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",

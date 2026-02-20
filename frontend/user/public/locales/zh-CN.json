@@ -192,6 +192,18 @@
     "back_home": "回到首页",
     "safety": "查看安全资源"
   },
+  "fields": {
+    "account": "账号",
+    "password": "密码",
+    "note": "日记内容"
+  },
+  "validation": {
+    "required": "{{field}}不能为空",
+    "email": "请输入有效邮箱地址",
+    "min_length": "{{field}}至少 {{count}} 个字符",
+    "max_length": "{{field}}不能超过 {{count}} 个字符",
+    "account_chars": "账号仅支持字母、数字、点、下划线和短横线"
+  },
   "common": {
     "loading": "加载中...",
     "error": "出错了",

@@ -7,6 +7,8 @@ import { useAuthStore } from '../../stores/auth';
 import { toast } from '../../stores/toast';
 import Button from '../../components/Button/Button';
 import Card from '../../components/Card/Card';
+import FieldError from '../../components/Form/FieldError';
+import { maxLength, required, runValidators } from '../../utils/validators';
 
 const MOODS = [
   { value: 'happy', emoji: '😊', color: 'bg-safe-soft' },
@@ -25,6 +27,7 @@ export default function JournalPage() {
   const [mood, setMood] = useState('calm');
   const [energy, setEnergy] = useState(5);
   const [note, setNote] = useState('');
+  const [noteError, setNoteError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [trendData, setTrendData] = useState<Array<{ date: string; energy: number }>>([]);
 
@@ -42,12 +45,26 @@ export default function JournalPage() {
       .catch(() => {});
   }, [userId]);
 
+  const validateNote = (value: string): string | null => {
+    return runValidators(value, [
+      required(t('validation.required', { field: t('fields.note') })),
+      maxLength(500, t('validation.max_length', { field: t('fields.note'), count: 500 })),
+    ]);
+  };
+
   const handleSave = async () => {
     if (!userId) return;
+    const nextError = validateNote(note);
+    setNoteError(nextError);
+    if (nextError) {
+      toast.error(nextError);
+      return;
+    }
     setSaving(true);
     try {
       await createJournalEntry(userId, mood, energy, note);
       setNote('');
+      setNoteError(null);
       toast.success(t('journal.save') === '保存' ? '日记已保存' : 'Entry saved');
       const data = await getJournalTrend(userId, 7);
       if (data.entries) {
@@ -114,11 +131,24 @@ export default function JournalPage() {
         <h3 className="font-heading font-bold mb-3">{t('journal.note_label')}</h3>
         <textarea
           value={note}
-          onChange={(e) => setNote(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            setNote(value);
+            if (noteError) {
+              setNoteError(validateNote(value));
+            }
+          }}
+          onBlur={() => setNoteError(validateNote(note))}
           placeholder={t('journal.note_placeholder')}
           rows={4}
-          className="w-full border border-line rounded-xl px-4 py-3 bg-white/90 focus:outline-none focus:ring-2 focus:ring-accent/30 resize-none"
+          className={`w-full border rounded-xl px-4 py-3 bg-white/90 focus:outline-none focus:ring-2 resize-none ${
+            noteError ? 'border-danger focus:ring-danger/30' : 'border-line focus:ring-accent/30'
+          }`}
         />
+        <div className="flex items-center justify-between mt-2">
+          <FieldError message={noteError} />
+          <p className={`text-xs ${note.length > 500 ? 'text-danger' : 'text-muted'}`}>{note.length}/500</p>
+        </div>
         <Button
           className="mt-3 w-full"
           onClick={handleSave}
