@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../../stores/auth';
 import { adminLogin, register } from '../../api/auth';
+import { toast } from '../../stores/toast';
 import Button from '../../components/Button/Button';
 
 export default function Auth() {
@@ -14,11 +15,9 @@ export default function Auth() {
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('admin');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
     try {
@@ -37,9 +36,10 @@ export default function Auth() {
       }
 
       setUser(userId!, email, 'zh-CN');
+      toast.success(t('auth.login') === '登录' ? '登录成功' : 'Login successful');
       navigate('/home');
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      toast.error(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -83,10 +83,6 @@ export default function Auth() {
               className="border border-line rounded-xl px-4 py-3 bg-white/90 text-ink focus:outline-none focus:ring-2 focus:ring-accent/30 transition-shadow"
             />
           </label>
-
-          {error && (
-            <p className="text-danger text-sm font-medium">{error}</p>
-          )}
 
           <Button type="submit" loading={loading} className="w-full">
             {t('auth.login')}
