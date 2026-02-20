@@ -11,3 +11,7 @@ __pycache__/
 # Local runtime persistence
 data/
 *.sqlite3
+
+# Node.js / Frontend
+node_modules/
+frontend/user/dist/

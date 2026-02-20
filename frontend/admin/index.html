@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MindCoach AI Admin Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true"></div>
+
+    <div id="globalAlert" class="global-alert hidden" role="alert"></div>
+
+    <section id="authGate" class="auth-gate">
+      <article class="auth-card panel">
+        <p class="eyebrow">MindCoach AI Admin</p>
+        <h1>登录管理台</h1>
+        <p>本系统是心理教练平台管理原型。非医疗产品，不提供临床诊断或处方建议。</p>
+
+        <form id="loginForm" class="stack">
+          <label>
+            <span>用户名</span>
+            <input id="loginUsername" type="text" value="admin" readonly />
+          </label>
+          <label>
+            <span>密码</span>
+            <input id="loginPassword" type="password" autocomplete="current-password" required />
+          </label>
+          <button type="submit">登录</button>
+        </form>
+        <p id="loginError" class="error-text hidden"></p>
+      </article>
+    </section>
+
+    <div id="adminApp" class="admin-app hidden">
+      <header class="topbar panel">
+        <div>
+          <p class="eyebrow">MindCoach AI</p>
+          <h2>Admin Console</h2>
+        </div>
+        <div class="topbar-right">
+          <label class="compact-field">
+            <span>API Base</span>
+            <input id="apiBase" type="text" />
+          </label>
+          <button id="logoutBtn" class="ghost">退出登录</button>
+        </div>
+      </header>
+
+      <div class="shell">
+        <nav class="sidebar panel" id="moduleNav">
+          <button class="nav-btn active" data-module="home">主页 Home</button>
+          <button class="nav-btn" data-module="clinical_scales">临床量表</button>
+          <button class="nav-btn" data-module="interactive_tests">互动测试</button>
+          <button class="nav-btn" data-module="healing_tools">疗愈工具</button>
+          <button class="nav-btn" data-module="journal">情绪日记</button>
+          <button class="nav-btn" data-module="coach">AI 教练</button>
+          <button class="nav-btn" data-module="safety">安全资源</button>
+          <button class="nav-btn" data-module="activity_logs">活动日志</button>
+          <button class="nav-btn" data-module="settings">设置</button>
+        </nav>
+
+        <main class="content panel">
+          <section class="module active" data-module-panel="home">
+            <h3>主页</h3>
+            <p>核心入口聚合：量表中心与互动测试中心。</p>
+            <div class="entry-grid">
+              <article class="entry-card">
+                <h4>临床量表中心 / Clinical Scales</h4>
+                <p>PHQ-9, GAD-7, PSS-10, C-SSRS, SCL-90 全量入口。</p>
+                <button class="jump-btn" data-jump="clinical_scales">进入量表中心</button>
+              </article>
+              <article class="entry-card">
+                <h4>互动测试中心 / Interactive Tests</h4>
+                <p>MBTI、Big5、依恋、爱情语言、EQ 等动态问卷入口。</p>
+                <button class="jump-btn" data-jump="interactive_tests">进入互动测试</button>
+              </article>
+            </div>
+          </section>
+
+          <section class="module" data-module-panel="clinical_scales">
+            <h3>临床量表中心</h3>
+            <p>根据目录动态渲染量表题目并提交评分。</p>
+            <div class="inline-actions">
+              <button id="loadScaleCatalogBtn">加载量表目录</button>
+            </div>
+            <div id="scaleCatalog" class="catalog-grid"></div>
+            <div id="scaleWorkspace" class="workspace hidden">
+              <div class="workspace-head">
+                <h4 id="scaleTitle">-</h4>
+                <div id="scaleProgress"></div>
+              </div>
+              <form id="scaleForm" class="question-list"></form>
+              <div class="inline-actions">
+                <button id="scalePrevBtn" class="secondary" type="button">上一页</button>
+                <button id="scaleNextBtn" class="secondary" type="button">下一页</button>
+                <button id="scaleSubmitBtn" type="button">提交评分</button>
+              </div>
+              <pre id="scaleResult" class="result">{}</pre>
+            </div>
+          </section>
+
+          <section class="module" data-module-panel="interactive_tests">
+            <h3>互动测试中心</h3>
+            <p>按测试目录动态渲染题目并提交结果。</p>
+            <div class="inline-actions">
+              <button id="loadTestsCatalogBtn">加载测试目录</button>
+            </div>
+            <div id="testsCatalog" class="catalog-grid"></div>
+            <div id="testWorkspace" class="workspace hidden">
+              <div class="workspace-head">
+                <h4 id="testTitle">-</h4>
+              </div>
+              <form id="testForm" class="question-list"></form>
+              <div class="inline-actions">
+                <button id="testSubmitBtn" type="button">提交测试</button>
+              </div>
+              <pre id="testResult" class="result">{}</pre>
+            </div>
+          </section>
+
+          <section class="module" data-module-panel="healing_tools">
+            <h3>疗愈工具</h3>
+            <p>白噪音、呼吸、冥想能力聚合在模块化导航下。</p>
+            <div class="inline-actions">
+              <button id="loadToolLibraryBtn">加载工具库</button>
+            </div>
+            <div class="stack">
+              <label>
+                <span>白噪音</span>
+                <select id="audioTrack"></select>
+              </label>
+              <label>
+                <span>时长（分钟）</span>
+                <input id="audioMinutes" type="number" min="1" max="180" value="10" />
+              </label>
+              <button id="startAudioBtn" class="secondary" type="button">开始播放</button>
+            </div>
+            <div class="stack">
+              <label>
+                <span>呼吸轮次</span>
+                <input id="breathingCycles" type="number" min="1" max="20" value="4" />
+              </label>
+              <button id="completeBreathingBtn" class="secondary" type="button">完成呼吸练习</button>
+            </div>
+            <div class="stack">
+              <label>
+                <span>正念引导</span>
+                <select id="meditationId"></select>
+              </label>
+              <button id="startMeditationBtn" class="secondary" type="button">开始正念</button>
+            </div>
+          </section>
+
+          <section class="module" data-module-panel="journal">
+            <h3>情绪日记</h3>
+            <form id="journalForm" class="stack">
+              <label>
+                <span>情绪标签</span>
+                <select id="journalMood">
+                  <option value="calm">calm</option>
+                  <option value="anxious">anxious</option>
+                  <option value="sad">sad</option>
+                  <option value="hopeful">hopeful</option>
+                  <option value="tired">tired</option>
+                </select>
+              </label>
+              <label>
+                <span>能量值 (0-10)</span>
+                <input id="journalEnergy" type="range" min="0" max="10" value="6" />
+                <strong id="energyValue">6</strong>
+              </label>
+              <label>
+                <span>笔记</span>
+                <textarea id="journalNote" rows="3" placeholder="今天最明显的感受是什么？"></textarea>
+              </label>
+              <button type="submit">保存日记</button>
+            </form>
+            <div class="inline-actions">
+              <button id="loadTrendBtn" class="secondary" type="button">加载 7 天趋势</button>
+            </div>
+            <pre id="trendView" class="result">{}</pre>
+          </section>
+
+          <section class="module" data-module-panel="coach">
+            <h3>AI 心理教练</h3>
+            <p>心理教练用途，不做诊断、不建议药物、不承诺保密。</p>
+            <div class="stack">
+              <label>
+                <span>风格</span>
+                <select id="coachStyle">
+                  <option value="warm_guide">warm_guide</option>
+                  <option value="rational_analysis">rational_analysis</option>
+                </select>
+              </label>
+              <label class="checkbox-field">
+                <input id="coachSubscription" type="checkbox" checked />
+                <span>模拟 coach 订阅有效</span>
+              </label>
+              <div class="inline-actions">
+                <button id="startCoachBtn" type="button">开始会话</button>
+                <button id="endCoachBtn" class="secondary" type="button">结束会话</button>
+              </div>
+            </div>
+            <form id="coachForm" class="stack">
+              <label>
+                <span>消息</span>
+                <textarea id="coachMessage" rows="3" placeholder="输入本轮对话内容..."></textarea>
+              </label>
+              <button type="submit">发送消息</button>
+            </form>
+            <pre id="coachReply" class="result">{}</pre>
+          </section>
+
+          <section class="module" data-module-panel="safety">
+            <h3>安全资源</h3>
+            <p>若存在即时危险，请优先联系当地紧急服务。</p>
+            <ul id="hotlineList" class="hotline-list"></ul>
+            <div id="crisisBanner" class="crisis-banner hidden" role="alert"></div>
+          </section>
+
+          <section class="module" data-module-panel="activity_logs">
+            <h3>活动日志</h3>
+            <p>用于记录所有 API 调用和异常响应。</p>
+            <ul id="activityLog"></ul>
+          </section>
+
+          <section class="module" data-module-panel="settings">
+            <h3>设置</h3>
+            <p>admin 登录与功能范围配置。</p>
+            <div class="setting-box">
+              <h4>用户管理接口</h4>
+              <p>本阶段仅保留 API 入口，完整用户管理 UI 已 deferred。</p>
+              <button id="checkAdminUsersBtn" type="button">检查 /api/admin/users</button>
+              <pre id="adminUsersResult" class="result">{}</pre>
+            </div>
+            <div class="setting-box">
+              <h4>演示用户</h4>
+              <p>互动测试、工具、教练模块会自动创建 demo user。</p>
+              <div class="status-row">
+                <span>demo_user_id:</span>
+                <code id="demoUserId">-</code>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <footer class="footer-note">
+        <p>
+          非医疗产品边界: 不做临床诊断、不建议药物或处方。检测到风险时优先进入安全响应并提供危机热线。
+        </p>
+      </footer>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
