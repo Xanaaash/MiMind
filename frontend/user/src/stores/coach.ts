@@ -15,14 +15,15 @@ interface CoachState {
   halted: boolean;
 
   setSession: (sessionId: string, styleId: string) => void;
-  addMessage: (role: ChatMessage['role'], content: string) => void;
+  addMessage: (role: ChatMessage['role'], content: string) => number;
+  updateMessage: (index: number, content: string) => void;
   setLoading: (loading: boolean) => void;
   setHalted: (halted: boolean) => void;
   endSession: () => void;
   reset: () => void;
 }
 
-export const useCoachStore = create<CoachState>((set) => ({
+export const useCoachStore = create<CoachState>((set, get) => ({
   sessionId: null,
   styleId: null,
   messages: [],
@@ -33,9 +34,19 @@ export const useCoachStore = create<CoachState>((set) => ({
   setSession: (sessionId, styleId) =>
     set({ sessionId, styleId, isActive: true, halted: false, messages: [] }),
 
-  addMessage: (role, content) =>
+  addMessage: (role, content) => {
+    const index = get().messages.length;
     set((state) => ({
       messages: [...state.messages, { role, content, timestamp: Date.now() }],
+    }));
+    return index;
+  },
+
+  updateMessage: (index, content) =>
+    set((state) => ({
+      messages: state.messages.map((message, idx) =>
+        idx === index ? { ...message, content } : message,
+      ),
     })),
 
   setLoading: (isLoading) => set({ isLoading }),
