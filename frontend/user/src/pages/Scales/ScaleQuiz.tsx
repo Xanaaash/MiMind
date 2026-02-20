@@ -111,7 +111,7 @@ export default function ScaleQuiz() {
                     text-left px-5 py-4 rounded-xl border-2 transition-all font-medium
                     ${answers[question.question_id] === val
                       ? 'border-accent bg-accent-soft text-accent'
-                      : 'border-line bg-white hover:border-accent/30'
+                      : 'border-line bg-paper hover:border-accent/30'
                     }
                   `}
                 >
@@ -129,7 +129,7 @@ export default function ScaleQuiz() {
                     text-left px-5 py-4 rounded-xl border-2 transition-all font-medium
                     ${answers[question.question_id] === value
                       ? 'border-accent bg-accent-soft text-accent'
-                      : 'border-line bg-white hover:border-accent/30'
+                      : 'border-line bg-paper hover:border-accent/30'
                     }
                   `}
                 >

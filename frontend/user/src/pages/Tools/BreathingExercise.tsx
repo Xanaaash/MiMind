@@ -162,7 +162,7 @@ export default function BreathingExercise() {
                   </div>
                   <div className="flex gap-1.5 mt-2 ml-10">
                     {mode.phases.map((p, i) => (
-                      <span key={i} className="text-xs bg-white/60 px-2 py-0.5 rounded-full text-muted font-medium">
+                      <span key={i} className="text-xs bg-paper/60 px-2 py-0.5 rounded-full text-muted font-medium">
                         {phaseLabel(p.phase)} {p.duration}s
                       </span>
                     ))}

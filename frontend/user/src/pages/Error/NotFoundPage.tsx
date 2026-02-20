@@ -31,7 +31,7 @@ export default function NotFoundPage() {
           </Link>
           <Link
             to="/safety"
-            className="px-5 py-3 rounded-xl border border-line bg-white text-ink font-semibold hover:bg-cream transition-colors"
+            className="px-5 py-3 rounded-xl border border-line bg-paper text-ink font-semibold hover:bg-cream transition-colors"
           >
             {t('not_found.safety')}
           </Link>

@@ -135,7 +135,7 @@ export default function Auth() {
               }}
               onBlur={() => setErrors((prev) => ({ ...prev, username: validateUsername(username) ?? undefined }))}
               required
-              className={`border rounded-xl px-4 py-3 bg-white/90 text-ink focus:outline-none focus:ring-2 transition-shadow ${
+              className={`border rounded-xl px-4 py-3 bg-paper/90 text-ink focus:outline-none focus:ring-2 transition-shadow ${
                 errors.username ? 'border-danger focus:ring-danger/30' : 'border-line focus:ring-accent/30'
               }`}
             />
@@ -156,7 +156,7 @@ export default function Auth() {
               }}
               onBlur={() => setErrors((prev) => ({ ...prev, password: validatePassword(password) ?? undefined }))}
               required
-              className={`border rounded-xl px-4 py-3 bg-white/90 text-ink focus:outline-none focus:ring-2 transition-shadow ${
+              className={`border rounded-xl px-4 py-3 bg-paper/90 text-ink focus:outline-none focus:ring-2 transition-shadow ${
                 errors.password ? 'border-danger focus:ring-danger/30' : 'border-line focus:ring-accent/30'
               }`}
             />

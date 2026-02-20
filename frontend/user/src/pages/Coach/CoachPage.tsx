@@ -291,7 +291,7 @@ export default function CoachPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={t('coach.placeholder')}
-            className="flex-1 min-w-0 border border-line rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 bg-white/90 focus:outline-none focus:ring-2 focus:ring-accent/30 text-base"
+            className="flex-1 min-w-0 border border-line rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 bg-paper/90 focus:outline-none focus:ring-2 focus:ring-accent/30 text-base"
             disabled={store.isLoading}
             enterKeyHint="send"
             autoComplete="off"

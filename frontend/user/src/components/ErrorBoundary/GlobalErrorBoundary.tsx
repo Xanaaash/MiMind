@@ -112,7 +112,7 @@ export default class GlobalErrorBoundary extends Component<Props, State> {
             <button
               type="button"
               onClick={this.handleGoHome}
-              className="px-4 py-3 rounded-xl border border-line bg-white text-ink font-semibold hover:bg-cream transition-colors"
+              className="px-4 py-3 rounded-xl border border-line bg-paper text-ink font-semibold hover:bg-cream transition-colors"
             >
               返回首页 / Home
             </button>

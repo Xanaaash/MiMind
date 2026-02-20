@@ -253,7 +253,7 @@ export default function Onboarding() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-line p-6">
+        <div className="bg-paper rounded-2xl border border-line p-6">
           <p className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">{step.scaleId}</p>
           <h2 className="font-heading text-xl font-bold mb-5">
             {step.question.text[lang] ?? step.question.text['zh-CN'] ?? step.question.text['en-US'] ?? step.question.question_id}

@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-paper: #fff9f2;
   --color-cream: #fff0df;
@@ -41,5 +43,38 @@
       radial-gradient(circle at 90% 5%, #f8dbc8 0%, transparent 35%),
       linear-gradient(145deg, #fff9f2 0%, #ffeede 50%, #f6decb 100%);
     min-height: 100vh;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  .dark body {
+    color: #e8ddd6;
+    background: radial-gradient(circle at 10% 20%, #2a1f1e 0%, transparent 26%),
+      radial-gradient(circle at 90% 5%, #2e2220 0%, transparent 35%),
+      linear-gradient(145deg, #1a1210 0%, #211816 50%, #1e1412 100%);
+  }
+
+  .dark {
+    --color-paper: #1a1210;
+    --color-cream: #2a1f1c;
+    --color-ink: #e8ddd6;
+    --color-muted: #a89890;
+    --color-accent: #e07a60;
+    --color-accent-soft: #3d2520;
+    --color-accent-hover: #f08a70;
+    --color-safe: #5cb87e;
+    --color-safe-soft: #1e2e24;
+    --color-warn: #e4b853;
+    --color-warn-soft: #2e2810;
+    --color-danger: #e05545;
+    --color-danger-soft: #3a1a16;
+    --color-calm: #6ba0cc;
+    --color-calm-soft: #1a2530;
+    --color-line: rgba(200, 180, 170, 0.15);
+    --color-panel: rgba(30, 22, 18, 0.95);
+    --color-overlay: rgba(0, 0, 0, 0.6);
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
   }
 }

@@ -1,6 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/auth';
+import { useThemeStore } from '../../stores/theme';
 import SafetyDisclaimer from '../SafetyDisclaimer/SafetyDisclaimer';
 import { useEffect, useState } from 'react';
 
@@ -17,8 +18,16 @@ const NAV_ITEMS = [
 export default function AppLayout() {
   const { t, i18n } = useTranslation();
   const { isAuthenticated, logout } = useAuthStore();
+  const { theme, setTheme, resolved } = useThemeStore();
   const navigate = useNavigate();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  const cycleTheme = () => {
+    const order: Array<'light' | 'dark' | 'system'> = ['light', 'dark', 'system'];
+    const next = order[(order.indexOf(theme) + 1) % order.length];
+    setTheme(next);
+  };
+  const themeIcon = resolved === 'dark' ? '🌙' : theme === 'system' ? '💻' : '☀️';
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -63,7 +72,15 @@ export default function AppLayout() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <button
+              onClick={cycleTheme}
+              className="text-sm px-2 py-1 rounded-lg hover:bg-cream transition-colors"
+              aria-label="Toggle theme"
+              title={theme === 'system' ? 'System' : theme === 'dark' ? 'Dark' : 'Light'}
+            >
+              {themeIcon}
+            </button>
             <button
               onClick={toggleLang}
               className="text-sm text-muted hover:text-ink px-2 py-1 rounded-lg hover:bg-cream transition-colors"

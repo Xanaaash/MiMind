@@ -141,7 +141,7 @@ export default function JournalPage() {
           onBlur={() => setNoteError(validateNote(note))}
           placeholder={t('journal.note_placeholder')}
           rows={4}
-          className={`w-full border rounded-xl px-4 py-3 bg-white/90 focus:outline-none focus:ring-2 resize-none ${
+          className={`w-full border rounded-xl px-4 py-3 bg-paper/90 focus:outline-none focus:ring-2 resize-none ${
             noteError ? 'border-danger focus:ring-danger/30' : 'border-line focus:ring-accent/30'
           }`}
         />

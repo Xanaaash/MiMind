@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Button from '../../components/Button/Button';
 import SafetyDisclaimer from '../../components/SafetyDisclaimer/SafetyDisclaimer';
+import { useThemeStore } from '../../stores/theme';
 
 const FEATURES = [
   { key: 'scales', icon: '📋', color: 'bg-calm-soft' },
@@ -22,11 +23,19 @@ const fadeUp = {
 
 export default function Landing() {
   const { t, i18n } = useTranslation();
+  const { theme, setTheme, resolved } = useThemeStore();
 
   const toggleLang = () => {
     const next = i18n.language === 'zh-CN' ? 'en-US' : 'zh-CN';
     i18n.changeLanguage(next);
   };
+
+  const cycleTheme = () => {
+    const order: Array<'light' | 'dark' | 'system'> = ['light', 'dark', 'system'];
+    const next = order[(order.indexOf(theme) + 1) % order.length];
+    setTheme(next);
+  };
+  const themeIcon = resolved === 'dark' ? '🌙' : theme === 'system' ? '💻' : '☀️';
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -36,7 +45,14 @@ export default function Landing() {
           <span className="font-heading text-2xl font-bold text-accent">MiMind</span>
           <span className="text-xs bg-accent-soft text-accent px-2 py-0.5 rounded-full font-semibold">AI</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <button
+            onClick={cycleTheme}
+            className="text-sm px-2 py-1.5 rounded-lg hover:bg-cream/50 transition-colors"
+            aria-label="Toggle theme"
+          >
+            {themeIcon}
+          </button>
           <button
             onClick={toggleLang}
             className="text-sm text-muted hover:text-ink px-3 py-1.5 rounded-lg hover:bg-cream/50 transition-colors"

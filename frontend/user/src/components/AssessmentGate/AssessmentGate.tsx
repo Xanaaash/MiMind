@@ -77,7 +77,7 @@ export default function AssessmentGate({ reason }: Props) {
                 <p className="font-semibold text-sm">{t(`coach_gate.scale_${s.id}`)}</p>
                 <p className="text-xs text-muted truncate sm:whitespace-normal">{t(`coach_gate.scale_${s.id}_desc`)}</p>
               </div>
-              <span className="text-xs text-muted bg-white/80 px-2 py-1 rounded-lg shrink-0">
+              <span className="text-xs text-muted bg-paper/80 px-2 py-1 rounded-lg shrink-0">
                 {s.items} {t('scales.items')}
               </span>
             </div>
@@ -106,7 +106,7 @@ export default function AssessmentGate({ reason }: Props) {
                 <p className="font-semibold text-sm">{t(`coach_gate.scale_${s.id}`)}</p>
                 <p className="text-xs text-muted truncate sm:whitespace-normal">{t(`coach_gate.scale_${s.id}_desc`)}</p>
               </div>
-              <span className="text-xs text-muted bg-white/80 px-2 py-1 rounded-lg shrink-0">
+              <span className="text-xs text-muted bg-paper/80 px-2 py-1 rounded-lg shrink-0">
                 {s.items} {t('scales.items')}
               </span>
             </div>
