@@ -1,5 +1,5 @@
 import { api } from './client';
-import type { TestCatalogItem, TestResult } from '../types';
+import type { PairingReport, TestCatalogItem, TestResult } from '../types';
 
 export function getCatalog() {
   return api.get<Record<string, TestCatalogItem>>('/api/tests/catalog');
@@ -24,9 +24,9 @@ export function shareResult(userId: string, resultId: string) {
   return api.post<{ share_url: string }>(`/api/tests/${userId}/share/${resultId}`);
 }
 
-export function getPairingReport(resultId1: string, resultId2: string) {
-  return api.post<unknown>('/api/tests/pairing', {
-    result_id_1: resultId1,
-    result_id_2: resultId2,
+export function getPairingReport(leftResultId: string, rightResultId: string) {
+  return api.post<PairingReport>('/api/tests/pairing', {
+    left_result_id: leftResultId,
+    right_result_id: rightResultId,
   });
 }

@@ -82,6 +82,12 @@ export interface TestResult {
   created_at: string;
 }
 
+export interface PairingReport {
+  compatibility_score: number;
+  compatibility_level: string;
+  notes: string;
+}
+
 export interface CoachSession {
   session_id: string;
   user_id: string;
