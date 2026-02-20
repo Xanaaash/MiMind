@@ -236,6 +236,21 @@ def end_coach_session(session_id: str) -> dict:
     return _unwrap(status, body)
 
 
+@app.get("/api/coach/{user_id}/sessions")
+def list_coach_sessions(
+    user_id: str,
+    limit: int = Query(20, ge=1, le=100),
+) -> dict:
+    status, body = coach_api.get_session_history(user_id=user_id, limit=limit)
+    return _unwrap(status, body)
+
+
+@app.get("/api/coach/{user_id}/sessions/{session_id}")
+def get_coach_session_summary(user_id: str, session_id: str) -> dict:
+    status, body = coach_api.get_session_summary(user_id=user_id, session_id=session_id)
+    return _unwrap(status, body)
+
+
 @app.get("/api/tools/audio/library")
 def get_audio_library() -> dict:
     status, body = healing_tools_api.get_audio_library()

@@ -83,6 +83,16 @@ class CoachAPIContractTests(unittest.TestCase):
         self.assertIn("summary", end_body["data"])
         self.assertGreaterEqual(len(end_body["data"]["memory_items"]), 1)
 
+        history_status, history_body = self.coach_api.get_session_history(self.green_user_id, limit=10)
+        self.assertEqual(history_status, 200)
+        self.assertEqual(history_body["data"]["count"], 1)
+        self.assertEqual(history_body["data"]["items"][0]["session"]["session_id"], session_id)
+
+        summary_status, summary_body = self.coach_api.get_session_summary(self.green_user_id, session_id)
+        self.assertEqual(summary_status, 200)
+        self.assertEqual(summary_body["data"]["session"]["session_id"], session_id)
+        self.assertIsNotNone(summary_body["data"]["last_user_message"])
+
     def test_non_green_user_is_blocked(self) -> None:
         start_status, start_body = self.coach_api.post_start_session(
             user_id=self.yellow_user_id,
@@ -93,6 +103,11 @@ class CoachAPIContractTests(unittest.TestCase):
         )
         self.assertEqual(start_status, 400)
         self.assertIn("only available for green channel", start_body["error"])
+
+    def test_history_rejects_unknown_user(self) -> None:
+        status, body = self.coach_api.get_session_history("missing-user", limit=5)
+        self.assertEqual(status, 404)
+        self.assertIn("Unknown user_id", body["error"])
 
 
 if __name__ == "__main__":

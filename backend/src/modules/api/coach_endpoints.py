@@ -51,3 +51,17 @@ class CoachAPI:
             return 200, {"data": data}
         except ValueError as error:
             return 400, {"error": str(error)}
+
+    def get_session_history(self, user_id: str, limit: int = 20) -> Tuple[int, Dict[str, Any]]:
+        try:
+            data = self._service.list_session_history(user_id=user_id, limit=limit)
+            return 200, {"data": data}
+        except ValueError as error:
+            return 404, {"error": str(error)}
+
+    def get_session_summary(self, user_id: str, session_id: str) -> Tuple[int, Dict[str, Any]]:
+        try:
+            data = self._service.get_session_summary(user_id=user_id, session_id=session_id)
+            return 200, {"data": data}
+        except ValueError as error:
+            return 404, {"error": str(error)}

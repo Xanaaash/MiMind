@@ -70,6 +70,24 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         )
         self.assertEqual(chat.status_code, 200)
 
+        end = self.client.post(f"/api/coach/{session_id}/end")
+        self.assertEqual(end.status_code, 200)
+
+        history = self.client.get(
+            f"/api/coach/{user_id}/sessions",
+            params={"limit": 10},
+        )
+        self.assertEqual(history.status_code, 200)
+        history_data = history.json()
+        self.assertGreaterEqual(history_data["count"], 1)
+        self.assertEqual(history_data["items"][0]["session"]["session_id"], session_id)
+
+        summary = self.client.get(f"/api/coach/{user_id}/sessions/{session_id}")
+        self.assertEqual(summary.status_code, 200)
+        summary_data = summary.json()
+        self.assertEqual(summary_data["session"]["session_id"], session_id)
+        self.assertIn("summary", summary_data)
+
         obs = self.client.get(
             "/api/observability/model-invocations",
             params={"limit": 10, "task_type": "coach_generation"},
@@ -79,15 +97,15 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         self.assertGreaterEqual(len(data), 1)
         self.assertTrue(all(item["task_type"] == "coach_generation" for item in data))
 
-        summary = self.client.get(
+        model_summary = self.client.get(
             "/api/observability/model-invocations/summary",
             params={"limit": 10, "task_type": "coach_generation"},
         )
-        self.assertEqual(summary.status_code, 200)
-        summary_data = summary.json()
-        self.assertIn("totals", summary_data)
-        self.assertIn("by_task_type", summary_data)
-        self.assertGreaterEqual(summary_data["totals"]["total"], 1)
+        self.assertEqual(model_summary.status_code, 200)
+        model_summary_data = model_summary.json()
+        self.assertIn("totals", model_summary_data)
+        self.assertIn("by_task_type", model_summary_data)
+        self.assertGreaterEqual(model_summary_data["totals"]["total"], 1)
 
     def test_register_and_assessment_flow(self) -> None:
         email = f"api-{uuid4().hex[:8]}@example.com"

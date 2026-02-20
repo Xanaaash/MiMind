@@ -152,6 +152,33 @@ class CoachSessionService:
             "memory_items": self._memory_service.retrieve_recent(session.user_id, limit=3),
         }
 
+    def list_session_history(self, user_id: str, limit: int = 20) -> dict:
+        if self._store.get_user(user_id) is None:
+            raise ValueError("Unknown user_id")
+        if limit <= 0:
+            raise ValueError("limit must be greater than 0")
+
+        sessions = sorted(
+            self._store.list_user_coach_sessions(user_id),
+            key=lambda session: session.started_at,
+            reverse=True,
+        )
+        items = [self._serialize_session_history_item(session) for session in sessions[:limit]]
+        return {
+            "items": items,
+            "count": len(items),
+        }
+
+    def get_session_summary(self, user_id: str, session_id: str) -> dict:
+        if self._store.get_user(user_id) is None:
+            raise ValueError("Unknown user_id")
+
+        session = self._store.get_coach_session(session_id)
+        if session is None or session.user_id != user_id:
+            raise ValueError("Session not found")
+
+        return self._serialize_session_history_item(session)
+
     @staticmethod
     def parse_dialogue_risk(payload: Optional[dict]) -> Optional[DialogueRiskSignal]:
         if payload is None:
@@ -253,3 +280,18 @@ class CoachSessionService:
             )
 
         return f"Let's keep exploring: {user_message[:120]}"
+
+    def _serialize_session_history_item(self, session: CoachSession) -> dict:
+        return {
+            "session": session.to_dict(),
+            "summary": self._summary_service.build_summary(session),
+            "last_user_message": self._last_turn_message(session, "user"),
+            "last_coach_message": self._last_turn_message(session, "coach"),
+        }
+
+    @staticmethod
+    def _last_turn_message(session: CoachSession, role: str) -> Optional[str]:
+        for turn in reversed(session.turns):
+            if turn.role == role:
+                return turn.message
+        return None
