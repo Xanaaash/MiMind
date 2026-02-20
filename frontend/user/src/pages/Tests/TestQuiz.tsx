@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getTestDetail, submitTest } from '../../api/tests';
@@ -18,6 +18,7 @@ function inferRange(answerRange: string) {
 export default function TestQuiz() {
   const { testId } = useParams<{ testId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, i18n } = useTranslation();
   const userId = useAuthStore((s) => s.userId);
   const lang = i18n.language === 'en-US' ? 'en-US' : 'zh-CN';
@@ -66,7 +67,7 @@ export default function TestQuiz() {
         aggregated[key] = counts[key] ? Math.round(sums[key] / counts[key]) : 0;
       });
       const result = await submitTest(userId, testId, aggregated);
-      navigate(`/tests/${testId}/result`, { state: { result } });
+      navigate(`/tests/${testId}/result${location.search}`, { state: { result } });
     } finally {
       setSubmitting(false);
     }
