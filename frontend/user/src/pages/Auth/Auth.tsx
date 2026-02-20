@@ -96,8 +96,13 @@ export default function Auth() {
 
       setUser(userId!, email, 'zh-CN');
       setChannel(resolvedChannel);
+
+      if (resolvedChannel) {
+        localStorage.setItem('mc_assessment_ts', String(Date.now()));
+      }
+
       toast.success(t('auth.login') === '登录' ? '登录成功' : 'Login successful');
-      navigate(resolvedChannel ? '/home' : '/onboarding');
+      navigate('/home');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     } finally {
