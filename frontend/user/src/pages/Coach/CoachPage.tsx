@@ -11,6 +11,9 @@ import AssessmentGate, { isAssessmentExpired } from '../../components/Assessment
 const STYLES = [
   { id: 'warm_guide', nameKey: 'coach.style_warm', descKey: 'coach.style_warm_desc', icon: '🤗', color: 'bg-accent-soft' },
   { id: 'rational_analysis', nameKey: 'coach.style_rational', descKey: 'coach.style_rational_desc', icon: '🧠', color: 'bg-calm-soft' },
+  { id: 'deep_exploration', nameKey: 'coach.style_deep', descKey: 'coach.style_deep_desc', icon: '🔍', color: 'bg-cream' },
+  { id: 'mindful_guidance', nameKey: 'coach.style_mindful', descKey: 'coach.style_mindful_desc', icon: '🧘', color: 'bg-safe-soft' },
+  { id: 'action_coaching', nameKey: 'coach.style_action', descKey: 'coach.style_action_desc', icon: '🎯', color: 'bg-warn-soft' },
 ];
 
 export default function CoachPage() {

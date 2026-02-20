@@ -22,6 +22,21 @@ class LocalCoachProvider:
                 "Let's map this situation using CBT. "
                 "What thought came first, and what action followed?"
             )
+        elif style_id == "deep_exploration":
+            reply = (
+                "Let's slow down and notice repeated patterns. "
+                "When this situation appears, what familiar feeling or memory tends to show up first?"
+            )
+        elif style_id == "mindful_guidance":
+            reply = (
+                "Take one gentle breath in and out with me. "
+                "What do you notice in your body right now without judging it?"
+            )
+        elif style_id == "action_coaching":
+            reply = (
+                "Let's make this practical. "
+                "What is one small action you can complete in the next 24 hours?"
+            )
         else:
             reply = f"Let's keep exploring: {user_message[:120]}"
 

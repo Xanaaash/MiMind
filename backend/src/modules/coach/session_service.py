@@ -252,4 +252,22 @@ class CoachSessionService:
                 "What thought came first, and what action followed?"
             )
 
+        if style_id == "deep_exploration":
+            return (
+                "Let's look for recurring patterns together. "
+                "When this kind of moment happens, what feeling tends to appear first?"
+            )
+
+        if style_id == "mindful_guidance":
+            return (
+                "Let's pause for one slow breath. "
+                "What sensations do you notice in your body right now?"
+            )
+
+        if style_id == "action_coaching":
+            return (
+                "Let's turn this into one clear next step. "
+                "What is one small action you can take today?"
+            )
+
         return f"Let's keep exploring: {user_message[:120]}"

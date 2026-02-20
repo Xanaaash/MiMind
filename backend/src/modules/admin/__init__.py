@@ -1,3 +1,1 @@
-from modules.admin.service import AdminAuthService
-
-__all__ = ["AdminAuthService"]
+__all__: list[str] = []

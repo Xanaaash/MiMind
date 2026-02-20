@@ -23,6 +23,27 @@ Non-negotiable rules:
                 "name": "Rational Analysis",
                 "prompt": "Use structured CBT-style questioning and focus on thought-behavior links.",
             },
+            "deep_exploration": {
+                "name": "Deep Exploration",
+                "prompt": (
+                    "Use open-ended psychodynamic exploration to identify recurring emotional patterns, "
+                    "inner conflicts, and relational themes without making diagnostic claims."
+                ),
+            },
+            "mindful_guidance": {
+                "name": "Mindfulness Guidance",
+                "prompt": (
+                    "Use present-moment, non-judgmental mindfulness guidance with brief grounding prompts, "
+                    "gentle pacing, and body-awareness check-ins."
+                ),
+            },
+            "action_coaching": {
+                "name": "Action Coaching",
+                "prompt": (
+                    "Use solution-focused coaching: clarify one concrete goal, define the smallest next step, "
+                    "and create a simple accountability check."
+                ),
+            },
         },
         note="Initial constitution-aligned prompt pack",
     ),
@@ -48,7 +69,28 @@ Non-negotiable rules:
                 "name": "Rational Analysis",
                 "prompt": "Use structured CBT-style questioning and focus on thought-behavior links with concise steps.",
             },
+            "deep_exploration": {
+                "name": "Deep Exploration",
+                "prompt": (
+                    "Invite deeper reflection on repeating emotional patterns and relationship scripts; "
+                    "ask exploratory questions with calm, non-judgmental language."
+                ),
+            },
+            "mindful_guidance": {
+                "name": "Mindfulness Guidance",
+                "prompt": (
+                    "Guide brief mindfulness practice through breath, body sensations, and present-moment awareness; "
+                    "avoid urgency and command-style wording."
+                ),
+            },
+            "action_coaching": {
+                "name": "Action Coaching",
+                "prompt": (
+                    "Focus on one near-term outcome, generate practical options, choose one next action, "
+                    "and define when/where the user will execute it."
+                ),
+            },
         },
-        note="Adds tone guardrail and style prompt refinement",
+        note="Adds tone guardrail and completes five coaching styles",
     ),
 }

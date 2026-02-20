@@ -36,10 +36,16 @@ class PromptRegistryUnitTests(unittest.TestCase):
         registry.activate("2026.02.0")
         style_old = get_style_prompt("warm_guide")
         self.assertIn("avoid directive language", style_old["prompt"])
+        deep_old = get_style_prompt("deep_exploration")
+        self.assertIn("pattern", deep_old["prompt"].lower())
 
         registry.activate("2026.02.1")
         style_new = get_style_prompt("warm_guide")
         self.assertIn("gentle next-step question", style_new["prompt"])
+        mindful_new = get_style_prompt("mindful_guidance")
+        action_new = get_style_prompt("action_coaching")
+        self.assertIn("mindfulness", mindful_new["prompt"].lower())
+        self.assertIn("next action", action_new["prompt"].lower())
 
         system_prompt = get_system_prompt().lower()
         self.assertIn("never provide clinical diagnosis", system_prompt)
@@ -48,6 +54,17 @@ class PromptRegistryUnitTests(unittest.TestCase):
     def test_invalid_default_version_falls_back_to_latest(self) -> None:
         service = PromptRegistryService(default_active_version="1999.01.0")
         self.assertEqual(service.get_active_version(), "2026.02.1")
+
+    def test_active_pack_exposes_five_styles(self) -> None:
+        service = PromptRegistryService()
+        active = service.get_active_pack()
+        self.assertEqual(set(active.style_prompts.keys()), {
+            "warm_guide",
+            "rational_analysis",
+            "deep_exploration",
+            "mindful_guidance",
+            "action_coaching",
+        })
 
 
 if __name__ == "__main__":

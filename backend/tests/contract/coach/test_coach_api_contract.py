@@ -94,6 +94,15 @@ class CoachAPIContractTests(unittest.TestCase):
         self.assertEqual(start_status, 400)
         self.assertIn("only available for green channel", start_body["error"])
 
+    def test_new_styles_are_supported_for_green_user(self) -> None:
+        for style_id in ("deep_exploration", "mindful_guidance", "action_coaching"):
+            start_status, start_body = self.coach_api.post_start_session(
+                user_id=self.green_user_id,
+                payload={"style_id": style_id, "subscription_active": True},
+            )
+            self.assertEqual(start_status, 200)
+            self.assertEqual(start_body["data"]["session"]["style_id"], style_id)
+
 
 if __name__ == "__main__":
     unittest.main()
