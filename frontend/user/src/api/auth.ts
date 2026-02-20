@@ -1,5 +1,5 @@
 import { api } from './client';
-import type { User } from '../types';
+import type { AuthSessionPayload, User } from '../types';
 
 export function register(email: string, locale: string, policyVersion: string) {
   return api.post<{ user_id: string; triage?: unknown }>('/api/register', {
@@ -7,6 +7,31 @@ export function register(email: string, locale: string, policyVersion: string) {
     locale,
     policy_version: policyVersion,
   });
+}
+
+export function authRegister(email: string, password: string, locale: string, policyVersion: string) {
+  return api.post<AuthSessionPayload>('/api/auth/register', {
+    email,
+    password,
+    locale,
+    policy_version: policyVersion,
+  });
+}
+
+export function authLogin(email: string, password: string) {
+  return api.post<AuthSessionPayload>('/api/auth/login', { email, password });
+}
+
+export function authSession() {
+  return api.get<AuthSessionPayload>('/api/auth/session');
+}
+
+export function authRefresh() {
+  return api.post<AuthSessionPayload>('/api/auth/refresh');
+}
+
+export function authLogout() {
+  return api.post<{ authenticated: boolean }>('/api/auth/logout');
 }
 
 export function submitAssessment(userId: string, responses: Record<string, unknown>) {
