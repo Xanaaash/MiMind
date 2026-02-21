@@ -46,11 +46,13 @@
 
 - 依赖管理：`uv + pyproject.toml`
 - 一键初始化：`scripts/dev-setup.sh`
+- 执行数据库迁移：`scripts/run-db-migrations.sh`
 - 启动 API 服务：`scripts/run-api.sh`（默认 `http://127.0.0.1:8000`）
 - 常用命令：
   - `uv run pytest`
   - `uv run ruff check .`
   - `uv run mypy`
+  - `scripts/run-db-migrations.sh`
   - `scripts/run-backend-tests.sh`
 
 ## Docker（T-401）

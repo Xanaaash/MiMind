@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional
 from modules.admin.models import AdminSession
 from modules.assessment.models import AssessmentScoreSet, AssessmentSubmission, ReassessmentSchedule
 from modules.storage.in_memory import InMemoryStore
+from modules.storage.migrations import apply_sqlite_migrations
 from modules.tests.models import TestResult
 from modules.triage.models import RiskLevel, TriageChannel, TriageDecision
 from modules.user.models import User
@@ -40,80 +41,8 @@ class SQLiteStore(InMemoryStore):
         return connection
 
     def _initialize_schema(self) -> None:
-        statements = [
-            """
-            CREATE TABLE IF NOT EXISTS users (
-                user_id TEXT PRIMARY KEY,
-                email TEXT NOT NULL,
-                locale TEXT NOT NULL,
-                created_at TEXT NOT NULL
-            )
-            """,
-            """
-            CREATE TABLE IF NOT EXISTS admin_sessions (
-                session_id TEXT PRIMARY KEY,
-                username TEXT NOT NULL,
-                created_at TEXT NOT NULL,
-                expires_at TEXT NOT NULL,
-                revoked INTEGER NOT NULL
-            )
-            """,
-            """
-            CREATE TABLE IF NOT EXISTS assessment_submissions (
-                submission_id TEXT PRIMARY KEY,
-                user_id TEXT NOT NULL,
-                responses_json TEXT NOT NULL,
-                submitted_at TEXT NOT NULL
-            )
-            """,
-            """
-            CREATE TABLE IF NOT EXISTS assessment_scores (
-                user_id TEXT PRIMARY KEY,
-                phq9_score INTEGER NOT NULL,
-                gad7_score INTEGER NOT NULL,
-                pss10_score INTEGER NOT NULL,
-                cssrs_positive INTEGER NOT NULL,
-                scl90_global_index REAL,
-                scl90_dimension_scores_json TEXT,
-                scl90_moderate_or_above INTEGER NOT NULL
-            )
-            """,
-            """
-            CREATE TABLE IF NOT EXISTS triage_decisions (
-                user_id TEXT PRIMARY KEY,
-                channel TEXT NOT NULL,
-                reasons_json TEXT NOT NULL,
-                halt_coaching INTEGER NOT NULL,
-                show_hotline INTEGER NOT NULL,
-                dialogue_risk_level TEXT
-            )
-            """,
-            """
-            CREATE TABLE IF NOT EXISTS reassessment_schedules (
-                user_id TEXT PRIMARY KEY,
-                due_dates_json TEXT NOT NULL
-            )
-            """,
-            """
-            CREATE TABLE IF NOT EXISTS test_results (
-                result_id TEXT PRIMARY KEY,
-                user_id TEXT NOT NULL,
-                test_id TEXT NOT NULL,
-                answers_json TEXT NOT NULL,
-                summary_json TEXT NOT NULL,
-                created_at TEXT NOT NULL
-            )
-            """,
-            """
-            CREATE INDEX IF NOT EXISTS idx_test_results_user_id
-            ON test_results (user_id, created_at)
-            """,
-        ]
-
         with self._lock:
-            for statement in statements:
-                self._connection.execute(statement)
-            self._connection.commit()
+            apply_sqlite_migrations(self._connection)
 
     def save_user(self, user: User) -> None:
         super().save_user(user)

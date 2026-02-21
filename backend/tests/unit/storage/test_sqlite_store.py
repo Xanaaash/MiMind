@@ -1,5 +1,6 @@
 import tempfile
 import unittest
+import sqlite3
 from datetime import date, datetime, timezone
 
 from backend.tests.bootstrap import configure_import_path
@@ -14,6 +15,32 @@ from modules.user.models import User
 
 
 class SQLiteStorePersistenceTests(unittest.TestCase):
+    def test_schema_migrations_recorded_and_idempotent(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            db_path = f"{temp_dir}/mimind.db"
+
+            store = SQLiteStore(db_path=db_path)
+            store.close()
+
+            reopened = SQLiteStore(db_path=db_path)
+            reopened.close()
+
+            connection = sqlite3.connect(db_path)
+            try:
+                rows = connection.execute(
+                    """
+                    SELECT version, name
+                    FROM schema_migrations
+                    ORDER BY version ASC
+                    """
+                ).fetchall()
+            finally:
+                connection.close()
+
+            self.assertGreaterEqual(len(rows), 1)
+            self.assertEqual(rows[0][0], 1)
+            self.assertEqual(rows[0][1], "baseline_schema")
+
     def test_scale_artifacts_persist_across_store_instances(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             db_path = f"{temp_dir}/mimind.db"
