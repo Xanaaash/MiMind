@@ -124,7 +124,7 @@
 
 ## 五、Admin 管理端增强
 
-- [🔒 codex-0221a] **T-501** Admin Observability 面板 UI（模型调用统计、延迟分布、错误率）
+- [✅] **T-501** Admin Observability 面板 UI（模型调用统计、延迟分布、错误率）
 - [ ] **T-502** Admin Prompt 管理面板 UI（查看/切换 Prompt Pack）
 - [ ] **T-503** Admin 用户管理面板（用户列表、通道状态、手动分流调整）
 - [ ] **T-504** Admin 数据合规操作面板（触发数据导出/删除）
