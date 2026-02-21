@@ -10,9 +10,12 @@ import CrisisBanner from '../../components/CrisisBanner/CrisisBanner';
 import AssessmentGate, { isAssessmentExpired } from '../../components/AssessmentGate/AssessmentGate';
 import { saveCoachHistory } from '../../utils/coachHistory';
 
-const STYLES = [
+export const COACH_STYLES = [
   { id: 'warm_guide', nameKey: 'coach.style_warm', descKey: 'coach.style_warm_desc', icon: '🤗', color: 'bg-accent-soft' },
   { id: 'rational_analysis', nameKey: 'coach.style_rational', descKey: 'coach.style_rational_desc', icon: '🧠', color: 'bg-calm-soft' },
+  { id: 'deep_exploration', nameKey: 'coach.style_deep', descKey: 'coach.style_deep_desc', icon: '🪞', color: 'bg-warn-soft' },
+  { id: 'mindfulness_guide', nameKey: 'coach.style_mindful', descKey: 'coach.style_mindful_desc', icon: '🪷', color: 'bg-safe-soft' },
+  { id: 'action_coach', nameKey: 'coach.style_action', descKey: 'coach.style_action_desc', icon: '🎯', color: 'bg-cream' },
 ];
 
 function useVisualViewportHeight() {
@@ -189,7 +192,7 @@ export default function CoachPage() {
         </motion.div>
 
         <div className="grid gap-3 sm:gap-4">
-          {STYLES.map((style, i) => (
+          {COACH_STYLES.map((style, i) => (
             <motion.div
               key={style.id}
               initial={{ opacity: 0, y: 16 }}
