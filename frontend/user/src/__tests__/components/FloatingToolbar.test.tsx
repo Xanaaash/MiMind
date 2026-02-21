@@ -1,6 +1,6 @@
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import FloatingToolbar from '../../components/FloatingToolbar/FloatingToolbar';
 import { useToolStore } from '../../stores/useToolStore';
 
@@ -94,5 +94,27 @@ describe('FloatingToolbar', () => {
 
     fireEvent.click(screen.getByText('tools.stop'));
     expect(ambientServiceMocks.stopAllAmbientPlayback).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows running pomodoro mini widget and supports minimize / expand / open panel', () => {
+    act(() => {
+      useToolStore.getState().startPomodoro('work', 65);
+    });
+    render(<FloatingToolbar />);
+
+    expect(screen.getByRole('button', { name: 'tools.pomo_floating_open' })).toBeInTheDocument();
+    expect(screen.getAllByText('01:05').length).toBeGreaterThan(0);
+
+    fireEvent.click(screen.getByRole('button', { name: 'tools.pomo_floating_minimize' }));
+    expect(screen.getByRole('button', { name: 'tools.pomo_floating_expand' })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'tools.pomo_floating_open' }));
+    expect(useToolStore.getState().ui.isRightSidebarOpen).toBe(true);
+    expect(useToolStore.getState().ui.activePanel).toBe('pomodoro');
+
+    act(() => {
+      useToolStore.getState().stopPomodoro();
+    });
+    expect(screen.queryByRole('button', { name: 'tools.pomo_floating_open' })).not.toBeInTheDocument();
   });
 });

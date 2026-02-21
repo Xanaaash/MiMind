@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 import { routes } from '../../router';
 import { useAuthStore } from '../../stores/auth';
@@ -76,6 +76,30 @@ describe('tools rearchitecture smoke routes', () => {
     expect(await screen.findByText('tools.rescue.title')).toBeInTheDocument();
     expect(useToolStore.getState().ui.isRightSidebarOpen).toBe(true);
     expect(ambientServiceMocks.stopAllAmbientPlayback).not.toHaveBeenCalled();
+  });
+
+  it('keeps pomodoro mini timer visible and counting down across routes', async () => {
+    renderAt('/home');
+    act(() => {
+      useToolStore.getState().startPomodoro('work', 5);
+    });
+
+    expect(await screen.findByRole('button', { name: 'tools.pomo_floating_open' })).toBeInTheDocument();
+
+    const coachNav = screen.getAllByRole('link', { name: /nav\.coach/ })[0];
+    fireEvent.click(coachNav);
+    fireEvent.click(screen.getAllByRole('link', { name: /nav\.rescue/ })[0]);
+    expect(await screen.findByText('tools.rescue.title')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'tools.pomo_floating_open' })).toBeInTheDocument();
+
+    const before = useToolStore.getState().pomodoro.remainingSec;
+    await act(async () => {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1100);
+      });
+    });
+    const after = useToolStore.getState().pomodoro.remainingSec;
+    expect(after).toBeLessThan(before);
   });
 
   it('starts relief quick action with one click and reaches sensory page', async () => {

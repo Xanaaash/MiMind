@@ -18,7 +18,7 @@
 
 ### Phase 2: Widget & Scale Professionalization
 
-- [ ] **T2.1 / T-805** 实现番茄钟轻量悬浮计时器（跨路由可见、可最小化） - `frontend/user/src/components/FloatingToolbar/*`, `frontend/user/src/stores/useToolStore.ts`
+- [x] **T2.1 / T-805** 实现番茄钟轻量悬浮计时器（跨路由可见、可最小化） - `frontend/user/src/components/FloatingToolbar/*`, `frontend/user/src/stores/useToolStore.ts`
 - [ ] **T2.2 / T-806** 扩充权威量表定义与来源文献映射 - `backend/src/modules/assessment/*`, `frontend/user/src/pages/Scales/*`
 - [ ] **T2.3 / T-807** 为 tests/scales 列表补充通俗用途说明区块（中英文） - `frontend/user/src/pages/Tests/*`, `frontend/user/src/pages/Scales/*`, `frontend/user/public/locales/*.json`
 

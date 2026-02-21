@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AMBIENT_SOUNDS, type AmbientSoundId } from '../../utils/ambientAudio';
 import {
@@ -26,6 +26,7 @@ function formatTime(totalSec: number): string {
 
 export default function FloatingToolbar() {
   const { t } = useTranslation();
+  const [isPomodoroMiniCollapsed, setPomodoroMiniCollapsed] = useState(false);
   const isOpen = useToolStore((s) => s.ui.isRightSidebarOpen);
   const activePanel = useToolStore((s) => s.ui.activePanel);
   const setActivePanel = useToolStore((s) => s.setActivePanel);
@@ -71,9 +72,73 @@ export default function FloatingToolbar() {
   const displaySec = pomodoro.mode === 'idle'
     ? pomodoro.preset.workMin * 60
     : pomodoro.remainingSec;
+  const showPomodoroMini = pomodoro.isRunning && !isOpen;
+
+  useEffect(() => {
+    if (!pomodoro.isRunning) {
+      setPomodoroMiniCollapsed(false);
+    }
+  }, [pomodoro.isRunning]);
+
+  const openPomodoroPanel = () => {
+    setActivePanel('pomodoro');
+    setRightSidebarOpen(true);
+  };
 
   return (
     <>
+      {showPomodoroMini && (
+        <div
+          className={`
+            fixed right-4 bottom-20 z-40 rounded-2xl border border-line bg-panel/95 backdrop-blur-md shadow-soft p-2
+            ${isPomodoroMiniCollapsed ? 'w-36' : 'w-[min(48vw,220px)] sm:w-52'}
+          `}
+        >
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={openPomodoroPanel}
+              className="flex-1 min-w-0 text-left rounded-xl px-2 py-1.5 hover:bg-paper transition-colors"
+              aria-label={t('tools.pomo_floating_open')}
+            >
+              <div className="text-[10px] uppercase tracking-wide text-muted">
+                {t(`pomo.phase_${pomodoro.mode}`)}
+              </div>
+              <div className="font-mono text-lg font-bold text-accent leading-tight">
+                {formatTime(displaySec)}
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setPomodoroMiniCollapsed((prev) => !prev)}
+              className="rounded-lg px-2 py-1 text-xs text-muted hover:bg-paper hover:text-ink transition-colors"
+              aria-label={isPomodoroMiniCollapsed ? t('tools.pomo_floating_expand') : t('tools.pomo_floating_minimize')}
+            >
+              {isPomodoroMiniCollapsed ? '▣' : '—'}
+            </button>
+          </div>
+
+          {!isPomodoroMiniCollapsed && (
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={openPomodoroPanel}
+                className="rounded-lg bg-accent text-white text-xs font-semibold py-1.5 hover:bg-accent-hover transition-colors"
+              >
+                {t('tools.open')}
+              </button>
+              <button
+                type="button"
+                onClick={stopPomodoro}
+                className="rounded-lg bg-danger-soft text-danger text-xs font-semibold py-1.5 hover:bg-danger hover:text-white transition-colors"
+              >
+                {t('tools.stop')}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       <button
         type="button"
         onClick={toggleRightSidebar}
