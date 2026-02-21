@@ -2,6 +2,37 @@ const CARD_WIDTH = 750;
 const CARD_HEIGHT = 1334;
 
 type NumericMap = Record<string, number>;
+type Big5TraitKey = 'O' | 'C' | 'E' | 'A' | 'N';
+type ShareCardCopy = {
+  genericSubtitle: string;
+  footerLine1: string;
+  footerLine2: string;
+  mbtiSubtitle: string;
+  mbtiTypeLabel: string;
+  big5Subtitle: string;
+  big5DominantLabel: string;
+  big5Traits: Record<Big5TraitKey, string>;
+};
+type ShareCardCopyOverride = Partial<Omit<ShareCardCopy, 'big5Traits'>> & {
+  big5Traits?: Partial<ShareCardCopy['big5Traits']>;
+};
+
+const DEFAULT_SHARE_CARD_COPY: ShareCardCopy = {
+  genericSubtitle: 'Personal Insight Snapshot',
+  footerLine1: 'Share your profile, grow with clarity',
+  footerLine2: 'Mental wellness coaching tool',
+  mbtiSubtitle: 'Personality Axis Portrait',
+  mbtiTypeLabel: 'TYPE',
+  big5Subtitle: 'OCEAN Radar Profile',
+  big5DominantLabel: 'Dominant',
+  big5Traits: {
+    O: 'Openness',
+    C: 'Conscientiousness',
+    E: 'Extraversion',
+    A: 'Agreeableness',
+    N: 'Neuroticism',
+  },
+};
 
 function normalizeTestId(testName: string) {
   return testName.trim().toLowerCase();
@@ -52,18 +83,18 @@ function drawBaseBackground(ctx: CanvasRenderingContext2D, title: string, subtit
   ctx.stroke();
 }
 
-function drawFooter(ctx: CanvasRenderingContext2D) {
+function drawFooter(ctx: CanvasRenderingContext2D, copy: ShareCardCopy) {
   ctx.fillStyle = 'rgba(198, 103, 79, 0.16)';
   ctx.fillRect(0, 1180, CARD_WIDTH, 154);
 
   ctx.textAlign = 'center';
   ctx.fillStyle = '#785c55';
   ctx.font = '24px Nunito Sans, sans-serif';
-  ctx.fillText('Share your profile, grow with clarity', CARD_WIDTH / 2, 1240);
+  ctx.fillText(copy.footerLine1, CARD_WIDTH / 2, 1240);
 
   ctx.fillStyle = '#c6674f';
   ctx.font = 'bold 22px Nunito Sans, sans-serif';
-  ctx.fillText('Mental wellness coaching tool', CARD_WIDTH / 2, 1290);
+  ctx.fillText(copy.footerLine2, CARD_WIDTH / 2, 1290);
 }
 
 function toNumericMap(value: unknown): NumericMap {
@@ -92,8 +123,13 @@ function formatValue(value: unknown): string {
   return '-';
 }
 
-function drawGenericCard(ctx: CanvasRenderingContext2D, testName: string, summary: Record<string, unknown>) {
-  drawBaseBackground(ctx, resolveTestTitle(testName), 'Personal Insight Snapshot');
+function drawGenericCard(
+  ctx: CanvasRenderingContext2D,
+  testName: string,
+  summary: Record<string, unknown>,
+  copy: ShareCardCopy,
+) {
+  drawBaseBackground(ctx, resolveTestTitle(testName), copy.genericSubtitle);
 
   const entries = Object.entries(summary).filter(([, value]) => value !== null && value !== undefined).slice(0, 12);
   ctx.textAlign = 'left';
@@ -111,8 +147,13 @@ function drawGenericCard(ctx: CanvasRenderingContext2D, testName: string, summar
   }
 }
 
-function drawMbtiCard(ctx: CanvasRenderingContext2D, testName: string, summary: Record<string, unknown>) {
-  drawBaseBackground(ctx, resolveTestTitle(testName), 'Personality Axis Portrait', '#b3543f');
+function drawMbtiCard(
+  ctx: CanvasRenderingContext2D,
+  testName: string,
+  summary: Record<string, unknown>,
+  copy: ShareCardCopy,
+) {
+  drawBaseBackground(ctx, resolveTestTitle(testName), copy.mbtiSubtitle, '#b3543f');
 
   const mbtiType = typeof summary.type === 'string' ? summary.type : '----';
   const strengths = toNumericMap(summary.dimension_strength);
@@ -134,7 +175,7 @@ function drawMbtiCard(ctx: CanvasRenderingContext2D, testName: string, summary: 
   ctx.textAlign = 'center';
   ctx.fillStyle = '#785c55';
   ctx.font = '600 24px Nunito Sans, sans-serif';
-  ctx.fillText('TYPE', CARD_WIDTH / 2, 386);
+  ctx.fillText(copy.mbtiTypeLabel, CARD_WIDTH / 2, 386);
   ctx.fillStyle = '#b3543f';
   ctx.font = 'bold 106px Fraunces, serif';
   ctx.fillText(mbtiType, CARD_WIDTH / 2, 506);
@@ -170,18 +211,17 @@ function drawMbtiCard(ctx: CanvasRenderingContext2D, testName: string, summary: 
   }
 }
 
-function drawBigFiveCard(ctx: CanvasRenderingContext2D, testName: string, summary: Record<string, unknown>) {
-  drawBaseBackground(ctx, resolveTestTitle(testName), 'OCEAN Radar Profile', '#3c8a90');
+function drawBigFiveCard(
+  ctx: CanvasRenderingContext2D,
+  testName: string,
+  summary: Record<string, unknown>,
+  copy: ShareCardCopy,
+) {
+  drawBaseBackground(ctx, resolveTestTitle(testName), copy.big5Subtitle, '#3c8a90');
 
   const rawScores = toNumericMap(summary.scores);
   const traits = ['O', 'C', 'E', 'A', 'N'];
-  const labels: Record<string, string> = {
-    O: 'Openness',
-    C: 'Conscientiousness',
-    E: 'Extraversion',
-    A: 'Agreeableness',
-    N: 'Neuroticism',
-  };
+  const labels: Record<string, string> = copy.big5Traits;
   const scores = traits.map((trait) => rawScores[trait] ?? rawScores[trait.toLowerCase()] ?? 0);
 
   const cx = CARD_WIDTH / 2;
@@ -242,7 +282,7 @@ function drawBigFiveCard(ctx: CanvasRenderingContext2D, testName: string, summar
     ctx.fillStyle = '#3c8a90';
     ctx.textAlign = 'center';
     ctx.font = 'bold 28px Nunito Sans, sans-serif';
-    ctx.fillText(`Dominant: ${labels[dominant]}`, cx, 968);
+    ctx.fillText(`${copy.big5DominantLabel}: ${labels[dominant]}`, cx, 968);
   }
 
   let y = 1018;
@@ -260,7 +300,11 @@ function drawBigFiveCard(ctx: CanvasRenderingContext2D, testName: string, summar
   }
 }
 
-export function generateShareCard(testName: string, summary: Record<string, unknown>): HTMLCanvasElement {
+export function generateShareCard(
+  testName: string,
+  summary: Record<string, unknown>,
+  copyOverride?: ShareCardCopyOverride,
+): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = CARD_WIDTH;
   canvas.height = CARD_HEIGHT;
@@ -268,17 +312,25 @@ export function generateShareCard(testName: string, summary: Record<string, unkn
   if (!ctx) {
     return canvas;
   }
+  const copy: ShareCardCopy = {
+    ...DEFAULT_SHARE_CARD_COPY,
+    ...copyOverride,
+    big5Traits: {
+      ...DEFAULT_SHARE_CARD_COPY.big5Traits,
+      ...(copyOverride?.big5Traits ?? {}),
+    },
+  };
 
   const id = normalizeTestId(testName);
   if (id === 'mbti' || id === '16p') {
-    drawMbtiCard(ctx, testName, summary);
+    drawMbtiCard(ctx, testName, summary, copy);
   } else if (id === 'big5') {
-    drawBigFiveCard(ctx, testName, summary);
+    drawBigFiveCard(ctx, testName, summary, copy);
   } else {
-    drawGenericCard(ctx, testName, summary);
+    drawGenericCard(ctx, testName, summary, copy);
   }
 
-  drawFooter(ctx);
+  drawFooter(ctx, copy);
   return canvas;
 }
 

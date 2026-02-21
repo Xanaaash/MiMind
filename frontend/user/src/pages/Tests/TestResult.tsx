@@ -54,6 +54,23 @@ export default function TestResult() {
   const [pairingReport, setPairingReport] = useState<PairingReport | null>(null);
   const [pairingLoading, setPairingLoading] = useState(false);
   const [pairingError, setPairingError] = useState<string | null>(null);
+  const localizedTestName = t(TEST_NAME_KEYS[testId ?? ''] ?? '', { defaultValue: testId ?? '' });
+  const shareCardCopy = useMemo(() => ({
+    genericSubtitle: t('tests.share_card.generic_subtitle'),
+    footerLine1: t('tests.share_card.footer_line1'),
+    footerLine2: t('tests.share_card.footer_line2'),
+    mbtiSubtitle: t('tests.share_card.mbti_subtitle'),
+    mbtiTypeLabel: t('tests.share_card.mbti_type_label'),
+    big5Subtitle: t('tests.share_card.big5_subtitle'),
+    big5DominantLabel: t('tests.share_card.big5_dominant_label'),
+    big5Traits: {
+      O: t('tests.share_card.trait_o'),
+      C: t('tests.share_card.trait_c'),
+      E: t('tests.share_card.trait_e'),
+      A: t('tests.share_card.trait_a'),
+      N: t('tests.share_card.trait_n'),
+    },
+  }), [t]);
 
   const inviteLink = useMemo(() => {
     if (!resultId || !testId) return '';
@@ -116,9 +133,7 @@ export default function TestResult() {
       animate={{ opacity: 1, y: 0 }}
     >
       <h1 className="font-heading text-3xl font-bold mb-2">{t('tests.result_title')}</h1>
-      <p className="text-muted">
-        {t(TEST_NAME_KEYS[testId ?? ''] ?? '', { defaultValue: testId ?? '' })}
-      </p>
+      <p className="text-muted">{localizedTestName}</p>
       <p className="text-xs text-muted leading-relaxed mb-8">
         {t(TEST_INTRO_KEYS[testId ?? ''] ?? 'tests.intro.generic')}
       </p>
@@ -166,7 +181,9 @@ export default function TestResult() {
             </Button>
             {canShare() && (
               <Button size="sm" variant="secondary" onClick={() => {
-                if (canvasRef.current) shareImage(canvasRef.current, testId ?? 'result');
+                if (canvasRef.current) {
+                  shareImage(canvasRef.current, localizedTestName || testId || 'result');
+                }
               }}>
                 {t('common.share')}
               </Button>
@@ -234,7 +251,7 @@ export default function TestResult() {
         </Button>
         <Button variant="secondary" onClick={() => {
           if (summary) {
-            const canvas = generateShareCard(testId ?? 'Test', summary);
+            const canvas = generateShareCard(localizedTestName || testId || 'Test', summary, shareCardCopy);
             canvasRef.current = canvas;
             setSharePreview(canvas.toDataURL('image/png'));
           }

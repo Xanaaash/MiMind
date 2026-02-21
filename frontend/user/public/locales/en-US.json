@@ -342,6 +342,20 @@
       "N": "Neuroticism (N)",
       "mixed": "Mixed",
       "medium": "Medium"
+    },
+    "share_card": {
+      "generic_subtitle": "Personal Insight Snapshot",
+      "footer_line1": "Share your profile, grow with clarity",
+      "footer_line2": "Mental wellness coaching tool",
+      "mbti_subtitle": "Personality Axis Portrait",
+      "mbti_type_label": "Type",
+      "big5_subtitle": "OCEAN Radar Profile",
+      "big5_dominant_label": "Dominant",
+      "trait_o": "Openness",
+      "trait_c": "Conscientiousness",
+      "trait_e": "Extraversion",
+      "trait_a": "Agreeableness",
+      "trait_n": "Neuroticism"
     }
   },
   "coach_gate": {
@@ -419,6 +433,14 @@
     "meditation_now_playing": "Now Playing",
     "meditation_log_failed": "Playback started, but session logging failed. Please retry later.",
     "meditation_play_failed": "Unable to play audio. Please check audio permissions and retry.",
+    "meditation_source_label": "Source",
+    "meditation_license_label": "License",
+    "meditation_attribution_label": "Attribution",
+    "meditation_open_source": "Open source",
+    "meditation_theme_stress": "Stress Relief",
+    "meditation_theme_sleep": "Sleep",
+    "meditation_theme_focus": "Focus",
+    "meditation_theme_recovery": "Recovery",
     "meditation_track_calm_title": "Calm Reset (10 min)",
     "meditation_track_calm_desc": "Release neck and shoulder tension with a gentle breathing reset.",
     "meditation_track_focus_title": "Focus Grounding (15 min)",
@@ -482,6 +504,80 @@
       "vision_title_placeholder": "Card title",
       "vision_note_placeholder": "Describe what you see and feel when this vision has happened.",
       "empty_vision": "No vision cards yet. Save your first one."
+    },
+    "meditation_attr": {
+      "pixabay_no_attribution": "No attribution required. Keep source URL and license snapshots before release.",
+      "mixkit_no_attribution": "Attribution is typically not required; verify the latest Mixkit terms before publishing.",
+      "incompetech_credit_note": "If track-level credit is required, mirror attribution in-app and in publishing channels.",
+      "incompetech_retail_note": "If using no-attribution retail licenses, retain purchase receipts and license proof."
+    },
+    "meditation_tags": {
+      "stress_relief": "Stress Relief",
+      "breath_sync": "Breath Sync",
+      "quick_recovery": "Quick Recovery",
+      "low_stimulation": "Low Stimulation",
+      "after_work": "After Work",
+      "focus": "Focus",
+      "task_launch": "Task Launch",
+      "anti_distraction": "Anti-Distraction",
+      "pre_pomodoro": "Pre-Pomodoro",
+      "execution": "Execution",
+      "sleep": "Sleep",
+      "body_scan": "Body Scan",
+      "sleep_aid": "Sleep Aid",
+      "ambient": "Ambient",
+      "recovery": "Recovery",
+      "resilience": "Resilience"
+    },
+    "meditation_tracks": {
+      "stress_calm_reset_10": {
+        "title": "Calm Reset (10 min)",
+        "desc": "A short decompression session when your body feels over-tightened by task load."
+      },
+      "stress_soft_reset_8": {
+        "title": "Soft Nervous Reset (8 min)",
+        "desc": "A quick between-meetings reset that stabilizes you without breaking momentum."
+      },
+      "stress_evening_release_12": {
+        "title": "Evening Unload (12 min)",
+        "desc": "A transition from work mode into rest by releasing accumulated cognitive strain."
+      },
+      "focus_grounding_15": {
+        "title": "Focus Grounding (15 min)",
+        "desc": "Brings attention back from noise to the task you want to execute now."
+      },
+      "focus_deepwork_12": {
+        "title": "Deep Work Ramp-Up (12 min)",
+        "desc": "Use before a 25-50 minute focus block to warm up executive control."
+      },
+      "focus_breath_align_9": {
+        "title": "Breath Alignment (9 min)",
+        "desc": "Builds stable breathing cadence before writing, study, or coding sessions."
+      },
+      "sleep_winddown_20": {
+        "title": "Sleep Wind Down (20 min)",
+        "desc": "Downshifts arousal levels and helps your system enter sleep-ready mode."
+      },
+      "sleep_bodyscan_15": {
+        "title": "Body Scan for Sleep (15 min)",
+        "desc": "Progressive release from toes to head to reduce bedtime hyper-alertness."
+      },
+      "sleep_night_rain_20": {
+        "title": "Night Rain Drift (20 min)",
+        "desc": "Steady ambience helps the mind move from rumination to calmer drift."
+      },
+      "recovery_somatic_10": {
+        "title": "Somatic Recovery (10 min)",
+        "desc": "Reconnect with body cues after emotional spikes to regain stability."
+      },
+      "recovery_clarity_11": {
+        "title": "Clarity Recovery (11 min)",
+        "desc": "Restores mental clarity and willingness to re-engage with meaningful tasks."
+      },
+      "recovery_gentle_14": {
+        "title": "Gentle Rebound (14 min)",
+        "desc": "A gentle close-out after high-pressure days to avoid further depletion."
+      }
     }
   },
   "relief": {

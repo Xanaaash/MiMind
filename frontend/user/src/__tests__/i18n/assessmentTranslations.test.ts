@@ -77,6 +77,18 @@ describe('assessment/test bilingual translations', () => {
       'tests.value_label.mature',
       'tests.value_label.mixed',
       'tests.value_label.medium',
+      'tests.share_card.generic_subtitle',
+      'tests.share_card.footer_line1',
+      'tests.share_card.footer_line2',
+      'tests.share_card.mbti_subtitle',
+      'tests.share_card.mbti_type_label',
+      'tests.share_card.big5_subtitle',
+      'tests.share_card.big5_dominant_label',
+      'tests.share_card.trait_o',
+      'tests.share_card.trait_c',
+      'tests.share_card.trait_e',
+      'tests.share_card.trait_a',
+      'tests.share_card.trait_n',
     ].forEach((key) => expectTranslation(key));
   });
 });

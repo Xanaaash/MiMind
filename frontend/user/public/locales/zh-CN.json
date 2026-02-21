@@ -342,6 +342,20 @@
       "N": "神经质 N",
       "mixed": "混合",
       "medium": "中等"
+    },
+    "share_card": {
+      "generic_subtitle": "个人洞察快照",
+      "footer_line1": "分享你的画像，更清晰地成长",
+      "footer_line2": "心理健康教练工具",
+      "mbti_subtitle": "人格维度画像",
+      "mbti_type_label": "类型",
+      "big5_subtitle": "OCEAN 雷达画像",
+      "big5_dominant_label": "主导特质",
+      "trait_o": "开放性",
+      "trait_c": "尽责性",
+      "trait_e": "外向性",
+      "trait_a": "宜人性",
+      "trait_n": "神经质"
     }
   },
   "coach_gate": {
@@ -419,6 +433,14 @@
     "meditation_now_playing": "正在播放",
     "meditation_log_failed": "已开始播放，但记录会话失败，可稍后重试",
     "meditation_play_failed": "播放失败，请检查设备音频权限或稍后重试",
+    "meditation_source_label": "来源",
+    "meditation_license_label": "授权",
+    "meditation_attribution_label": "署名说明",
+    "meditation_open_source": "查看来源",
+    "meditation_theme_stress": "减压",
+    "meditation_theme_sleep": "睡眠",
+    "meditation_theme_focus": "专注",
+    "meditation_theme_recovery": "恢复",
     "meditation_track_calm_title": "平静重置（10 分钟）",
     "meditation_track_calm_desc": "温和放松肩颈与呼吸，快速降噪减压。",
     "meditation_track_focus_title": "专注落地（15 分钟）",
@@ -482,6 +504,80 @@
       "vision_title_placeholder": "卡片标题",
       "vision_note_placeholder": "描述这个愿景已经发生时，你会看到什么、感受到什么。",
       "empty_vision": "还没有愿景卡片，先保存第一张。"
+    },
+    "meditation_attr": {
+      "pixabay_no_attribution": "无需署名；上线前保留来源链接与许可证快照。",
+      "mixkit_no_attribution": "当前免费条款通常无需署名；发布前请复核最新版条款。",
+      "incompetech_credit_note": "若曲目页要求署名，请在应用内与发布页同步标注。",
+      "incompetech_retail_note": "若选择免署名商业授权，请保留订单与授权凭证。"
+    },
+    "meditation_tags": {
+      "stress_relief": "减压",
+      "breath_sync": "呼吸同步",
+      "quick_recovery": "快速恢复",
+      "low_stimulation": "低刺激",
+      "after_work": "下班过渡",
+      "focus": "专注",
+      "task_launch": "任务启动",
+      "anti_distraction": "抗分心",
+      "pre_pomodoro": "番茄前热身",
+      "execution": "执行力",
+      "sleep": "睡眠",
+      "body_scan": "身体扫描",
+      "sleep_aid": "助眠",
+      "ambient": "环境声",
+      "recovery": "恢复",
+      "resilience": "恢复弹性"
+    },
+    "meditation_tracks": {
+      "stress_calm_reset_10": {
+        "title": "平静重置（10 分钟）",
+        "desc": "快速降低体感紧绷，适合被任务轰炸后的过渡。"
+      },
+      "stress_soft_reset_8": {
+        "title": "轻柔降噪（8 分钟）",
+        "desc": "会议间隙快速回稳，不打断当天工作节奏。"
+      },
+      "stress_evening_release_12": {
+        "title": "夜间卸载（12 分钟）",
+        "desc": "下班后卸下精神负荷，平滑切换到休息模式。"
+      },
+      "focus_grounding_15": {
+        "title": "专注落地（15 分钟）",
+        "desc": "把注意力从杂念拉回当前任务，适合深度工作前。"
+      },
+      "focus_deepwork_12": {
+        "title": "深度工作引导（12 分钟）",
+        "desc": "进入 25-50 分钟专注块前的注意力预热。"
+      },
+      "focus_breath_align_9": {
+        "title": "呼吸对齐（9 分钟）",
+        "desc": "在写作或学习前建立稳定呼吸与认知节律。"
+      },
+      "sleep_winddown_20": {
+        "title": "睡前安抚（20 分钟）",
+        "desc": "降低夜间唤醒水平，帮助神经系统进入休息模式。"
+      },
+      "sleep_bodyscan_15": {
+        "title": "身体扫描助眠（15 分钟）",
+        "desc": "从脚趾到头顶逐段放松，减少入睡前身体警觉。"
+      },
+      "sleep_night_rain_20": {
+        "title": "夜雨入眠（20 分钟）",
+        "desc": "用稳定节律帮助大脑从反刍思维切换到放松。"
+      },
+      "recovery_somatic_10": {
+        "title": "躯体恢复（10 分钟）",
+        "desc": "情绪波动后回到身体感受，重建稳定与掌控感。"
+      },
+      "recovery_clarity_11": {
+        "title": "恢复清明（11 分钟）",
+        "desc": "在情绪耗竭后恢复思维清晰度与行动意愿。"
+      },
+      "recovery_gentle_14": {
+        "title": "温和回弹（14 分钟）",
+        "desc": "高压一天后的温和收尾，避免继续透支。"
+      }
     }
   },
   "relief": {
