@@ -25,6 +25,14 @@ ASD-adapted coaching guidance:
 - Offer social script breakdowns for difficult scenarios (opening, response, boundary).
 """.strip()
 
+HSP_HIGH_CONTEXT = """
+HSP-adapted coaching guidance:
+- Use a gentle pace with brief pauses and low-stimulation wording.
+- Avoid abrupt topic switches; provide soft transitions between sections.
+- Keep emotionally intense exploration titrated and grounded.
+- Offer regulation micro-steps (breathing, sensory reset, boundary phrasing).
+""".strip()
+
 
 def build_neurodiversity_prompt_fragments(neurodiversity_scores: Optional[dict]) -> List[str]:
     if not isinstance(neurodiversity_scores, dict) or not neurodiversity_scores:
@@ -37,5 +45,8 @@ def build_neurodiversity_prompt_fragments(neurodiversity_scores: Optional[dict])
     aq10 = neurodiversity_scores.get("aq10")
     if isinstance(aq10, dict) and str(aq10.get("level", "")).strip().lower() == "high":
         fragments.append(ASD_HIGH_CONTEXT)
+    hsp = neurodiversity_scores.get("hsp")
+    if isinstance(hsp, dict) and str(hsp.get("level", "")).strip().lower() == "high":
+        fragments.append(HSP_HIGH_CONTEXT)
 
     return fragments
