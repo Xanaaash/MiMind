@@ -113,11 +113,23 @@ def score_scl90(answers: Any) -> Tuple[float, Optional[Dict[str, float]]]:
     return global_index, parsed
 
 
-def score_who5(answers: Iterable[int]) -> Tuple[int, int]:
+def score_who5(answers: Iterable[int]) -> Tuple[int, int, str, Dict[str, str]]:
     validated = _validate_likert_answers(WHO5, answers, QUESTION_COUNTS[WHO5], 0, 5)
     raw_score = sum(validated)
     index_score = raw_score * 4
-    return raw_score, index_score
+    if index_score >= 76:
+        severity = "minimal"
+    elif index_score >= 51:
+        severity = "mild"
+    elif index_score >= 29:
+        severity = "moderate"
+    else:
+        severity = "severe"
+    interpretation = {
+        "en-US": "Lower WHO-5 index may indicate reduced emotional well-being and suggests follow-up screening.",
+        "zh-CN": "WHO-5 指数较低可能提示幸福感下降，建议结合后续评估或支持。",
+    }
+    return raw_score, index_score, severity, interpretation
 
 
 def score_isi7(answers: Iterable[int]) -> int:
@@ -173,16 +185,13 @@ def score_single_scale(scale_id: str, answers: Any) -> dict:
         }
 
     if scale_id == WHO5:
-        raw_score, index_score = score_who5(answers)
+        raw_score, index_score, severity, interpretation = score_who5(answers)
         return {
             "scale_id": WHO5,
             "score": index_score,
             "raw_score": raw_score,
-            "severity": "reduced_wellbeing" if index_score <= 50 else "stable_wellbeing",
-            "interpretation": {
-                "en-US": "WHO-5 index <= 50 may indicate reduced well-being and suggests follow-up screening.",
-                "zh-CN": "WHO-5 指数 <= 50 可能提示幸福感下降，建议结合后续评估或支持。",
-            },
+            "severity": severity,
+            "interpretation": interpretation,
         }
 
     if scale_id == ISI7:
