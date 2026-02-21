@@ -31,6 +31,16 @@ cp .env.example .env
 
 - `OPENAI_API_KEY`
 
+若支付 provider 使用 `stripe`，还需设置：
+
+- `BILLING_PROVIDER=stripe`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_PRICE_ID_BASE`
+- `STRIPE_PRICE_ID_COACH`
+- `STRIPE_CHECKOUT_SUCCESS_URL`
+- `STRIPE_CHECKOUT_CANCEL_URL`
+
 ---
 
 ## 3. 方式 A：单容器部署

@@ -1,6 +1,8 @@
 from typing import Any, Dict, Optional, Tuple
 
 from modules.billing.service import BillingService
+from modules.billing.stripe.config import load_stripe_billing_config
+from modules.billing.stripe.gateway import StripeGateway
 from modules.entitlement.service import EntitlementService
 from modules.storage.in_memory import InMemoryStore
 
@@ -10,6 +12,8 @@ class BillingAPI:
         self._store = store or InMemoryStore()
         self._billing = BillingService(self._store)
         self._entitlement = EntitlementService()
+        self._stripe_config = load_stripe_billing_config()
+        self._stripe_gateway = StripeGateway(self._stripe_config)
 
     @property
     def store(self) -> InMemoryStore:
@@ -35,14 +39,30 @@ class BillingAPI:
         except ValueError as error:
             return 400, {"error": str(error)}
 
-    def post_webhook(self, payload: Dict[str, Any]) -> Tuple[int, Dict[str, Any]]:
+    def post_webhook(
+        self,
+        payload: Dict[str, Any],
+        raw_body: bytes = b"",
+        stripe_signature: Optional[str] = None,
+    ) -> Tuple[int, Dict[str, Any]]:
         try:
-            event_id = str(payload.get("event_id", "")).strip()
-            event_type = str(payload.get("event_type", "")).strip()
-            event_payload = payload.get("payload", {})
-            if not isinstance(event_payload, dict):
-                raise ValueError("payload must be an object")
+            if "event_id" in payload or "event_type" in payload:
+                event_id = str(payload.get("event_id", "")).strip()
+                event_type = str(payload.get("event_type", "")).strip()
+                event_payload = payload.get("payload", {})
+                if not isinstance(event_payload, dict):
+                    raise ValueError("payload must be an object")
+            else:
+                if self._stripe_config.stripe_enabled:
+                    self._stripe_gateway.verify_webhook_signature(raw_body=raw_body, signature_header=stripe_signature or "")
+
+                event_id, event_type, event_payload = self._stripe_gateway.event_to_internal(payload)
+                if not event_id:
+                    raise ValueError("event_id is required")
+
             data = self._billing.process_webhook(event_id=event_id, event_type=event_type, payload=event_payload)
+            if "id" in payload and "type" in payload:
+                data["provider_event_type"] = str(payload.get("type", "")).strip()
             return 200, {"data": data}
         except ValueError as error:
             return 400, {"error": str(error)}

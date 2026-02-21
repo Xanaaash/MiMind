@@ -581,8 +581,10 @@ def checkout(user_id: str, payload: dict = Body(...)) -> dict:
 
 
 @app.post("/api/billing/webhook")
-def billing_webhook(payload: dict = Body(...)) -> dict:
-    status, body = billing_api.post_webhook(payload)
+async def billing_webhook(request: Request, payload: dict = Body(...)) -> dict:
+    raw_body = await request.body()
+    stripe_signature = request.headers.get("Stripe-Signature")
+    status, body = billing_api.post_webhook(payload, raw_body=raw_body, stripe_signature=stripe_signature)
     return _unwrap(status, body)
 
 

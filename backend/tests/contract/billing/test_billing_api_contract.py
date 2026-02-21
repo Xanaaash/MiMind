@@ -1,3 +1,5 @@
+import json
+import os
 import unittest
 
 from backend.tests.bootstrap import configure_import_path
@@ -110,6 +112,59 @@ class BillingAPIContractTests(unittest.TestCase):
         )
         self.assertEqual(checkout_status, 400)
         self.assertIn("green channel", checkout_body["error"])
+
+    def test_stripe_event_shape_activates_subscription(self) -> None:
+        webhook_status, webhook_body = self.billing_api.post_webhook(
+            {
+                "id": "evt-stripe-contract-1",
+                "type": "checkout.session.completed",
+                "data": {
+                    "object": {
+                        "metadata": {"user_id": self.green_user_id, "plan_id": "coach"},
+                    }
+                },
+            }
+        )
+
+        self.assertEqual(webhook_status, 200)
+        self.assertEqual(webhook_body["data"]["status"], "subscription_activated")
+        self.assertEqual(webhook_body["data"]["provider_event_type"], "checkout.session.completed")
+
+    def test_stripe_provider_requires_valid_signature(self) -> None:
+        original_provider = os.environ.get("BILLING_PROVIDER")
+        original_webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET")
+        try:
+            os.environ["BILLING_PROVIDER"] = "stripe"
+            os.environ["STRIPE_WEBHOOK_SECRET"] = "whsec_test_signature"
+            stripe_api = BillingAPI(store=self.store)
+
+            event = {
+                "id": "evt-stripe-contract-2",
+                "type": "checkout.session.completed",
+                "data": {
+                    "object": {
+                        "metadata": {"user_id": self.green_user_id, "plan_id": "coach"},
+                    }
+                },
+            }
+            raw_body = json.dumps(event, separators=(",", ":")).encode("utf-8")
+            webhook_status, webhook_body = stripe_api.post_webhook(
+                event,
+                raw_body=raw_body,
+                stripe_signature="",
+            )
+            self.assertEqual(webhook_status, 400)
+            self.assertIn("signature", webhook_body["error"].lower())
+        finally:
+            if original_provider is None:
+                os.environ.pop("BILLING_PROVIDER", None)
+            else:
+                os.environ["BILLING_PROVIDER"] = original_provider
+
+            if original_webhook_secret is None:
+                os.environ.pop("STRIPE_WEBHOOK_SECRET", None)
+            else:
+                os.environ["STRIPE_WEBHOOK_SECRET"] = original_webhook_secret
 
 
 if __name__ == "__main__":
