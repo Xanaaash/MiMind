@@ -5,6 +5,11 @@ export const SCALE_NAME_KEYS: Record<string, string> = {
   cssrs: 'scales.name.cssrs',
   scl90: 'scales.name.scl90',
   who5: 'scales.name.who5',
+  isi7: 'scales.name.isi7',
+  swls5: 'scales.name.swls5',
+  ucla3: 'scales.name.ucla3',
+  cdrisc10: 'scales.name.cdrisc10',
+  phq15: 'scales.name.phq15',
 };
 
 export const SCALE_INTRO_KEYS: Record<string, string> = {
@@ -14,6 +19,11 @@ export const SCALE_INTRO_KEYS: Record<string, string> = {
   cssrs: 'scales.intro.cssrs',
   scl90: 'scales.intro.scl90',
   who5: 'scales.intro.who5',
+  isi7: 'scales.intro.isi7',
+  swls5: 'scales.intro.swls5',
+  ucla3: 'scales.intro.ucla3',
+  cdrisc10: 'scales.intro.cdrisc10',
+  phq15: 'scales.intro.phq15',
 };
 
 export const SCALE_PURPOSE_KEYS: Record<string, string> = {
@@ -23,6 +33,20 @@ export const SCALE_PURPOSE_KEYS: Record<string, string> = {
   cssrs: 'scales.purpose.cssrs',
   scl90: 'scales.purpose.scl90',
   who5: 'scales.purpose.who5',
+};
+
+export const SCALE_DISCLAIMER_KEYS: Record<string, string> = {
+  phq9: 'scales.disclaimer.phq9',
+  gad7: 'scales.disclaimer.gad7',
+  pss10: 'scales.disclaimer.pss10',
+  cssrs: 'scales.disclaimer.cssrs',
+  scl90: 'scales.disclaimer.scl90',
+  who5: 'scales.disclaimer.who5',
+  isi7: 'scales.disclaimer.isi7',
+  swls5: 'scales.disclaimer.swls5',
+  ucla3: 'scales.disclaimer.ucla3',
+  cdrisc10: 'scales.disclaimer.cdrisc10',
+  phq15: 'scales.disclaimer.phq15',
 };
 
 export const TEST_NAME_KEYS: Record<string, string> = {

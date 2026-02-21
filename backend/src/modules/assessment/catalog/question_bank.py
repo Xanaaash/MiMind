@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import Dict, List
 
-from modules.assessment.catalog.scales import SCL90, WHO5
+from modules.assessment.catalog.scales import CDRISC10, ISI7, PHQ15, SCL90, SWLS5, UCLA3, WHO5
 
 SUPPORTED_LOCALES = ["en-US", "zh-CN"]
 
@@ -53,6 +53,40 @@ LIKERT_0_5 = {
         "超过一半时间",
         "大多数时间",
         "一直如此",
+    ],
+}
+
+LIKERT_0_6 = {
+    "en-US": [
+        "Strongly disagree",
+        "Disagree",
+        "Slightly disagree",
+        "Neutral",
+        "Slightly agree",
+        "Agree",
+        "Strongly agree",
+    ],
+    "zh-CN": [
+        "非常不同意",
+        "不同意",
+        "有点不同意",
+        "中立",
+        "有点同意",
+        "同意",
+        "非常同意",
+    ],
+}
+
+LIKERT_0_2 = {
+    "en-US": [
+        "Not at all",
+        "Several days",
+        "Nearly every day",
+    ],
+    "zh-CN": [
+        "完全没有",
+        "偶尔出现",
+        "经常出现",
     ],
 }
 
@@ -196,21 +230,6 @@ SCALE_QUESTION_BANKS = {
             _q("q6", "Have you ever done anything, started to do anything, or prepared to do anything to end your life?", "你是否曾做过、开始做过，或准备做过任何结束自己生命的行为？"),
         ],
     },
-    WHO5: {
-        "supported_locales": SUPPORTED_LOCALES,
-        "instructions": {
-            "en-US": "Over the last two weeks, indicate how often each statement matched your experience.",
-            "zh-CN": "在过去两周内，请选择以下描述符合你的频率。",
-        },
-        "answer_labels": LIKERT_0_5,
-        "questions": [
-            _q("q1", "I have felt cheerful and in good spirits.", "我感到心情愉快、精神状态良好。"),
-            _q("q2", "I have felt calm and relaxed.", "我感到平静和放松。"),
-            _q("q3", "I have felt active and energetic.", "我感到有活力、有精力。"),
-            _q("q4", "I woke up feeling fresh and rested.", "我醒来时感到神清气爽、休息充分。"),
-            _q("q5", "My daily life has been filled with things that interest me.", "我的日常生活充满让我感兴趣的事情。"),
-        ],
-    },
     SCL90: {
         "supported_locales": SUPPORTED_LOCALES,
         "instructions": {
@@ -219,6 +238,111 @@ SCALE_QUESTION_BANKS = {
         },
         "answer_labels": SCL90_0_4,
         "questions": _scl90_questions(),
+    },
+    WHO5: {
+        "supported_locales": SUPPORTED_LOCALES,
+        "instructions": {
+            "en-US": "Over the last 2 weeks, indicate how often each statement applied to you.",
+            "zh-CN": "请回顾过去两周，评估以下描述出现的频率。",
+        },
+        "answer_labels": LIKERT_0_5,
+        "questions": [
+            _q("q1", "I have felt cheerful and in good spirits.", "我感到心情愉快、精神状态良好。"),
+            _q("q2", "I have felt calm and relaxed.", "我感到平静、放松。"),
+            _q("q3", "I have felt active and vigorous.", "我感到精力充沛、充满活力。"),
+            _q("q4", "I woke up feeling fresh and rested.", "我醒来时感到精神焕发、休息充分。"),
+            _q("q5", "My daily life has been filled with things that interest me.", "我的日常生活中有让我感兴趣的事情。"),
+        ],
+    },
+    ISI7: {
+        "supported_locales": SUPPORTED_LOCALES,
+        "instructions": {
+            "en-US": "Rate your sleep difficulties in the past 2 weeks.",
+            "zh-CN": "请评估你在过去两周的睡眠困难程度。",
+        },
+        "answer_labels": LIKERT_0_4,
+        "questions": [
+            _q("q1", "Difficulty falling asleep.", "入睡困难。"),
+            _q("q2", "Difficulty staying asleep.", "维持睡眠困难（中途醒来后难再入睡）。"),
+            _q("q3", "Problem waking up too early.", "过早醒来问题。"),
+            _q("q4", "How satisfied/dissatisfied are you with your current sleep pattern?", "你对当前睡眠模式的满意程度。"),
+            _q("q5", "How noticeable to others do you think your sleep problem is?", "你认为睡眠问题对他人可见程度如何？"),
+            _q("q6", "How worried/distressed are you about your current sleep problem?", "你对当前睡眠问题有多担心或困扰？"),
+            _q("q7", "To what extent do you consider your sleep problem to interfere with daily functioning?", "睡眠问题对你日间功能影响的程度。"),
+        ],
+    },
+    SWLS5: {
+        "supported_locales": SUPPORTED_LOCALES,
+        "instructions": {
+            "en-US": "Please indicate your agreement with each statement about life satisfaction.",
+            "zh-CN": "请评估你对以下生活满意度陈述的同意程度。",
+        },
+        "answer_labels": LIKERT_0_6,
+        "questions": [
+            _q("q1", "In most ways my life is close to my ideal.", "在大多数方面，我的人生接近理想状态。"),
+            _q("q2", "The conditions of my life are excellent.", "我目前生活条件总体良好。"),
+            _q("q3", "I am satisfied with my life.", "我对自己的生活感到满意。"),
+            _q("q4", "So far I have gotten the important things I want in life.", "到目前为止，我得到了生活中重要的东西。"),
+            _q("q5", "If I could live my life over, I would change almost nothing.", "如果可以重来，我几乎不会改变自己的人生。"),
+        ],
+    },
+    UCLA3: {
+        "supported_locales": SUPPORTED_LOCALES,
+        "instructions": {
+            "en-US": "How often do you feel this way in your daily life?",
+            "zh-CN": "在日常生活中，你出现以下感受的频率如何？",
+        },
+        "answer_labels": LIKERT_0_2,
+        "questions": [
+            _q("q1", "How often do you feel that you lack companionship?", "你有多常感到缺少陪伴？"),
+            _q("q2", "How often do you feel left out?", "你有多常感到被排除在外？"),
+            _q("q3", "How often do you feel isolated from others?", "你有多常感到与他人隔离或疏离？"),
+        ],
+    },
+    CDRISC10: {
+        "supported_locales": SUPPORTED_LOCALES,
+        "instructions": {
+            "en-US": "Rate how true each statement has been for you in the past month.",
+            "zh-CN": "请评估过去一个月中以下陈述对你的符合程度。",
+        },
+        "answer_labels": LIKERT_0_4,
+        "questions": [
+            _q("q1", "I am able to adapt when changes occur.", "当变化发生时，我能够适应。"),
+            _q("q2", "I can deal with whatever comes my way.", "无论发生什么，我都能应对。"),
+            _q("q3", "I try to see the humorous side of things when I am faced with problems.", "面对问题时，我会尝试看到事情中积极或幽默的一面。"),
+            _q("q4", "Having to cope with stress can make me stronger.", "应对压力的过程会让我变得更强。"),
+            _q("q5", "I tend to bounce back after illness or hardship.", "经历生病或困难后，我通常能恢复过来。"),
+            _q("q6", "I believe I can achieve my goals, even if there are obstacles.", "即使有阻碍，我也相信自己能实现目标。"),
+            _q("q7", "Under pressure, I can stay focused and think clearly.", "在压力下，我仍能保持专注和清晰思考。"),
+            _q("q8", "I am not easily discouraged by failure.", "我不会因失败而轻易气馁。"),
+            _q("q9", "I think of myself as a strong person when dealing with life challenges.", "面对生活挑战时，我认为自己是有力量的人。"),
+            _q("q10", "I can handle unpleasant feelings.", "我能够处理不舒服的情绪。"),
+        ],
+    },
+    PHQ15: {
+        "supported_locales": SUPPORTED_LOCALES,
+        "instructions": {
+            "en-US": "Over the last 4 weeks, how much have you been bothered by each symptom?",
+            "zh-CN": "在过去四周，这些症状对你的困扰程度如何？",
+        },
+        "answer_labels": LIKERT_0_2,
+        "questions": [
+            _q("q1", "Stomach pain.", "胃痛。"),
+            _q("q2", "Back pain.", "背痛。"),
+            _q("q3", "Pain in arms, legs, or joints.", "手臂、腿部或关节疼痛。"),
+            _q("q4", "Menstrual cramps or other menstrual problems.", "经期痉挛或其他月经相关不适。"),
+            _q("q5", "Headaches.", "头痛。"),
+            _q("q6", "Chest pain.", "胸痛。"),
+            _q("q7", "Dizziness.", "头晕。"),
+            _q("q8", "Fainting spells.", "晕厥感或眼前发黑。"),
+            _q("q9", "Feeling your heart pound or race.", "感到心跳过快或心悸。"),
+            _q("q10", "Shortness of breath.", "呼吸短促。"),
+            _q("q11", "Pain or problems during sexual intercourse.", "性生活中疼痛或不适。"),
+            _q("q12", "Constipation, loose bowels, or diarrhea.", "便秘、稀便或腹泻。"),
+            _q("q13", "Nausea, gas, or indigestion.", "恶心、胀气或消化不良。"),
+            _q("q14", "Feeling tired or having low energy.", "感到疲惫或精力不足。"),
+            _q("q15", "Trouble sleeping.", "睡眠困难。"),
+        ],
     },
 }
 

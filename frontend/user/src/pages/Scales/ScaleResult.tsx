@@ -6,7 +6,7 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts
 import { useAuthStore } from '../../stores/auth';
 import { getEntitlements } from '../../api/billing';
 import Button from '../../components/Button/Button';
-import { SCALE_INTRO_KEYS, SCALE_NAME_KEYS } from '../../utils/assessmentCopy';
+import { SCALE_DISCLAIMER_KEYS, SCALE_INTRO_KEYS, SCALE_NAME_KEYS } from '../../utils/assessmentCopy';
 
 const SEVERITY_COLORS: Record<string, string> = {
   minimal: '#4a9d6e',
@@ -66,6 +66,7 @@ export default function ScaleResult() {
   const isPaywalled = entitlementsReady && !reportsEnabled;
   const localizedScaleName = t(SCALE_NAME_KEYS[scaleId ?? ''] ?? '', { defaultValue: scaleId?.toUpperCase() ?? '' });
   const severityLabel = t(`scales.severity_label.${severity.toLowerCase()}`, { defaultValue: severity });
+  const disclaimerKey = SCALE_DISCLAIMER_KEYS[scaleId ?? ''] ?? 'scales.disclaimer.generic';
 
   const chartData = [{ name: localizedScaleName, value: score }];
 
@@ -79,6 +80,9 @@ export default function ScaleResult() {
       <p className="text-muted">{localizedScaleName}</p>
       <p className="text-xs text-muted leading-relaxed mb-8">
         {t(SCALE_INTRO_KEYS[scaleId ?? ''] ?? 'scales.intro.generic')}
+      </p>
+      <p className="text-xs text-muted leading-relaxed -mt-6 mb-8">
+        {t(disclaimerKey)}
       </p>
 
       <div className="bg-panel border border-line rounded-2xl p-8 shadow-sm mb-6 relative overflow-hidden">

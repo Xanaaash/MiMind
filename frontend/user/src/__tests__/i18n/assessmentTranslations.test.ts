@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import zhCN from '../../../public/locales/zh-CN.json';
 import enUS from '../../../public/locales/en-US.json';
 import {
+  SCALE_DISCLAIMER_KEYS,
   SCALE_INTRO_KEYS,
   SCALE_NAME_KEYS,
   SCALE_PURPOSE_KEYS,
@@ -38,11 +39,13 @@ describe('assessment/test bilingual translations', () => {
       ...Object.values(SCALE_NAME_KEYS),
       ...Object.values(SCALE_INTRO_KEYS),
       ...Object.values(SCALE_PURPOSE_KEYS),
+      ...Object.values(SCALE_DISCLAIMER_KEYS),
       ...Object.values(TEST_NAME_KEYS),
       ...Object.values(TEST_INTRO_KEYS),
       ...Object.values(TEST_PURPOSE_KEYS),
       'scales.intro.generic',
       'scales.purpose.generic',
+      'scales.disclaimer.generic',
       'tests.intro.generic',
       'tests.purpose.generic',
       'scales.purpose_label',
@@ -60,6 +63,11 @@ describe('assessment/test bilingual translations', () => {
       'scales.severity_label.moderately severe',
       'scales.severity_label.severe',
       'scales.severity_label.unknown',
+      'scales.severity_label.subthreshold',
+      'scales.severity_label.reduced_wellbeing',
+      'scales.severity_label.stable_wellbeing',
+      'scales.severity_label.elevated_loneliness',
+      'scales.severity_label.low_to_moderate_loneliness',
       'tests.summary_label.type',
       'tests.summary_label.dimension_strength',
       'tests.summary_label.identity_score',

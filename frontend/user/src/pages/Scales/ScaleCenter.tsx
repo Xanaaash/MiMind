@@ -15,6 +15,11 @@ const SCALE_ICONS: Record<string, string> = {
   cssrs: '🛡️',
   scl90: '📋',
   who5: '🌤️',
+  isi7: '🌙',
+  swls5: '😊',
+  ucla3: '🤝',
+  cdrisc10: '🧗',
+  phq15: '🩺',
 };
 
 export default function ScaleCenter() {

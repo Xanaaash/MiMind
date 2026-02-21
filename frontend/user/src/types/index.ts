@@ -37,8 +37,17 @@ export interface AssessmentScoreSet {
 }
 
 export interface ScaleCatalogItem {
+  scale_id?: string;
   display_name: string;
+  display_name_i18n?: Record<string, string>;
   item_count: number;
+  cadence_days?: number;
+  required_for_triage?: boolean;
+  theory_reference?: string;
+  source_citation?: string;
+  use_case_i18n?: Record<string, string>;
+  scoring_method?: string;
+  disclaimer_i18n?: Record<string, string>;
   question_bank: {
     questions: ScaleQuestion[];
     answer_labels?: Record<string, string[]>;
@@ -69,7 +78,12 @@ export interface ScaleQuestion {
 
 export interface ScaleScoreResult {
   scale_id: string;
-  score: number;
+  score?: number;
+  raw_score?: number;
+  global_index?: number;
+  positive?: boolean;
+  dimension_scores?: Record<string, number> | null;
+  moderate_or_above?: boolean;
   severity?: string;
   interpretation?: Record<string, string>;
 }

@@ -8,7 +8,7 @@ import Button from '../../components/Button/Button';
 import Loading from '../../components/Loading/Loading';
 import { useAuthStore } from '../../stores/auth';
 import { toast } from '../../stores/toast';
-import { SCALE_INTRO_KEYS, SCALE_NAME_KEYS } from '../../utils/assessmentCopy';
+import { SCALE_DISCLAIMER_KEYS, SCALE_INTRO_KEYS, SCALE_NAME_KEYS } from '../../utils/assessmentCopy';
 
 type ScaleAnswer = number | boolean | null;
 
@@ -146,6 +146,11 @@ export default function ScaleQuiz() {
   const labels = scale?.question_bank.answer_labels?.[lang]
     ?? scale?.question_bank.answer_labels?.['zh-CN']
     ?? null;
+  const disclaimerKey = SCALE_DISCLAIMER_KEYS[scaleId ?? ''] ?? 'scales.disclaimer.generic';
+  const localizedDisclaimer = scale?.disclaimer_i18n?.[lang]
+    ?? scale?.disclaimer_i18n?.['zh-CN']
+    ?? scale?.disclaimer_i18n?.['en-US']
+    ?? t(disclaimerKey);
   const total = questions.length;
   const question = questions[currentIndex];
   const isCssrs = scaleId === 'cssrs';
@@ -304,6 +309,11 @@ export default function ScaleQuiz() {
         <p className="mt-3 text-xs text-muted leading-relaxed">
           {t(SCALE_INTRO_KEYS[scaleId ?? ''] ?? 'scales.intro.generic')}
         </p>
+        {localizedDisclaimer ? (
+          <p className="mt-2 text-xs text-muted leading-relaxed">
+            {localizedDisclaimer}
+          </p>
+        ) : null}
         {isScl90 ? (
           <div className="mt-2 text-xs text-muted space-y-1">
             <p>{t('scales.answered_progress', { answered: answeredTotal, total })}</p>

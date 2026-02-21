@@ -158,7 +158,12 @@
       "pss10": "PSS-10 Perceived Stress",
       "cssrs": "C-SSRS Safety Risk Screening",
       "scl90": "SCL-90 Symptom Checklist",
-      "who5": "WHO-5 Well-Being Index"
+      "who5": "WHO-5 Well-Being Index",
+      "isi7": "Insomnia Severity Index (ISI-7)",
+      "swls5": "Satisfaction With Life Scale (SWLS-5)",
+      "ucla3": "UCLA Loneliness (3-item)",
+      "cdrisc10": "CD-RISC-10 Resilience",
+      "phq15": "PHQ-15 Somatic Symptoms"
     },
     "start": "Start Assessment",
     "items": "items",
@@ -183,6 +188,11 @@
       "moderate": "Moderate",
       "moderately severe": "Moderately Severe",
       "severe": "Severe",
+      "subthreshold": "Subthreshold",
+      "reduced_wellbeing": "Reduced Well-Being",
+      "stable_wellbeing": "Stable Well-Being",
+      "elevated_loneliness": "Elevated Loneliness",
+      "low_to_moderate_loneliness": "Low to Moderate Loneliness",
       "unknown": "Unrated"
     },
     "dim_somatization": "Somatic Discomfort",
@@ -211,8 +221,27 @@
       "pss10": "PSS-10 measures perceived stress appraisal and is commonly used in stress research.",
       "cssrs": "C-SSRS uses structured risk items to identify recent self-harm or suicidal ideation and behavior risk.",
       "scl90": "SCL-90 spans multiple symptom domains and supports broad screening of overall psychological distress.",
-      "who5": "WHO-5 tracks positive well-being in the last two weeks and is useful for observing emotional recovery trend.",
-      "generic": "This scale follows standardized psychometric design for preliminary status screening."
+      "generic": "This scale follows standardized psychometric design for preliminary status screening.",
+      "who5": "WHO-5 screens positive well-being over the last two weeks and helps flag reduced well-being risk.",
+      "isi7": "ISI-7 assesses insomnia severity and daytime impact for rapid sleep-related screening.",
+      "swls5": "SWLS-5 measures global cognitive life satisfaction rather than one specific event.",
+      "ucla3": "UCLA-3 is a brief screen for loneliness and social disconnection signals.",
+      "cdrisc10": "CD-RISC-10 measures resilience resources and recovery capacity under stress.",
+      "phq15": "PHQ-15 screens common somatic symptom burden in stress-related mind-body conditions."
+    },
+    "disclaimer": {
+      "phq9": "This score is for screening and monitoring, not diagnosis. Seek professional evaluation if symptoms persist or worsen.",
+      "gad7": "This score is an anxiety screening signal, not a diagnostic conclusion. Seek professional support if daily functioning is affected.",
+      "pss10": "This reflects perceived stress appraisal, not direct medical risk. Interpret together with sleep, routines, and support context.",
+      "cssrs": "This tool is for safety triage. Any positive response requires timely professional or emergency support.",
+      "scl90": "This is a broad symptom screener and does not replace psychiatric diagnosis; follow-up clinical assessment is recommended when needed.",
+      "who5": "This reflects recent well-being level, not diagnosis. Persistently low scores suggest follow-up mood/anxiety screening.",
+      "isi7": "This score screens sleep difficulty severity and is not a sleep medicine diagnosis; persistent insomnia should be clinically evaluated.",
+      "swls5": "This reflects subjective life satisfaction and should be interpreted alongside mood and functional status.",
+      "ucla3": "This indicates loneliness risk signals, not a personality flaw or diagnosis; social support strategies may help.",
+      "cdrisc10": "This reflects current resilience resources, not a fixed trait; resilience can improve with training and support.",
+      "phq15": "This screens somatic symptom burden and does not rule out medical conditions; seek medical care for notable symptoms.",
+      "generic": "Assessment scores are for psychoeducation and self-observation only, not medical diagnosis or prescription advice."
     },
     "purpose": {
       "phq9": "Helps you quickly understand whether low mood symptoms have recently become heavier.",

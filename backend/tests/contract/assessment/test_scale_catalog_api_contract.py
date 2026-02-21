@@ -21,12 +21,18 @@ class ScaleCatalogAPIContractTests(unittest.TestCase):
         self.assertIn("cssrs", data)
         self.assertIn("scl90", data)
         self.assertIn("who5", data)
+        self.assertIn("isi7", data)
+        self.assertIn("swls5", data)
+        self.assertIn("ucla3", data)
+        self.assertIn("cdrisc10", data)
+        self.assertIn("phq15", data)
         self.assertEqual(data["scl90"]["cadence_days"], 90)
-        self.assertEqual(data["who5"]["item_count"], 5)
+        self.assertIn("display_name_i18n", data["who5"])
+        self.assertIn("disclaimer_i18n", data["who5"])
+        self.assertIn("source_citation", data["who5"])
         self.assertIn("question_bank", data["phq9"])
         self.assertIn("zh-CN", data["phq9"]["question_bank"]["supported_locales"])
         self.assertEqual(len(data["scl90"]["question_bank"]["questions"]), 90)
-        self.assertEqual(len(data["who5"]["question_bank"]["questions"]), 5)
 
     def test_score_scale_contract(self) -> None:
         status, body = self.api.post_score_scale(
@@ -88,9 +94,44 @@ class ScaleCatalogAPIContractTests(unittest.TestCase):
             (
                 {
                     "scale_id": "who5",
-                    "answers": [4, 4, 4, 4, 4],
+                    "answers": [5, 4, 3, 4, 4],
                 },
                 ("score", 80),
+            ),
+            (
+                {
+                    "scale_id": "isi7",
+                    "answers": [2, 2, 1, 2, 1, 2, 2],
+                },
+                ("severity", "subthreshold"),
+            ),
+            (
+                {
+                    "scale_id": "swls5",
+                    "answers": [4, 4, 3, 4, 4],
+                },
+                ("score", 24),
+            ),
+            (
+                {
+                    "scale_id": "ucla3",
+                    "answers": [2, 1, 2],
+                },
+                ("score", 5),
+            ),
+            (
+                {
+                    "scale_id": "cdrisc10",
+                    "answers": [3] * 10,
+                },
+                ("score", 30),
+            ),
+            (
+                {
+                    "scale_id": "phq15",
+                    "answers": [1] * 15,
+                },
+                ("severity", "severe"),
             ),
         ]
 

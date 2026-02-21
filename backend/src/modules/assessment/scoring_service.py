@@ -1,14 +1,19 @@
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from modules.assessment.catalog.scales import (
+    CDRISC10,
     CSSRS,
     GAD7,
+    ISI7,
     MANDATORY_SCALES,
     PHQ9,
+    PHQ15,
     PSS10,
     QUESTION_COUNTS,
     SCL90,
     SCL90_DIMENSIONS,
+    SWLS5,
+    UCLA3,
     WHO5,
 )
 from modules.assessment.models import AssessmentScoreSet
@@ -108,31 +113,37 @@ def score_scl90(answers: Any) -> Tuple[float, Optional[Dict[str, float]]]:
     return global_index, parsed
 
 
-def score_who5(answers: Iterable[int]) -> Tuple[int, int, str, Dict[str, str]]:
+def score_who5(answers: Iterable[int]) -> Tuple[int, int]:
     validated = _validate_likert_answers(WHO5, answers, QUESTION_COUNTS[WHO5], 0, 5)
     raw_score = sum(validated)
-    score_100 = raw_score * 4
+    index_score = raw_score * 4
+    return raw_score, index_score
 
-    if score_100 <= 28:
-        severity = "severe"
-        interpretation = {
-            "en-US": "Current well-being appears low. Consider adding structured support and checking in with a professional if this pattern persists.",
-            "zh-CN": "当前主观幸福感偏低。建议增加结构化支持，并在持续低迷时寻求专业支持。",
-        }
-    elif score_100 <= 50:
-        severity = "moderate"
-        interpretation = {
-            "en-US": "Well-being is in a middle range. Daily recovery habits and regular mood tracking may help improve stability.",
-            "zh-CN": "当前主观幸福感处于中间区间。建议通过日常恢复习惯和持续追踪来提升稳定性。",
-        }
-    else:
-        severity = "minimal"
-        interpretation = {
-            "en-US": "Well-being is currently in a relatively healthy range. Keep protective routines and regular self-checks.",
-            "zh-CN": "当前主观幸福感总体处于较健康区间。建议保持保护性习惯并定期自我检查。",
-        }
 
-    return raw_score, score_100, severity, interpretation
+def score_isi7(answers: Iterable[int]) -> int:
+    validated = _validate_likert_answers(ISI7, answers, QUESTION_COUNTS[ISI7], 0, 4)
+    return sum(validated)
+
+
+def score_swls5(answers: Iterable[int]) -> int:
+    validated = _validate_likert_answers(SWLS5, answers, QUESTION_COUNTS[SWLS5], 0, 6)
+    # UI stores 0..6. SWLS conventional scoring is 1..7.
+    return sum(value + 1 for value in validated)
+
+
+def score_ucla3(answers: Iterable[int]) -> int:
+    validated = _validate_likert_answers(UCLA3, answers, QUESTION_COUNTS[UCLA3], 0, 2)
+    return sum(validated)
+
+
+def score_cdrisc10(answers: Iterable[int]) -> int:
+    validated = _validate_likert_answers(CDRISC10, answers, QUESTION_COUNTS[CDRISC10], 0, 4)
+    return sum(validated)
+
+
+def score_phq15(answers: Iterable[int]) -> int:
+    validated = _validate_likert_answers(PHQ15, answers, QUESTION_COUNTS[PHQ15], 0, 2)
+    return sum(validated)
 
 
 def score_single_scale(scale_id: str, answers: Any) -> dict:
@@ -162,13 +173,82 @@ def score_single_scale(scale_id: str, answers: Any) -> dict:
         }
 
     if scale_id == WHO5:
-        raw_score, score_100, severity, interpretation = score_who5(answers)
+        raw_score, index_score = score_who5(answers)
         return {
             "scale_id": WHO5,
-            "score": score_100,
+            "score": index_score,
             "raw_score": raw_score,
+            "severity": "reduced_wellbeing" if index_score <= 50 else "stable_wellbeing",
+            "interpretation": {
+                "en-US": "WHO-5 index <= 50 may indicate reduced well-being and suggests follow-up screening.",
+                "zh-CN": "WHO-5 指数 <= 50 可能提示幸福感下降，建议结合后续评估或支持。",
+            },
+        }
+
+    if scale_id == ISI7:
+        score = score_isi7(answers)
+        if score <= 7:
+            severity = "none"
+        elif score <= 14:
+            severity = "subthreshold"
+        elif score <= 21:
+            severity = "moderate"
+        else:
+            severity = "severe"
+        return {
+            "scale_id": ISI7,
+            "score": score,
             "severity": severity,
-            "interpretation": interpretation,
+        }
+
+    if scale_id == SWLS5:
+        score = score_swls5(answers)
+        return {
+            "scale_id": SWLS5,
+            "score": score,
+            "interpretation": {
+                "en-US": "Higher total generally indicates better global life satisfaction.",
+                "zh-CN": "总分越高通常代表总体生活满意度越高。",
+            },
+        }
+
+    if scale_id == UCLA3:
+        score = score_ucla3(answers)
+        return {
+            "scale_id": UCLA3,
+            "score": score,
+            "severity": "elevated_loneliness" if score >= 4 else "low_to_moderate_loneliness",
+        }
+
+    if scale_id == CDRISC10:
+        score = score_cdrisc10(answers)
+        return {
+            "scale_id": CDRISC10,
+            "score": score,
+            "interpretation": {
+                "en-US": "Higher total suggests stronger perceived resilience resources.",
+                "zh-CN": "总分越高通常代表主观心理韧性资源越强。",
+            },
+        }
+
+    if scale_id == PHQ15:
+        score = score_phq15(answers)
+        if score >= 15:
+            severity = "severe"
+        elif score >= 10:
+            severity = "moderate"
+        elif score >= 5:
+            severity = "mild"
+        else:
+            severity = "minimal"
+        return {
+            "scale_id": PHQ15,
+            "score": score,
+            "severity": severity,
+            "interpretation": {
+                "en-US": "Higher PHQ-15 totals indicate greater somatic symptom burden.",
+                "zh-CN": "PHQ-15 分数越高通常提示躯体症状负担越高。",
+            },
         }
 
     raise ValueError(f"Unsupported scale_id: {scale_id}")
