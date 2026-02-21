@@ -22,6 +22,31 @@ class AuthServiceUnitTests(unittest.TestCase):
         self.assertEqual(user.auth_provider, "password")
         self.assertIsNotNone(user.password_hash)
         self.assertNotEqual(user.password_hash, "StrongPass123")
+        self.assertFalse(user.email_verified)
+        self.assertIsNotNone(user.email_verification_token)
+
+    def test_verify_email_marks_user_verified(self) -> None:
+        user = self.service.register_user(
+            email="verify@example.com",
+            locale="en-US",
+            password="StrongPass123",
+        )
+        self.assertIsNotNone(user.email_verification_token)
+
+        verified = self.service.verify_email(user.email_verification_token or "")
+        self.assertTrue(verified.email_verified)
+        self.assertIsNone(verified.email_verification_token)
+
+    def test_resend_verification_rotates_token(self) -> None:
+        user = self.service.register_user(
+            email="resend@example.com",
+            locale="en-US",
+            password="StrongPass123",
+        )
+        original = user.email_verification_token
+        resent = self.service.resend_verification("resend@example.com")
+        self.assertFalse(resent.email_verified)
+        self.assertNotEqual(original, resent.email_verification_token)
 
     def test_authenticate_rejects_wrong_password(self) -> None:
         self.service.register_user(

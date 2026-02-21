@@ -217,6 +217,19 @@ MIGRATIONS: List[SQLiteMigration] = [
             """,
         ],
     ),
+    SQLiteMigration(
+        version=6,
+        name="user_email_verification_fields",
+        statements=[
+            "ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0",
+            "ALTER TABLE users ADD COLUMN email_verification_token TEXT",
+            "ALTER TABLE users ADD COLUMN email_verification_expires_at TEXT",
+            """
+            CREATE INDEX IF NOT EXISTS idx_users_email_verification_token
+            ON users(email_verification_token)
+            """,
+        ],
+    ),
 ]
 
 

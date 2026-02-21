@@ -111,13 +111,26 @@ class SQLiteStore(InMemoryStore):
         with self._lock:
             self._connection.execute(
                 """
-                INSERT INTO users (user_id, email, locale, password_hash, auth_provider, created_at)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO users (
+                    user_id,
+                    email,
+                    locale,
+                    password_hash,
+                    auth_provider,
+                    email_verified,
+                    email_verification_token,
+                    email_verification_expires_at,
+                    created_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(user_id) DO UPDATE SET
                     email = excluded.email,
                     locale = excluded.locale,
                     password_hash = excluded.password_hash,
                     auth_provider = excluded.auth_provider,
+                    email_verified = excluded.email_verified,
+                    email_verification_token = excluded.email_verification_token,
+                    email_verification_expires_at = excluded.email_verification_expires_at,
                     created_at = excluded.created_at
                 """,
                 (
@@ -126,6 +139,9 @@ class SQLiteStore(InMemoryStore):
                     user.locale,
                     user.password_hash,
                     user.auth_provider,
+                    int(user.email_verified),
+                    user.email_verification_token,
+                    user.email_verification_expires_at.isoformat() if user.email_verification_expires_at else None,
                     user.created_at.isoformat(),
                 ),
             )
@@ -139,7 +155,16 @@ class SQLiteStore(InMemoryStore):
         with self._lock:
             row = self._connection.execute(
                 """
-                SELECT user_id, email, locale, password_hash, auth_provider, created_at
+                SELECT
+                    user_id,
+                    email,
+                    locale,
+                    password_hash,
+                    auth_provider,
+                    email_verified,
+                    email_verification_token,
+                    email_verification_expires_at,
+                    created_at
                 FROM users
                 WHERE user_id = ?
                 """,
@@ -155,6 +180,11 @@ class SQLiteStore(InMemoryStore):
             locale=row["locale"],
             password_hash=row["password_hash"],
             auth_provider=row["auth_provider"] or "guest",
+            email_verified=bool(row["email_verified"]),
+            email_verification_token=row["email_verification_token"],
+            email_verification_expires_at=datetime.fromisoformat(row["email_verification_expires_at"])
+            if row["email_verification_expires_at"]
+            else None,
             created_at=datetime.fromisoformat(row["created_at"]),
         )
         super().save_user(user)
@@ -172,7 +202,16 @@ class SQLiteStore(InMemoryStore):
         with self._lock:
             row = self._connection.execute(
                 """
-                SELECT user_id, email, locale, password_hash, auth_provider, created_at
+                SELECT
+                    user_id,
+                    email,
+                    locale,
+                    password_hash,
+                    auth_provider,
+                    email_verified,
+                    email_verification_token,
+                    email_verification_expires_at,
+                    created_at
                 FROM users
                 WHERE email = ?
                 LIMIT 1
@@ -189,6 +228,59 @@ class SQLiteStore(InMemoryStore):
             locale=row["locale"],
             password_hash=row["password_hash"],
             auth_provider=row["auth_provider"] or "guest",
+            email_verified=bool(row["email_verified"]),
+            email_verification_token=row["email_verification_token"],
+            email_verification_expires_at=datetime.fromisoformat(row["email_verification_expires_at"])
+            if row["email_verification_expires_at"]
+            else None,
+            created_at=datetime.fromisoformat(row["created_at"]),
+        )
+        super().save_user(user)
+        return user
+
+    def get_user_by_email_verification_token(self, token: str) -> Optional[User]:
+        in_memory = super().get_user_by_email_verification_token(token)
+        if in_memory is not None:
+            return in_memory
+
+        normalized = str(token).strip()
+        if not normalized:
+            return None
+
+        with self._lock:
+            row = self._connection.execute(
+                """
+                SELECT
+                    user_id,
+                    email,
+                    locale,
+                    password_hash,
+                    auth_provider,
+                    email_verified,
+                    email_verification_token,
+                    email_verification_expires_at,
+                    created_at
+                FROM users
+                WHERE email_verification_token = ?
+                LIMIT 1
+                """,
+                (normalized,),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        user = User(
+            user_id=row["user_id"],
+            email=row["email"],
+            locale=row["locale"],
+            password_hash=row["password_hash"],
+            auth_provider=row["auth_provider"] or "guest",
+            email_verified=bool(row["email_verified"]),
+            email_verification_token=row["email_verification_token"],
+            email_verification_expires_at=datetime.fromisoformat(row["email_verification_expires_at"])
+            if row["email_verification_expires_at"]
+            else None,
             created_at=datetime.fromisoformat(row["created_at"]),
         )
         super().save_user(user)

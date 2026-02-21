@@ -37,6 +37,7 @@ class UserAuthAPI:
 
             tokens = self._auth.issue_token_bundle(user)
             response = self._auth.auth_payload(user, tokens=tokens)
+            response["email_verification"] = self._auth.verification_payload(user, include_token=True)
             response["consent_id"] = data["consent_id"]
             response["policy_version"] = data["policy_version"]
             return 201, {"data": response}, tokens
@@ -55,7 +56,9 @@ class UserAuthAPI:
 
             user = self._auth.authenticate(email=email, password=password)
             tokens = self._auth.issue_token_bundle(user)
-            return 200, {"data": self._auth.auth_payload(user, tokens=tokens)}, tokens
+            payload = self._auth.auth_payload(user, tokens=tokens)
+            payload["email_verification"] = self._auth.verification_payload(user)
+            return 200, {"data": payload}, tokens
         except ValueError as error:
             status = 401 if str(error) == "Invalid credentials" else 400
             return status, {"error": str(error)}, None
@@ -65,7 +68,9 @@ class UserAuthAPI:
             if not access_token:
                 raise ValueError("User session required")
             user = self._auth.get_user_from_access_token(access_token)
-            return 200, {"data": self._auth.auth_payload(user)}
+            payload = self._auth.auth_payload(user)
+            payload["email_verification"] = self._auth.verification_payload(user)
+            return 200, {"data": payload}
         except ValueError:
             return 401, {"error": "User session required"}
 
@@ -74,7 +79,9 @@ class UserAuthAPI:
             if not refresh_token:
                 raise ValueError("Refresh token required")
             user, tokens = self._auth.refresh_tokens(refresh_token)
-            return 200, {"data": self._auth.auth_payload(user, tokens=tokens)}, tokens
+            payload = self._auth.auth_payload(user, tokens=tokens)
+            payload["email_verification"] = self._auth.verification_payload(user)
+            return 200, {"data": payload}, tokens
         except ValueError as error:
             message = str(error)
             auth_errors = {
@@ -92,3 +99,39 @@ class UserAuthAPI:
     @staticmethod
     def post_logout() -> Tuple[int, Dict[str, Any]]:
         return 200, {"data": {"authenticated": False}}
+
+    def post_verify_email(self, payload: Dict[str, Any]) -> Tuple[int, Dict[str, Any]]:
+        try:
+            token = str(payload.get("token", "")).strip()
+            if not token:
+                raise ValueError("token is required")
+            user = self._auth.verify_email(token)
+            return 200, {
+                "data": {
+                    "verified": bool(user.email_verified),
+                    "email": user.email,
+                    "user_id": user.user_id,
+                }
+            }
+        except ValueError as error:
+            message = str(error)
+            status = 400 if message in {"token is required", "Verification token expired"} else 404
+            return status, {"error": message}
+
+    def post_resend_verification(self, payload: Dict[str, Any]) -> Tuple[int, Dict[str, Any]]:
+        try:
+            email = str(payload.get("email", "")).strip()
+            if not email:
+                raise ValueError("email is required")
+            user = self._auth.resend_verification(email)
+            return 200, {
+                "data": {
+                    "email": user.email,
+                    "user_id": user.user_id,
+                    "email_verification": self._auth.verification_payload(user, include_token=True),
+                }
+            }
+        except ValueError as error:
+            message = str(error)
+            status = 400 if message in {"email is required", "Email verification not required"} else 404
+            return status, {"error": message}

@@ -33,6 +33,10 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         self.assertEqual(register.status_code, 201)
         self.assertIn("mc_access_token", register.cookies)
         self.assertIn("mc_refresh_token", register.cookies)
+        self.assertIn("email_verification", register.json())
+        verification = register.json()["email_verification"]
+        self.assertTrue(verification["required"])
+        self.assertIn("token", verification)
 
         session = self.client.get("/api/auth/session")
         self.assertEqual(session.status_code, 200)
@@ -42,6 +46,13 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         refresh = self.client.post("/api/auth/refresh")
         self.assertEqual(refresh.status_code, 200)
         self.assertTrue(refresh.json()["authenticated"])
+
+        verify = self.client.post(
+            "/api/auth/verify-email",
+            json={"token": verification["token"]},
+        )
+        self.assertEqual(verify.status_code, 200)
+        self.assertTrue(verify.json()["verified"])
 
         logout = self.client.post("/api/auth/logout")
         self.assertEqual(logout.status_code, 200)

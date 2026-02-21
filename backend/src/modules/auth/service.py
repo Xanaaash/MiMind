@@ -34,10 +34,18 @@ class AuthService:
 
         auth_provider = "guest"
         password_hash = None
+        email_verified = True
+        email_verification_token = None
+        email_verification_expires_at = None
         if password is not None:
             validate_password_strength(password)
             password_hash = hash_password(password)
             auth_provider = "password"
+            email_verified = False
+            email_verification_token = uuid.uuid4().hex
+            email_verification_expires_at = datetime.now(timezone.utc) + timedelta(
+                hours=self._config.email_verification_ttl_hours
+            )
 
         user = User(
             user_id=str(uuid.uuid4()),
@@ -45,6 +53,9 @@ class AuthService:
             locale=str(locale).strip(),
             password_hash=password_hash,
             auth_provider=auth_provider,
+            email_verified=email_verified,
+            email_verification_token=email_verification_token,
+            email_verification_expires_at=email_verification_expires_at,
         )
         self._store.save_user(user)
         return user
@@ -116,12 +127,70 @@ class AuthService:
             "user": self._serialize_user(user),
             "user_id": user.user_id,
             "email": user.email,
+            "email_verified": user.email_verified,
         }
         if tokens is not None:
             payload["access_token"] = tokens.access_token
             payload["refresh_token"] = tokens.refresh_token
             payload["expires_at"] = tokens.access_expires_at.isoformat()
         return payload
+
+    def verification_payload(self, user: User, include_token: bool = False) -> dict:
+        required = user.auth_provider == "password"
+        payload = {
+            "required": required,
+            "verified": bool(user.email_verified),
+            "expires_at": user.email_verification_expires_at.isoformat()
+            if user.email_verification_expires_at
+            else None,
+        }
+        if include_token and user.email_verification_token:
+            payload["token"] = user.email_verification_token
+            payload["preview_link"] = f"/api/auth/verify-email?token={user.email_verification_token}"
+        return payload
+
+    def verify_email(self, token: str) -> User:
+        normalized = str(token).strip()
+        if not normalized:
+            raise ValueError("Verification token is required")
+
+        user = self._store.get_user_by_email_verification_token(normalized)
+        if user is None:
+            raise ValueError("Verification token is invalid")
+        if user.auth_provider != "password":
+            raise ValueError("Verification token is invalid")
+        if user.email_verified:
+            return user
+        if user.email_verification_expires_at is not None and user.email_verification_expires_at <= datetime.now(
+            timezone.utc
+        ):
+            raise ValueError("Verification token expired")
+
+        user.email_verified = True
+        user.email_verification_token = None
+        user.email_verification_expires_at = None
+        self._store.save_user(user)
+        return user
+
+    def resend_verification(self, email: str) -> User:
+        normalized = str(email).strip().lower()
+        if not normalized:
+            raise ValueError("email is required")
+
+        user = self._store.get_user_by_email(normalized)
+        if user is None:
+            raise ValueError("User not found")
+        if user.auth_provider != "password":
+            raise ValueError("Email verification not required")
+        if user.email_verified:
+            return user
+
+        user.email_verification_token = uuid.uuid4().hex
+        user.email_verification_expires_at = datetime.now(timezone.utc) + timedelta(
+            hours=self._config.email_verification_ttl_hours
+        )
+        self._store.save_user(user)
+        return user
 
     @staticmethod
     def access_cookie_name() -> str:
@@ -164,5 +233,6 @@ class AuthService:
             "user_id": user.user_id,
             "email": user.email,
             "locale": user.locale,
+            "email_verified": user.email_verified,
             "created_at": user.created_at.isoformat(),
         }

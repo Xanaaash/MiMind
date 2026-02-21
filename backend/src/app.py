@@ -268,6 +268,24 @@ def auth_logout(response: Response) -> dict:
     return _unwrap(status, body)
 
 
+@app.post("/api/auth/verify-email")
+def auth_verify_email(payload: dict = Body(...)) -> dict:
+    status, body = user_auth_api.post_verify_email(payload)
+    return _unwrap(status, body)
+
+
+@app.get("/api/auth/verify-email")
+def auth_verify_email_via_query(token: str = Query("", alias="token")) -> dict:
+    status, body = user_auth_api.post_verify_email({"token": token})
+    return _unwrap(status, body)
+
+
+@app.post("/api/auth/verification/resend")
+def auth_resend_verification(payload: dict = Body(...)) -> dict:
+    status, body = user_auth_api.post_resend_verification(payload)
+    return _unwrap(status, body)
+
+
 @app.post("/api/assessment/{user_id}")
 def submit_assessment(user_id: str, payload: dict = Body(...)) -> dict:
     status, body = onboarding_api.post_assessment(user_id=user_id, payload=payload)

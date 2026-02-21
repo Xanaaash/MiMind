@@ -10,4 +10,7 @@ class User:
     locale: str
     password_hash: Optional[str] = None
     auth_provider: str = "guest"
+    email_verified: bool = True
+    email_verification_token: Optional[str] = None
+    email_verification_expires_at: Optional[datetime] = None
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
