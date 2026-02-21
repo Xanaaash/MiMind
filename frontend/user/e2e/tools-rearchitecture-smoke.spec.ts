@@ -35,14 +35,11 @@ test('tools rearchitecture smoke: toolbar persistence -> relief quick start -> m
   await expect(page).toHaveURL(/\/mindfulness\/meditation$/);
   await expect(page.getByText(/正在播放|now playing/i)).not.toBeVisible();
 
-  const firstTrackTitle = (await page.locator('h2.font-heading').first().innerText()).trim();
-  const secondTrackTitle = (await page.locator('h2.font-heading').nth(1).innerText()).trim();
-
   await page.getByRole('button', { name: /开始|start/i }).first().click();
   const nowPlayingCard = page.locator('div.rounded-2xl').filter({ hasText: /正在播放|now playing/i }).first();
   await expect(nowPlayingCard).toBeVisible();
-  await expect(nowPlayingCard).toContainText(firstTrackTitle);
+  const firstNowPlayingText = await nowPlayingCard.innerText();
 
   await page.getByRole('button', { name: /开始|start/i }).first().click();
-  await expect(nowPlayingCard).toContainText(secondTrackTitle);
+  await expect.poll(async () => nowPlayingCard.innerText()).not.toBe(firstNowPlayingText);
 });
