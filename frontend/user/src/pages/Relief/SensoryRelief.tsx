@@ -105,7 +105,7 @@ export default function SensoryRelief() {
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-6 sm:mb-8">
           <button
-            onClick={() => navigate('/tools')}
+            onClick={() => navigate('/relief')}
             className="text-sm text-[#a89890] hover:text-[#e8ddd6] transition-colors"
           >
             ← {t('sensory.back')}

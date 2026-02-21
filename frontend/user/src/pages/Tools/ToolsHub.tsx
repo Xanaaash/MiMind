@@ -294,7 +294,7 @@ export default function ToolsHub() {
       {/* Other tools */}
       <div className="grid md:grid-cols-2 gap-6">
         {/* Sensory Relief */}
-        <Card hoverable onClick={() => navigate('/tools/sensory-relief')}>
+        <Card hoverable onClick={() => navigate('/relief/sensory')}>
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-calm-soft flex items-center justify-center text-3xl">🛡️</div>
             <div>
@@ -306,7 +306,7 @@ export default function ToolsHub() {
         </Card>
 
         {/* Breathing */}
-        <Card hoverable onClick={() => navigate('/tools/breathing')}>
+        <Card hoverable onClick={() => navigate('/relief/breathing')}>
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-safe-soft flex items-center justify-center text-3xl">🌬️</div>
             <div>

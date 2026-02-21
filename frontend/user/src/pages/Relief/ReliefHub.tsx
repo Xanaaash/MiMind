@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import Card from '../../components/Card/Card';
 
 export default function ReliefHub() {
   const { t } = useTranslation();
@@ -26,17 +25,25 @@ export default function ReliefHub() {
       </motion.section>
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Card hoverable onClick={() => navigate('/tools/sensory-relief')}>
-          <div className="text-sm text-muted">{t('tools.sensory_title')}</div>
-          <div className="mt-1 text-xl font-heading font-bold">{t('relief.quick_sensory_title')}</div>
-          <p className="mt-1 text-sm text-muted">{t('relief.quick_sensory_desc')}</p>
-        </Card>
+        <button
+          type="button"
+          onClick={() => navigate('/relief/sensory')}
+          className="rounded-2xl border border-danger/40 bg-danger-soft px-5 py-6 text-left transition-colors hover:bg-danger hover:text-white"
+        >
+          <div className="text-xs uppercase tracking-wider font-semibold">{t('tools.sensory_title')}</div>
+          <div className="mt-2 font-heading text-2xl font-bold">{t('relief.quick_sensory_title')}</div>
+          <p className="mt-2 text-sm opacity-90">{t('relief.quick_sensory_desc')}</p>
+        </button>
 
-        <Card hoverable onClick={() => navigate('/tools/breathing')}>
-          <div className="text-sm text-muted">{t('tools.breathing_title')}</div>
-          <div className="mt-1 text-xl font-heading font-bold">{t('relief.quick_breath_title')}</div>
-          <p className="mt-1 text-sm text-muted">{t('relief.quick_breath_desc')}</p>
-        </Card>
+        <button
+          type="button"
+          onClick={() => navigate('/relief/breathing')}
+          className="rounded-2xl border border-accent/40 bg-accent-soft px-5 py-6 text-left transition-colors hover:bg-accent hover:text-white"
+        >
+          <div className="text-xs uppercase tracking-wider font-semibold">{t('tools.breathing_title')}</div>
+          <div className="mt-2 font-heading text-2xl font-bold">{t('relief.quick_breath_title')}</div>
+          <p className="mt-2 text-sm opacity-90">{t('relief.quick_breath_desc')}</p>
+        </button>
       </section>
     </div>
   );

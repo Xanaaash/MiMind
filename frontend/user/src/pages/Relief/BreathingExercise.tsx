@@ -258,7 +258,7 @@ export default function BreathingExercise() {
             <Button variant="ghost" onClick={() => { setPhase('idle'); setPhaseIndex(0); }}>
               {t('common.retry')}
             </Button>
-            <Button onClick={() => navigate('/tools')}>{t('common.back')}</Button>
+            <Button onClick={() => navigate('/relief')}>{t('common.back')}</Button>
           </div>
         </motion.div>
       )}
