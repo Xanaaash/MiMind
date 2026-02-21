@@ -87,6 +87,28 @@ class BillingCoreUnitTests(unittest.TestCase):
         self.assertTrue(coach_ent["ai_coaching_enabled"])
         self.assertFalse(exhausted_ent["ai_coaching_enabled"])
 
+    def test_maintenance_emits_renewal_reminder_and_downgrades_expired_subscription(self) -> None:
+        self.billing.process_webhook(
+            event_id="evt_renew_1",
+            event_type="payment.succeeded",
+            payload={"user_id": self.user_id, "plan_id": "base"},
+        )
+        now = datetime.now(timezone.utc)
+        subscription = self.store.get_subscription(self.user_id)
+        subscription.ends_at = now + timedelta(days=2)
+
+        first = self.billing.run_maintenance(now=now)
+        self.assertEqual(first["renewal_reminders"], 1)
+        reminders = self.billing.get_renewal_reminders(self.user_id)
+        self.assertEqual(len(reminders), 1)
+        self.assertEqual(reminders[0]["plan_id"], "base")
+
+        subscription.ends_at = now - timedelta(minutes=1)
+        second = self.billing.run_maintenance(now=now)
+        self.assertEqual(second["downgraded_subscriptions"], 1)
+        downgraded = self.billing.get_subscription(self.user_id)
+        self.assertEqual(downgraded["plan_id"], "free")
+
 
 if __name__ == "__main__":
     unittest.main()

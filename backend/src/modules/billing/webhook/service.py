@@ -45,11 +45,12 @@ class WebhookService:
                 plan_id=plan.plan_id,
                 status="active",
                 started_at=now,
-                ends_at=None,
+                ends_at=now + timedelta(days=30),
                 trial=False,
                 ai_quota_monthly=plan.ai_sessions_per_month,
                 ai_used_in_cycle=0,
                 cycle_reset_at=now + timedelta(days=30),
+                renewal_reminder_sent_at=None,
             )
             self._store.save_subscription(subscription)
             outcome = "subscription_activated"

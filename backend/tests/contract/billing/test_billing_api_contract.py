@@ -3,6 +3,7 @@ import hmac
 import json
 import os
 import unittest
+from datetime import datetime, timedelta, timezone
 
 from backend.tests.bootstrap import configure_import_path
 
@@ -258,6 +259,33 @@ class BillingAPIContractTests(unittest.TestCase):
                 os.environ.pop("ALIPAY_NOTIFY_SECRET", None)
             else:
                 os.environ["ALIPAY_NOTIFY_SECRET"] = original_alipay_secret
+
+    def test_renewal_reminder_and_expiry_downgrade_contract(self) -> None:
+        webhook_status, _ = self.billing_api.post_webhook(
+            {
+                "event_id": "evt-contract-renew",
+                "event_type": "payment.succeeded",
+                "payload": {"user_id": self.green_user_id, "plan_id": "base"},
+            }
+        )
+        self.assertEqual(webhook_status, 200)
+
+        now = datetime.now(timezone.utc)
+        subscription = self.store.get_subscription(self.green_user_id)
+        subscription.ends_at = now + timedelta(days=1)
+        maintenance_status, maintenance_body = self.billing_api.post_run_maintenance()
+        self.assertEqual(maintenance_status, 200)
+        self.assertGreaterEqual(maintenance_body["data"]["renewal_reminders"], 1)
+
+        reminders_status, reminders_body = self.billing_api.get_renewal_reminders(self.green_user_id)
+        self.assertEqual(reminders_status, 200)
+        self.assertGreaterEqual(len(reminders_body["data"]), 1)
+
+        subscription.ends_at = now - timedelta(minutes=1)
+        self.billing_api.post_run_maintenance()
+        sub_status, sub_body = self.billing_api.get_subscription(self.green_user_id)
+        self.assertEqual(sub_status, 200)
+        self.assertEqual(sub_body["data"]["plan_id"], "free")
 
 
 if __name__ == "__main__":

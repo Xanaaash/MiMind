@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 
 from modules.admin.models import AdminSession
 from modules.assessment.models import AssessmentScoreSet, AssessmentSubmission, ReassessmentSchedule
-from modules.billing.models import SubscriptionRecord
+from modules.billing.models import RenewalReminderRecord, SubscriptionRecord
 from modules.coach.models import CoachSession
 from modules.compliance.models import ConsentRecord
 from modules.journal.models import JournalEntry
@@ -35,6 +35,7 @@ class InMemoryStore:
     model_invocations: List[ModelInvocationRecord] = field(default_factory=list)
     api_audit_logs: List[APIAuditLogRecord] = field(default_factory=list)
     subscriptions: Dict[str, SubscriptionRecord] = field(default_factory=dict)
+    renewal_reminders: Dict[str, List[RenewalReminderRecord]] = field(default_factory=dict)
     processed_webhooks: set = field(default_factory=set)
     admin_sessions: Dict[str, AdminSession] = field(default_factory=dict)
 
@@ -86,6 +87,9 @@ class InMemoryStore:
 
     def save_subscription(self, subscription: SubscriptionRecord) -> None:
         self.subscriptions[subscription.user_id] = subscription
+
+    def save_renewal_reminder(self, reminder: RenewalReminderRecord) -> None:
+        self.renewal_reminders.setdefault(reminder.user_id, []).append(reminder)
 
     def save_admin_session(self, session: AdminSession) -> None:
         self.admin_sessions[session.session_id] = session
@@ -157,6 +161,9 @@ class InMemoryStore:
 
     def get_subscription(self, user_id: str) -> Optional[SubscriptionRecord]:
         return self.subscriptions.get(user_id)
+
+    def list_renewal_reminders(self, user_id: str) -> List[RenewalReminderRecord]:
+        return list(self.renewal_reminders.get(user_id, []))
 
     def get_admin_session(self, session_id: str) -> Optional[AdminSession]:
         return self.admin_sessions.get(session_id)
@@ -247,7 +254,17 @@ class InMemoryStore:
                     "cycle_reset_at": subscription.cycle_reset_at.isoformat(),
                 }
                 if subscription is not None
-                else None
+                else None,
+                "renewal_reminders": [
+                    {
+                        "reminder_id": item.reminder_id,
+                        "plan_id": item.plan_id,
+                        "due_at": item.due_at.isoformat(),
+                        "reminder_at": item.reminder_at.isoformat(),
+                        "days_remaining": item.days_remaining,
+                    }
+                    for item in self.list_renewal_reminders(user_id)
+                ],
             },
         }
 
@@ -287,6 +304,7 @@ class InMemoryStore:
                 retained_api_logs.append(record)
         self.api_audit_logs = retained_api_logs
         removed_subscription = 1 if self.subscriptions.pop(user_id, None) is not None else 0
+        removed_renewal_reminders = len(self.renewal_reminders.pop(user_id, []))
         removed_user = 1 if self.users.pop(user_id, None) is not None else 0
 
         return {
@@ -304,4 +322,5 @@ class InMemoryStore:
             "memory_vectors": removed_memory_vectors,
             "api_audit_logs": removed_api_audit_logs,
             "subscriptions": removed_subscription,
+            "renewal_reminders": removed_renewal_reminders,
         }

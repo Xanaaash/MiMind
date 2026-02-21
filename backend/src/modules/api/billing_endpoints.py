@@ -102,6 +102,11 @@ class BillingAPI:
             return 404, {"error": "Subscription not found"}
         return 200, {"data": subscription}
 
+    def get_renewal_reminders(self, user_id: str) -> Tuple[int, Dict[str, Any]]:
+        if self._store.get_user(user_id) is None:
+            return 404, {"error": "User not found"}
+        return 200, {"data": self._billing.get_renewal_reminders(user_id)}
+
     def get_entitlements(self, user_id: str) -> Tuple[int, Dict[str, Any]]:
         triage = self._store.get_triage(user_id)
         if triage is None:

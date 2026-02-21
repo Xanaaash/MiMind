@@ -4,6 +4,7 @@ from typing import Optional
 from modules.billing.catalog.service import BillingCatalogService
 from modules.billing.checkout.service import CheckoutService
 from modules.billing.quota.service import QuotaService
+from modules.billing.renewal.service import RenewalService
 from modules.billing.trial.service import TrialService
 from modules.billing.webhook.service import WebhookService
 from modules.storage.in_memory import InMemoryStore
@@ -16,6 +17,7 @@ class BillingService:
         self._checkout = CheckoutService(store)
         self._trial = TrialService(store)
         self._quota = QuotaService(store)
+        self._renewal = RenewalService(store)
         self._webhook = WebhookService(store)
 
     def list_plans(self) -> dict:
@@ -46,9 +48,13 @@ class BillingService:
 
     def run_maintenance(self, now: Optional[datetime] = None) -> dict:
         expired_trials = self._trial.expire_trials(now=now)
+        downgraded_subscriptions = self._renewal.downgrade_expired_subscriptions(now=now)
+        renewal_reminders = self._renewal.enqueue_renewal_reminders(now=now)
         reset_quotas = self._quota.reset_monthly_quotas(now=now)
         return {
             "expired_trials": expired_trials,
+            "downgraded_subscriptions": downgraded_subscriptions,
+            "renewal_reminders": renewal_reminders,
             "reset_quotas": reset_quotas,
         }
 
@@ -57,6 +63,20 @@ class BillingService:
         if subscription is None:
             return None
         return self._subscription_to_dict(subscription)
+
+    def get_renewal_reminders(self, user_id: str) -> list:
+        reminders = self._store.list_renewal_reminders(user_id)
+        return [
+            {
+                "reminder_id": item.reminder_id,
+                "user_id": item.user_id,
+                "plan_id": item.plan_id,
+                "due_at": item.due_at.isoformat(),
+                "reminder_at": item.reminder_at.isoformat(),
+                "days_remaining": item.days_remaining,
+            }
+            for item in reminders
+        ]
 
     @staticmethod
     def _subscription_to_dict(subscription) -> dict:
@@ -71,4 +91,7 @@ class BillingService:
             "ai_used_in_cycle": subscription.ai_used_in_cycle,
             "ai_quota_remaining": subscription.quota_remaining(),
             "cycle_reset_at": subscription.cycle_reset_at.isoformat(),
+            "renewal_reminder_sent_at": subscription.renewal_reminder_sent_at.isoformat()
+            if subscription.renewal_reminder_sent_at
+            else None,
         }

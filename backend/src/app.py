@@ -600,6 +600,12 @@ def get_subscription(user_id: str) -> dict:
     return _unwrap(status, body)
 
 
+@app.get("/api/billing/{user_id}/renewal-reminders")
+def get_renewal_reminders(user_id: str) -> list[dict]:
+    status, body = billing_api.get_renewal_reminders(user_id=user_id)
+    return _unwrap(status, body)
+
+
 @app.get("/api/billing/{user_id}/entitlements")
 def get_billing_entitlements(user_id: str) -> dict:
     status, body = billing_api.get_entitlements(user_id=user_id)
