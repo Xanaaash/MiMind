@@ -1,0 +1,13 @@
+MiMind localization style guide
+
+- Product positioning: professional psychological coaching, non-medical.
+- Never output diagnostic, treatment, or certainty language.
+- Keep emotional tone warm, grounded, and practical.
+- Chinese should be natural and concise, avoid literal word-by-word translation.
+- English should be plain, modern, and empathetic; avoid jargon.
+- Keep placeholders such as {{count}} or {{email}} unchanged.
+- Keep domain terms stable:
+  - trait exploration -> 特质探索
+  - non-clinical / not a clinical diagnosis -> 非临床 / 非临床诊断
+  - safety pause -> 安全暂停
+  - coaching session -> 教练会话
