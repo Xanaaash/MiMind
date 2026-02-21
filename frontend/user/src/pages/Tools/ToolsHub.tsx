@@ -2,41 +2,30 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AMBIENT_SOUNDS, type AmbientSoundId } from '../../utils/ambientAudio';
 import {
-  AMBIENT_SOUNDS,
-  startAmbient,
-  stopAmbient,
-  stopAmbientSound,
-  setAmbientVolume,
-  setTimer,
-  clearTimer,
-  isPlaying,
-  isSoundPlaying,
-  type AmbientSoundId,
-} from '../../utils/ambientAudio';
+  setAmbientPlaybackTimer,
+  setAmbientPlaybackVolume,
+  stopAllAmbientPlayback,
+  toggleAmbientPlayback,
+} from '../../utils/ambientAudioService';
 import { getToolUsageStats } from '../../api/tools';
 import { useAuthStore } from '../../stores/auth';
+import { useToolStore } from '../../stores/useToolStore';
 import Card from '../../components/Card/Card';
 import type { ToolUsageStats } from '../../types';
 
 const TIMER_OPTIONS = [0, 5, 15, 30, 60];
-const DEFAULT_SOUND_VOLUME = 0.7;
-
-function buildInitialSoundVolumes(): Partial<Record<AmbientSoundId, number>> {
-  return AMBIENT_SOUNDS.reduce<Partial<Record<AmbientSoundId, number>>>((acc, sound) => {
-    acc[sound.id] = DEFAULT_SOUND_VOLUME;
-    return acc;
-  }, {});
-}
 
 export default function ToolsHub() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const userId = useAuthStore((s) => s.userId);
+  const activeSounds = useToolStore((s) => s.ambient.activeSoundIds);
+  const soundVolumes = useToolStore((s) => s.ambient.volumes);
+  const timerMin = useToolStore((s) => s.ambient.timerMin);
+  const startedAtMs = useToolStore((s) => s.ambient.startedAtMs);
 
-  const [activeSounds, setActiveSounds] = useState<AmbientSoundId[]>([]);
-  const [soundVolumes, setSoundVolumes] = useState<Partial<Record<AmbientSoundId, number>>>(() => buildInitialSoundVolumes());
-  const [timerMin, setTimerMin] = useState(0);
   const [elapsed, setElapsed] = useState(0);
   const [usageStats, setUsageStats] = useState<ToolUsageStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
@@ -45,14 +34,14 @@ export default function ToolsHub() {
 
   useEffect(() => {
     return () => {
-      stopAmbient();
       if (tickRef.current) clearInterval(tickRef.current);
     };
   }, []);
 
   useEffect(() => {
     if (playing) {
-      const start = Date.now();
+      const start = startedAtMs ?? Date.now();
+      setElapsed(Math.floor((Date.now() - start) / 1000));
       tickRef.current = setInterval(() => {
         setElapsed(Math.floor((Date.now() - start) / 1000));
       }, 1000);
@@ -61,7 +50,7 @@ export default function ToolsHub() {
       setElapsed(0);
     }
     return () => { if (tickRef.current) clearInterval(tickRef.current); };
-  }, [playing]);
+  }, [playing, startedAtMs]);
 
   useEffect(() => {
     if (!userId) {
@@ -94,45 +83,15 @@ export default function ToolsHub() {
   }, [userId]);
 
   const handleToggle = useCallback((soundId: AmbientSoundId) => {
-    const volume = soundVolumes[soundId] ?? DEFAULT_SOUND_VOLUME;
-    setActiveSounds((prev) => {
-      if (prev.includes(soundId)) {
-        stopAmbientSound(soundId);
-        const next = prev.filter((id) => id !== soundId);
-        if (next.length === 0) {
-          clearTimer();
-        }
-        return next;
-      }
-
-      startAmbient(soundId, volume);
-      const next = [...prev, soundId];
-      if (timerMin > 0) {
-        setTimer(timerMin, () => {
-          setActiveSounds([]);
-        });
-      }
-      return next;
-    });
-  }, [soundVolumes, timerMin]);
+    toggleAmbientPlayback(soundId);
+  }, []);
 
   const handleVolumeChange = useCallback((soundId: AmbientSoundId, volume: number) => {
-    setSoundVolumes((prev) => ({ ...prev, [soundId]: volume }));
-    if (isSoundPlaying(soundId)) {
-      setAmbientVolume(soundId, volume);
-    }
+    setAmbientPlaybackVolume(soundId, volume);
   }, []);
 
   const handleTimerChange = useCallback((min: number) => {
-    setTimerMin(min);
-    if (!isPlaying()) return;
-    if (min > 0) {
-      setTimer(min, () => {
-        setActiveSounds([]);
-      });
-      return;
-    }
-    clearTimer();
+    setAmbientPlaybackTimer(min);
   }, []);
 
   const formatTime = (sec: number) => {
@@ -271,7 +230,7 @@ export default function ToolsHub() {
                   const sound = AMBIENT_SOUNDS.find((item) => item.id === soundId);
                   if (!sound) return null;
 
-                  const volume = soundVolumes[soundId] ?? DEFAULT_SOUND_VOLUME;
+                  const volume = soundVolumes[soundId] ?? 0.7;
 
                   return (
                     <div key={soundId} className="flex items-center gap-3 rounded-xl bg-paper border border-line px-3 py-2">
@@ -322,7 +281,7 @@ export default function ToolsHub() {
 
               {/* Stop */}
               <button
-                onClick={() => { stopAmbient(); setActiveSounds([]); }}
+                onClick={() => { stopAllAmbientPlayback(); }}
                 className="w-full py-2.5 rounded-xl bg-danger-soft text-danger font-semibold text-sm hover:bg-danger hover:text-white transition-colors"
               >
                 {t('tools.stop')}
