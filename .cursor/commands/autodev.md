@@ -1,23 +1,29 @@
 ---
-description: 自动推进开发（强约束版）：原子认领 + 强制 worktree + 漂移守卫 + 自动整合 main
+description: 自动推进开发（协作强化版）：主目录零开发 + 原子认领 + 强制 worktree + 漂移守卫 + 同步闸门
 ---
 
-# Autodev（强约束版）
+# Autodev（协作强化版）
 
-目标：解决多 Agent 并行时最常见的三类问题。
+目标：解决多 Agent 并行时最常见的五类问题。
 
 1. 分支串线（开发中被切到别的分支）
 2. 工作区污染（主目录遗留未提交改动）
 3. 认领竞争（`todo.md` 被并发写入）
+4. 外来改动闯入（当前任务外文件突然变脏）
+5. 推送抢跑（`non-fast-forward` / rebase 阻塞）
 
 ---
 
 ## 唯一规则
 
-1. **认领只能在 `main` + 干净工作区执行**
-2. **开发只能在独立 worktree 执行**
-3. **每个任务开工前必须通过 guard**
-4. **一个 agent 同时只持有一个 `[🔒 <agent-id>]`**
+1. **主目录只做编排，不做开发**  
+   允许动作仅限：`preflight / claim / worktree / merge / todo状态更新 / cleanup`
+2. **认领只能在 `main` + 干净工作区执行**
+3. **开发只能在独立 worktree 执行**
+4. **每个任务开工前必须通过 guard**
+5. **一个 agent 同时只持有一个 `[🔒 <agent-id>]`**
+6. **发现未知来源改动时，立即停手，不得混入当前任务提交**
+7. **每次 push 前必须先同步远端（`pull --rebase`）**
 
 ---
 
@@ -29,6 +35,8 @@ description: 自动推进开发（强约束版）：原子认领 + 强制 worktr
 bash scripts/autodev-preflight.sh --require-main --require-clean
 git pull origin main --rebase
 ```
+
+若预检失败（工作区不干净），执行下方「脏区决策树」。
 
 ---
 
@@ -96,6 +104,7 @@ bash ../../scripts/autodev-guard.sh --session ../../.autodev/sessions/<agent-id>
 在 worktree 分支：
 
 ```bash
+bash ../../scripts/autodev-guard.sh --session ../../.autodev/sessions/<agent-id>-T-xxx.env
 git fetch origin
 git rebase origin/main
 ```
@@ -104,12 +113,20 @@ git rebase origin/main
 
 ```bash
 cd <repo-root>
+bash scripts/autodev-preflight.sh --require-main --require-clean
 git checkout main
 git pull origin main --rebase
 git merge agent/<agent-id>/T-xxx --no-ff -m "merge: T-xxx <简述> by <agent-id>"
 ```
 
-将 `todo.md` 状态从 `[🔒 <agent-id>]` 改为 `[✅]` 后提交并推送。
+将 `todo.md` 状态从 `[🔒 <agent-id>]` 改为 `[✅]` 后提交并推送：
+
+```bash
+git add todo.md
+git commit -m "done: T-xxx <简述>"
+git pull origin main --rebase
+git push origin main
+```
 
 ---
 
@@ -118,6 +135,27 @@ git merge agent/<agent-id>/T-xxx --no-ff -m "merge: T-xxx <简述> by <agent-id>
 ```bash
 git worktree remove .worktrees/<agent-id>-T-xxx
 git branch -d agent/<agent-id>/T-xxx
+```
+
+---
+
+## 脏区决策树（必须执行）
+
+当任一步骤提示 `Working tree is not clean`：
+
+1. **先识别来源**
+   - 当前任务相关且需要保留：`commit` 或 `stash`
+   - 来源不明/非当前任务：**立即停止并通知负责人**
+2. **禁止混提**
+   - 不得把“当前任务改动 + 外来改动”放进同一 commit
+3. **推荐优先级**
+   - 优先 `commit`（可追溯）
+   - 次选 `stash`（需命名）
+
+标准 stash 命名：
+
+```bash
+git stash push -u -m "autodev-temp-<agent-id>-<task-id>-<yyyymmdd-HHMMSS>"
 ```
 
 ---
@@ -132,6 +170,34 @@ bash scripts/autodev-guard.sh --session .autodev/sessions/<agent-id>-T-xxx.env
 
 - 通过：继续
 - 失败：**立即停止编辑**，切回对应 worktree 再继续
+
+---
+
+## 推送与同步闸门（新增）
+
+为避免 `non-fast-forward`：
+
+```bash
+git pull origin main --rebase
+git push origin main
+```
+
+若 push 失败且出现本地脏区：
+
+1. 先执行 `git status --short` 定位文件  
+2. 按「脏区决策树」处理  
+3. 再执行 `pull --rebase` 与 `push`
+
+---
+
+## 外来改动处置协议（新增）
+
+若主目录或 worktree 出现“你未触碰文件”的变更：
+
+1. 立即停止当前实现动作
+2. 输出变更文件列表（`git status --short`）
+3. 请求人工决策：`stash / commit checkpoint / 放弃本轮`
+4. 未获确认前不得继续合并或推送
 
 ---
 
