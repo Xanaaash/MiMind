@@ -12,7 +12,7 @@
 
 ### Phase 1: Research & Content Intake
 
-- [ ] **T1.1 / T-802** 产出冥想/显化资源调研清单（来源、授权、质量评分、接入建议） - `docs/content/meditation-manifestation-sources.md`
+- [x] **T1.1 / T-802** 产出冥想/显化资源调研清单（来源、授权、质量评分、接入建议） - `docs/content/meditation-manifestation-sources.md`
 - [x] **T1.2 / T-803** 替换冥想播放列表并增加来源/版权元数据展示 - `frontend/user/src/config/meditationPlaylist.ts`, `frontend/user/src/pages/Tools/MeditationPlayer.tsx`
 - [x] **T1.3 / T-804** 升级心灵空间信息架构与显化双层交互（快速/深度） - `frontend/user/src/pages/Mindfulness/*`
 
@@ -20,7 +20,7 @@
 
 - [x] **T2.1 / T-805** 实现番茄钟轻量悬浮计时器（跨路由可见、可最小化） - `frontend/user/src/components/FloatingToolbar/*`, `frontend/user/src/stores/useToolStore.ts`
 - [x] **T2.2 / T-806** 扩充权威量表定义与来源文献映射 - `backend/src/modules/assessment/*`, `frontend/user/src/pages/Scales/*`
-- [ ] **T2.3 / T-807** 为 tests/scales 列表补充通俗用途说明区块（中英文） - `frontend/user/src/pages/Tests/*`, `frontend/user/src/pages/Scales/*`, `frontend/user/public/locales/*.json`
+- [x] **T2.3 / T-807** 为 tests/scales 列表补充通俗用途说明区块（中英文） - `frontend/user/src/pages/Tests/*`, `frontend/user/src/pages/Scales/*`, `frontend/user/public/locales/*.json`
 
 ### Phase 3: Coach Expert Upgrade
 
