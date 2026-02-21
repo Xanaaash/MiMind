@@ -72,6 +72,27 @@ class ScoringAndTriageTests(unittest.TestCase):
         decision = self.triage.evaluate(scores)
         self.assertEqual(decision.channel, TriageChannel.RED)
 
+    def test_triage_ignores_neurodiversity_only_high_scores(self) -> None:
+        responses = self._base_responses()
+        responses["asrs"] = [3] * 18
+        responses["aq10"] = [1] * 10
+        responses["hsp"] = [4] * 12
+        responses["catq"] = [7] * 25
+
+        scores = score_submission(responses)
+        decision = self.triage.evaluate(scores)
+        self.assertEqual(decision.channel, TriageChannel.GREEN)
+
+    def test_triage_uses_core_thresholds_when_neurodiversity_payload_is_present(self) -> None:
+        responses = self._base_responses()
+        responses["asrs"] = [3] * 18
+        responses["aq10"] = [1] * 10
+        responses["phq9"] = [3] * 7 + [0, 0]  # total 21
+
+        scores = score_submission(responses)
+        decision = self.triage.evaluate(scores)
+        self.assertEqual(decision.channel, TriageChannel.RED)
+
 
 if __name__ == "__main__":
     unittest.main()

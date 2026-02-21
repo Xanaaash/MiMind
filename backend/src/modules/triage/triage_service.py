@@ -25,6 +25,8 @@ class TriageService:
                     dialogue_risk_level=dialogue_risk.level,
                 )
 
+        # Neurodiversity exploration (ASRS/AQ10/HSP/CAT-Q) is non-clinical context only.
+        # Crisis triage must be decided by dialogue risk and clinical scales.
         if scores.cssrs_positive:
             return TriageDecision(
                 channel=TriageChannel.RED,

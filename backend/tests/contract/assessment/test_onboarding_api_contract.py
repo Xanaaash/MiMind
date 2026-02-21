@@ -98,6 +98,29 @@ class OnboardingAPIContractTests(unittest.TestCase):
         self.assertFalse(ent_body["data"]["ai_coaching_enabled"])
         self.assertEqual(ent_body["data"]["channel"], "yellow")
 
+    def test_neurodiversity_payload_does_not_trigger_triage_without_core_threshold(self) -> None:
+        _, register_body = self.api.post_register(
+            {
+                "email": "neuro@example.com",
+                "locale": "en-US",
+                "policy_version": "2026.02",
+            }
+        )
+        user_id = register_body["data"]["user_id"]
+
+        responses = self._base_responses()
+        responses["asrs"] = [3] * 18
+        responses["aq10"] = [1] * 10
+        responses["hsp"] = [4] * 12
+        responses["catq"] = [7] * 25
+
+        status, body = self.api.post_assessment(
+            user_id=user_id,
+            payload={"responses": responses},
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(body["data"]["triage"]["channel"], "green")
+
 
 if __name__ == "__main__":
     unittest.main()
