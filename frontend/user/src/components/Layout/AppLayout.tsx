@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/auth';
 import { useThemeStore } from '../../stores/theme';
 import SafetyDisclaimer from '../SafetyDisclaimer/SafetyDisclaimer';
+import FloatingToolbar from '../FloatingToolbar/FloatingToolbar';
 import { useEffect, useState } from 'react';
 
 const NAV_ITEMS = [
@@ -139,6 +140,7 @@ export default function AppLayout() {
         <Outlet />
       </main>
 
+      <FloatingToolbar />
       <SafetyDisclaimer />
     </div>
   );
