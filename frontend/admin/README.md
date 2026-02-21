@@ -33,6 +33,7 @@ export ADMIN_SESSION_TTL_HOURS="8"
 - Includes admin observability dashboard for model invocation totals, latency distribution and error rate.
 - Includes prompt pack management panel (`/api/prompts/*`) for viewing and activating prompt versions.
 - Includes user management panel (`/api/admin/users`) with manual triage override action.
+- Includes compliance panel (`/api/compliance/{user_id}/export|erase`) for export/delete operations.
 - Homepage includes both entry cards:
   - Clinical Scales Center
   - Interactive Tests Center

@@ -128,6 +128,12 @@ const nodes = {
   adminTriageHalt: document.getElementById("adminTriageHalt"),
   adminTriageHotline: document.getElementById("adminTriageHotline"),
   adminTriageResult: document.getElementById("adminTriageResult"),
+  complianceUserId: document.getElementById("complianceUserId"),
+  complianceUseSelectedBtn: document.getElementById("complianceUseSelectedBtn"),
+  complianceExportBtn: document.getElementById("complianceExportBtn"),
+  complianceEraseConfirm: document.getElementById("complianceEraseConfirm"),
+  complianceEraseBtn: document.getElementById("complianceEraseBtn"),
+  complianceResult: document.getElementById("complianceResult"),
 };
 
 function defaultApiBase() {
@@ -853,6 +859,7 @@ function renderAdminUsersTable() {
       nodes.adminTriageReason.value = "";
       nodes.adminTriageHalt.checked = Boolean(user.triage?.halt_coaching);
       nodes.adminTriageHotline.checked = Boolean(user.triage?.show_hotline);
+      nodes.complianceUserId.value = user.user_id;
       renderAdminUsersTable();
     });
     actionCell.appendChild(selectBtn);
@@ -899,6 +906,38 @@ async function submitAdminTriageOverride() {
   state.selectedAdminUserId = userId;
   nodes.adminTriageResult.textContent = JSON.stringify(data, null, 2);
   logActivity("admin triage override", data);
+  await loadAdminUsers();
+}
+
+function resolveComplianceUserId() {
+  const typed = String(nodes.complianceUserId.value || "").trim();
+  if (typed) {
+    return typed;
+  }
+  if (state.selectedAdminUserId) {
+    return state.selectedAdminUserId;
+  }
+  throw new Error("请先输入 user_id 或在用户管理中选择用户");
+}
+
+async function runComplianceExport() {
+  const userId = resolveComplianceUserId();
+  const data = await api(`/api/compliance/${encodeURIComponent(userId)}/export`);
+  nodes.complianceResult.textContent = JSON.stringify(data, null, 2);
+  logActivity("compliance export", { user_id: userId, sections: Object.keys(data || {}) });
+}
+
+async function runComplianceErase() {
+  if (!nodes.complianceEraseConfirm.checked) {
+    throw new Error("请先勾选删除确认");
+  }
+  const userId = resolveComplianceUserId();
+  const data = await api(`/api/compliance/${encodeURIComponent(userId)}/erase`, { method: "POST" });
+  nodes.complianceResult.textContent = JSON.stringify(data, null, 2);
+  logActivity("compliance erase", { user_id: userId, deleted: data.deleted || {} });
+  if (state.selectedAdminUserId === userId) {
+    state.selectedAdminUserId = "";
+  }
   await loadAdminUsers();
 }
 
@@ -1197,6 +1236,32 @@ function bindEvents() {
       const payload = { error: String(error) };
       nodes.adminTriageResult.textContent = JSON.stringify(payload, null, 2);
       logActivity("admin triage override failed", payload, true);
+    }
+  });
+
+  nodes.complianceUseSelectedBtn.addEventListener("click", () => {
+    if (state.selectedAdminUserId) {
+      nodes.complianceUserId.value = state.selectedAdminUserId;
+    }
+  });
+
+  nodes.complianceExportBtn.addEventListener("click", async () => {
+    try {
+      await runComplianceExport();
+    } catch (error) {
+      const payload = { error: String(error) };
+      nodes.complianceResult.textContent = JSON.stringify(payload, null, 2);
+      logActivity("compliance export failed", payload, true);
+    }
+  });
+
+  nodes.complianceEraseBtn.addEventListener("click", async () => {
+    try {
+      await runComplianceErase();
+    } catch (error) {
+      const payload = { error: String(error) };
+      nodes.complianceResult.textContent = JSON.stringify(payload, null, 2);
+      logActivity("compliance erase failed", payload, true);
     }
   });
 }

@@ -65,6 +65,7 @@
           <button class="nav-btn" data-module="observability">Observability</button>
           <button class="nav-btn" data-module="prompt_registry">Prompt 管理</button>
           <button class="nav-btn" data-module="user_management">用户管理</button>
+          <button class="nav-btn" data-module="compliance_ops">数据合规</button>
           <button class="nav-btn" data-module="activity_logs">活动日志</button>
           <button class="nav-btn" data-module="settings">设置</button>
         </nav>
@@ -383,6 +384,27 @@
               </label>
               <pre id="adminTriageResult" class="result">{}</pre>
             </article>
+          </section>
+
+          <section class="module" data-module-panel="compliance_ops">
+            <h3>数据合规操作面板</h3>
+            <p>用于触发用户数据导出与删除（GDPR/隐私请求流程演示）。</p>
+            <div class="setting-box">
+              <label>
+                <span>目标 User ID</span>
+                <input id="complianceUserId" type="text" placeholder="输入 user_id" />
+              </label>
+              <div class="inline-actions">
+                <button id="complianceUseSelectedBtn" class="secondary" type="button">使用已选用户</button>
+                <button id="complianceExportBtn" type="button">导出数据</button>
+              </div>
+              <label class="checkbox-field">
+                <input id="complianceEraseConfirm" type="checkbox" />
+                <span>我确认执行删除（不可逆）</span>
+              </label>
+              <button id="complianceEraseBtn" class="ghost" type="button">删除用户数据</button>
+              <pre id="complianceResult" class="result">{}</pre>
+            </div>
           </section>
 
           <section class="module" data-module-panel="activity_logs">
