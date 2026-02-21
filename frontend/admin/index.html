@@ -64,6 +64,7 @@
           <button class="nav-btn" data-module="safety">安全资源</button>
           <button class="nav-btn" data-module="observability">Observability</button>
           <button class="nav-btn" data-module="prompt_registry">Prompt 管理</button>
+          <button class="nav-btn" data-module="user_management">用户管理</button>
           <button class="nav-btn" data-module="activity_logs">活动日志</button>
           <button class="nav-btn" data-module="settings">设置</button>
         </nav>
@@ -325,6 +326,65 @@
             <pre id="promptActivateResult" class="result">{}</pre>
           </section>
 
+          <section class="module" data-module-panel="user_management">
+            <h3>用户管理面板</h3>
+            <p>查看用户列表、当前分流通道，并支持管理员手动调整 triage。</p>
+            <div class="inline-actions">
+              <label>
+                <span>列表数量</span>
+                <input id="adminUsersLimit" type="number" min="10" max="500" value="100" />
+              </label>
+              <button id="loadAdminUsersBtn" type="button">加载用户列表</button>
+            </div>
+            <div class="obs-table-wrap">
+              <table class="obs-table">
+                <thead>
+                  <tr>
+                    <th>user_id</th>
+                    <th>email</th>
+                    <th>triage</th>
+                    <th>subscription</th>
+                    <th>created_at</th>
+                    <th>action</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersRows"></tbody>
+              </table>
+            </div>
+
+            <article class="obs-box">
+              <h4>手动分流调整</h4>
+              <form id="adminTriageForm" class="obs-filter-row">
+                <label>
+                  <span>User ID</span>
+                  <input id="adminTriageUserId" type="text" placeholder="从列表中选择或手填" required />
+                </label>
+                <label>
+                  <span>目标 channel</span>
+                  <select id="adminTriageChannel">
+                    <option value="green">green</option>
+                    <option value="yellow">yellow</option>
+                    <option value="red">red</option>
+                  </select>
+                </label>
+                <label>
+                  <span>原因（可选）</span>
+                  <input id="adminTriageReason" type="text" placeholder="manual-review" />
+                </label>
+                <button type="submit">应用分流调整</button>
+              </form>
+              <label class="checkbox-field">
+                <input id="adminTriageHalt" type="checkbox" />
+                <span>halt_coaching</span>
+              </label>
+              <label class="checkbox-field">
+                <input id="adminTriageHotline" type="checkbox" />
+                <span>show_hotline</span>
+              </label>
+              <pre id="adminTriageResult" class="result">{}</pre>
+            </article>
+          </section>
+
           <section class="module" data-module-panel="activity_logs">
             <h3>活动日志</h3>
             <p>用于记录所有 API 调用和异常响应。</p>
@@ -334,12 +394,6 @@
           <section class="module" data-module-panel="settings">
             <h3>设置</h3>
             <p>admin 登录与功能范围配置。</p>
-            <div class="setting-box">
-              <h4>用户管理接口</h4>
-              <p>本阶段仅保留 API 入口，完整用户管理 UI 已 deferred。</p>
-              <button id="checkAdminUsersBtn" type="button">检查 /api/admin/users</button>
-              <pre id="adminUsersResult" class="result">{}</pre>
-            </div>
             <div class="setting-box">
               <h4>演示用户</h4>
               <p>互动测试、工具、教练模块会自动创建 demo user。</p>

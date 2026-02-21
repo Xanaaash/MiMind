@@ -286,6 +286,50 @@ class SQLiteStore(InMemoryStore):
         super().save_user(user)
         return user
 
+    def list_users(self, limit: int = 100) -> List[User]:
+        safe_limit = max(1, min(int(limit), 500))
+        with self._lock:
+            rows = self._connection.execute(
+                """
+                SELECT
+                    user_id,
+                    email,
+                    locale,
+                    password_hash,
+                    auth_provider,
+                    email_verified,
+                    email_verification_token,
+                    email_verification_expires_at,
+                    created_at
+                FROM users
+                ORDER BY created_at DESC
+                LIMIT ?
+                """,
+                (safe_limit,),
+            ).fetchall()
+
+        users: List[User] = []
+        for row in rows:
+            user = User(
+                user_id=row["user_id"],
+                email=row["email"],
+                locale=row["locale"],
+                password_hash=row["password_hash"],
+                auth_provider=row["auth_provider"] or "guest",
+                email_verified=bool(row["email_verified"]),
+                email_verification_token=row["email_verification_token"],
+                email_verification_expires_at=datetime.fromisoformat(row["email_verification_expires_at"])
+                if row["email_verification_expires_at"]
+                else None,
+                created_at=datetime.fromisoformat(row["created_at"]),
+            )
+            super().save_user(user)
+            users.append(user)
+
+        if users:
+            return users
+        return super().list_users(limit=safe_limit)
+
     def add_submission(self, submission: AssessmentSubmission) -> None:
         super().add_submission(submission)
         encrypted_payload = self._encrypt_json(submission.responses)

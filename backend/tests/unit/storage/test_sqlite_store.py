@@ -198,6 +198,36 @@ class SQLiteStorePersistenceTests(unittest.TestCase):
             self.assertEqual(user_results[0].result_id, "r-1")
             store_two.close()
 
+    def test_list_users_returns_latest_first_across_store_instances(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            db_path = f"{temp_dir}/mimind.db"
+
+            store_one = SQLiteStore(db_path=db_path)
+            store_one.save_user(
+                User(
+                    user_id="u-old",
+                    email="old@example.com",
+                    locale="en-US",
+                    created_at=datetime(2026, 2, 1, tzinfo=timezone.utc),
+                )
+            )
+            store_one.save_user(
+                User(
+                    user_id="u-new",
+                    email="new@example.com",
+                    locale="en-US",
+                    created_at=datetime(2026, 2, 10, tzinfo=timezone.utc),
+                )
+            )
+            store_one.close()
+
+            store_two = SQLiteStore(db_path=db_path)
+            users = store_two.list_users(limit=10)
+            self.assertEqual(len(users), 2)
+            self.assertEqual(users[0].user_id, "u-new")
+            self.assertEqual(users[1].user_id, "u-old")
+            store_two.close()
+
     def test_coach_sessions_persist_across_store_instances(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             db_path = f"{temp_dir}/mimind.db"

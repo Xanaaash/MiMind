@@ -35,6 +35,8 @@ const state = {
   observabilityRecords: [],
   promptPacks: null,
   activePromptVersion: "",
+  adminUsers: [],
+  selectedAdminUserId: "",
 };
 
 const nodes = {
@@ -116,9 +118,16 @@ const nodes = {
   promptActiveBadge: document.getElementById("promptActiveBadge"),
   promptPackList: document.getElementById("promptPackList"),
   promptActivateResult: document.getElementById("promptActivateResult"),
-
-  checkAdminUsersBtn: document.getElementById("checkAdminUsersBtn"),
-  adminUsersResult: document.getElementById("adminUsersResult"),
+  adminUsersLimit: document.getElementById("adminUsersLimit"),
+  loadAdminUsersBtn: document.getElementById("loadAdminUsersBtn"),
+  adminUsersRows: document.getElementById("adminUsersRows"),
+  adminTriageForm: document.getElementById("adminTriageForm"),
+  adminTriageUserId: document.getElementById("adminTriageUserId"),
+  adminTriageChannel: document.getElementById("adminTriageChannel"),
+  adminTriageReason: document.getElementById("adminTriageReason"),
+  adminTriageHalt: document.getElementById("adminTriageHalt"),
+  adminTriageHotline: document.getElementById("adminTriageHotline"),
+  adminTriageResult: document.getElementById("adminTriageResult"),
 };
 
 function defaultApiBase() {
@@ -802,6 +811,97 @@ async function loadPromptRegistry() {
   });
 }
 
+function renderAdminUsersTable() {
+  nodes.adminUsersRows.innerHTML = "";
+  if (!state.adminUsers.length) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 6;
+    cell.textContent = "暂无用户数据";
+    row.appendChild(cell);
+    nodes.adminUsersRows.appendChild(row);
+    return;
+  }
+
+  state.adminUsers.forEach((user) => {
+    const triage = user.triage?.channel || "n/a";
+    const subscription = user.subscription?.plan_id || "free";
+    const row = document.createElement("tr");
+    if (state.selectedAdminUserId && state.selectedAdminUserId === user.user_id) {
+      row.classList.add("selected-row");
+    }
+
+    const createdAt = new Date(user.created_at);
+    const createdText = Number.isNaN(createdAt.getTime()) ? "-" : createdAt.toLocaleString();
+
+    const cells = [user.user_id, user.email, triage, subscription, createdText];
+    cells.forEach((value) => {
+      const cell = document.createElement("td");
+      cell.textContent = String(value || "-");
+      row.appendChild(cell);
+    });
+
+    const actionCell = document.createElement("td");
+    const selectBtn = document.createElement("button");
+    selectBtn.type = "button";
+    selectBtn.className = "secondary";
+    selectBtn.textContent = "选择";
+    selectBtn.addEventListener("click", () => {
+      state.selectedAdminUserId = user.user_id;
+      nodes.adminTriageUserId.value = user.user_id;
+      nodes.adminTriageChannel.value = String(user.triage?.channel || "green");
+      nodes.adminTriageReason.value = "";
+      nodes.adminTriageHalt.checked = Boolean(user.triage?.halt_coaching);
+      nodes.adminTriageHotline.checked = Boolean(user.triage?.show_hotline);
+      renderAdminUsersTable();
+    });
+    actionCell.appendChild(selectBtn);
+    row.appendChild(actionCell);
+
+    nodes.adminUsersRows.appendChild(row);
+  });
+}
+
+async function loadAdminUsers() {
+  const raw = Number(nodes.adminUsersLimit.value || 100);
+  const limit = Number.isFinite(raw) ? Math.min(Math.max(Math.round(raw), 10), 500) : 100;
+  nodes.adminUsersLimit.value = String(limit);
+  const data = await api(`/api/admin/users?limit=${limit}`);
+  state.adminUsers = Array.isArray(data.items) ? data.items : [];
+  if (state.selectedAdminUserId) {
+    const exists = state.adminUsers.some((item) => item.user_id === state.selectedAdminUserId);
+    if (!exists) {
+      state.selectedAdminUserId = "";
+    }
+  }
+  renderAdminUsersTable();
+  logActivity("admin users loaded", { count: Number(data.count || 0), limit });
+}
+
+async function submitAdminTriageOverride() {
+  const userId = String(nodes.adminTriageUserId.value || "").trim();
+  if (!userId) {
+    throw new Error("user_id is required");
+  }
+
+  const channel = String(nodes.adminTriageChannel.value || "").trim().toLowerCase();
+  const reason = String(nodes.adminTriageReason.value || "").trim();
+  const payload = {
+    channel,
+    reasons: reason ? [reason] : [],
+    halt_coaching: Boolean(nodes.adminTriageHalt.checked),
+    show_hotline: Boolean(nodes.adminTriageHotline.checked),
+  };
+  const data = await api(`/api/admin/users/${encodeURIComponent(userId)}/triage`, {
+    method: "POST",
+    body: payload,
+  });
+  state.selectedAdminUserId = userId;
+  nodes.adminTriageResult.textContent = JSON.stringify(data, null, 2);
+  logActivity("admin triage override", data);
+  await loadAdminUsers();
+}
+
 function bindNavigation() {
   nodes.moduleNav.querySelectorAll(".nav-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
@@ -818,6 +918,12 @@ function bindNavigation() {
           await loadPromptRegistry();
         } catch (error) {
           logActivity("prompt registry load failed", { error: String(error) }, true);
+        }
+      } else if (moduleId === "user_management" && !state.adminUsers.length) {
+        try {
+          await loadAdminUsers();
+        } catch (error) {
+          logActivity("admin users load failed", { error: String(error) }, true);
         }
       }
     });
@@ -1059,18 +1165,6 @@ function bindEvents() {
     }
   });
 
-  nodes.checkAdminUsersBtn.addEventListener("click", async () => {
-    try {
-      const data = await api("/api/admin/users");
-      nodes.adminUsersResult.textContent = JSON.stringify(data, null, 2);
-      logActivity("admin users endpoint", data);
-    } catch (error) {
-      const content = { error: String(error), note: "Expected 501 not implemented in this phase." };
-      nodes.adminUsersResult.textContent = JSON.stringify(content, null, 2);
-      logActivity("admin users endpoint response", content, true);
-    }
-  });
-
   nodes.loadObservabilityBtn.addEventListener("click", async () => {
     try {
       await loadObservabilityDashboard();
@@ -1086,6 +1180,25 @@ function bindEvents() {
       logActivity("prompt registry load failed", { error: String(error) }, true);
     }
   });
+
+  nodes.loadAdminUsersBtn.addEventListener("click", async () => {
+    try {
+      await loadAdminUsers();
+    } catch (error) {
+      logActivity("admin users load failed", { error: String(error) }, true);
+    }
+  });
+
+  nodes.adminTriageForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    try {
+      await submitAdminTriageOverride();
+    } catch (error) {
+      const payload = { error: String(error) };
+      nodes.adminTriageResult.textContent = JSON.stringify(payload, null, 2);
+      logActivity("admin triage override failed", payload, true);
+    }
+  });
 }
 
 async function init() {
@@ -1098,6 +1211,7 @@ async function init() {
   switchModule("home");
   renderObservabilityPanel();
   renderPromptRegistry();
+  renderAdminUsersTable();
 
   const restored = await restoreSession();
   if (!restored) {

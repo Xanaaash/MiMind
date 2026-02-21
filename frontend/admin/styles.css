@@ -486,6 +486,10 @@ code {
   background: #fff2f2;
 }
 
+.obs-table .selected-row td {
+  background: #eef7ff;
+}
+
 .prompt-grid {
   margin-top: 12px;
   display: grid;

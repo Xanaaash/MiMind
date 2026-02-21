@@ -206,14 +206,17 @@ def admin_session(request: Request) -> dict:
 
 
 @app.get("/api/admin/users")
-def admin_users(request: Request) -> JSONResponse:
+def admin_users(request: Request, limit: int = Query(100, ge=1, le=500)) -> dict:
     session_id = request.cookies.get(admin_api.service.cookie_name())
-    status, body = admin_api.get_users(session_id=session_id)
-    if status == 501:
-        return JSONResponse(status_code=501, content=body.get("error", {}))
-    if status >= 400:
-        raise HTTPException(status_code=status, detail=body.get("error", "request failed"))
-    return JSONResponse(status_code=200, content=body.get("data", {}))
+    status, body = admin_api.get_users(session_id=session_id, limit=limit)
+    return _unwrap(status, body)
+
+
+@app.post("/api/admin/users/{user_id}/triage")
+def admin_override_user_triage(user_id: str, request: Request, payload: dict = Body(...)) -> dict:
+    session_id = request.cookies.get(admin_api.service.cookie_name())
+    status, body = admin_api.post_user_triage_override(session_id=session_id, user_id=user_id, payload=payload)
+    return _unwrap(status, body)
 
 
 @app.post("/api/register")

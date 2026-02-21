@@ -100,6 +100,11 @@ class InMemoryStore:
     def get_user(self, user_id: str) -> Optional[User]:
         return self.users.get(user_id)
 
+    def list_users(self, limit: int = 100) -> List[User]:
+        safe_limit = max(1, min(int(limit), 500))
+        items = sorted(self.users.values(), key=lambda item: item.created_at, reverse=True)
+        return items[:safe_limit]
+
     def get_user_by_email(self, email: str) -> Optional[User]:
         normalized = str(email).strip().lower()
         if not normalized:

@@ -32,6 +32,7 @@ export ADMIN_SESSION_TTL_HOURS="8"
 - UI is login-gated and module-driven (sidebar on desktop, top tabs on mobile).
 - Includes admin observability dashboard for model invocation totals, latency distribution and error rate.
 - Includes prompt pack management panel (`/api/prompts/*`) for viewing and activating prompt versions.
+- Includes user management panel (`/api/admin/users`) with manual triage override action.
 - Homepage includes both entry cards:
   - Clinical Scales Center
   - Interactive Tests Center
