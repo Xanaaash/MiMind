@@ -101,7 +101,7 @@ export default function MeditationPlayer() {
         transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
       />
 
-      <div className="relative mx-auto max-w-4xl">
+      <div className="relative mx-auto max-w-3xl">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <button
             type="button"
@@ -118,7 +118,6 @@ export default function MeditationPlayer() {
           <p className="text-sm text-cyan-100/75">{t('tools.meditation_local_audio_note')}</p>
           {activeTrack ? (
             <div className="mt-4 rounded-2xl border border-white/20 bg-white/5 px-4 py-4">
-<<<<<<< HEAD
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 min-w-0">
                   <div
@@ -130,19 +129,6 @@ export default function MeditationPlayer() {
                     <p className="text-xs text-cyan-100/70 uppercase tracking-wider">{t('tools.meditation_now_playing')}</p>
                     <p className="font-semibold text-cyan-50">{t(activeTrack.titleKey)}</p>
                     <p className="text-xs text-cyan-100/75 mt-0.5">{t(activeTrack.descKey)}</p>
-=======
-              <div className="flex items-start gap-4">
-                <img src={activeTrack.cover} alt={t(activeTrack.titleKey)} className="h-20 w-20 rounded-xl object-cover border border-white/20" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs text-cyan-100/70 uppercase tracking-wider">{t('tools.meditation_now_playing')}</p>
-                  <p className="font-semibold text-cyan-50">{t(activeTrack.titleKey)}</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {activeTrack.tagKeys.map((tag) => (
-                      <span key={tag} className="rounded-full border border-cyan-200/30 px-2 py-0.5 text-[11px] text-cyan-100/80">
-                        {t(tag)}
-                      </span>
-                    ))}
->>>>>>> 7f5c721 (feat(meditation): ship 12-track curated playlist with license metadata (T-803))
                   </div>
                 </div>
                 <span className="text-sm text-cyan-100/75">
@@ -181,21 +167,6 @@ export default function MeditationPlayer() {
                 onChange={(e) => handleSeek(Number(e.target.value))}
                 className="w-full mt-3 accent-cyan-300"
               />
-              <div className="mt-3 text-xs text-cyan-100/70 space-y-1">
-                <p>
-                  {t('tools.meditation_meta_source')}:{' '}
-                  <a className="underline" href={activeTrack.sourcePageUrl} target="_blank" rel="noreferrer">
-                    {activeTrack.sourceName}
-                  </a>
-                </p>
-                <p>
-                  {t('tools.meditation_meta_license')}:{' '}
-                  <a className="underline" href={activeTrack.licenseUrl} target="_blank" rel="noreferrer">
-                    {activeTrack.licenseName}
-                  </a>
-                </p>
-                {activeTrack.attribution ? <p>{t('tools.meditation_meta_attribution')}: {activeTrack.attribution}</p> : null}
-              </div>
             </div>
           ) : null}
         </Card>
@@ -210,11 +181,10 @@ export default function MeditationPlayer() {
                 key={track.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.04 }}
+                transition={{ delay: idx * 0.05 }}
               >
                 <Card className={`bg-white/10 border-white/20 backdrop-blur-xl shadow-xl ${isActive ? 'border-cyan-300/60' : ''}`}>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-<<<<<<< HEAD
                     <div className="min-w-0">
                       <div className="flex items-start gap-3">
                         <div
@@ -246,36 +216,6 @@ export default function MeditationPlayer() {
                               {t('tools.meditation_license_label')}: {track.licenseType}
                             </p>
                           </div>
-=======
-                    <div className="min-w-0 flex-1 flex gap-3">
-                      <img src={track.cover} alt={t(track.titleKey)} className="h-16 w-16 rounded-lg object-cover border border-white/20" />
-                      <div className="min-w-0">
-                        <h2 className="font-heading text-lg font-bold text-cyan-50">{t(track.titleKey)}</h2>
-                        <p className="text-sm text-cyan-100/75 mt-1">{t(track.descKey)}</p>
-                        <p className="text-xs text-cyan-100/65 mt-2">
-                          {track.minutes} {t('tools.minutes')}
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {track.tagKeys.map((tag) => (
-                            <span key={tag} className="rounded-full border border-cyan-200/30 px-2 py-0.5 text-[11px] text-cyan-100/80">
-                              {t(tag)}
-                            </span>
-                          ))}
-                        </div>
-                        <div className="mt-2 text-xs text-cyan-100/70 space-y-1">
-                          <p>
-                            {t('tools.meditation_meta_source')}:{' '}
-                            <a className="underline" href={track.sourcePageUrl} target="_blank" rel="noreferrer">
-                              {track.sourceName}
-                            </a>
-                          </p>
-                          <p>
-                            {t('tools.meditation_meta_license')}:{' '}
-                            <a className="underline" href={track.licenseUrl} target="_blank" rel="noreferrer">
-                              {track.licenseName}
-                            </a>
-                          </p>
->>>>>>> 7f5c721 (feat(meditation): ship 12-track curated playlist with license metadata (T-803))
                         </div>
                       </div>
                     </div>
