@@ -17,6 +17,14 @@ ADHD-adapted coaching guidance:
 - Watch for rejection sensitivity cues (RSD): validate first, then reframe collaboratively.
 """.strip()
 
+ASD_HIGH_CONTEXT = """
+ASD-adapted coaching guidance:
+- Use clear, literal, and structured language with minimal metaphor.
+- Prefer systematic analysis: break interpersonal events into concrete steps.
+- Replace broad emotional prompts with specific, answerable questions.
+- Offer social script breakdowns for difficult scenarios (opening, response, boundary).
+""".strip()
+
 
 def build_neurodiversity_prompt_fragments(neurodiversity_scores: Optional[dict]) -> List[str]:
     if not isinstance(neurodiversity_scores, dict) or not neurodiversity_scores:
@@ -26,5 +34,8 @@ def build_neurodiversity_prompt_fragments(neurodiversity_scores: Optional[dict])
     asrs = neurodiversity_scores.get("asrs")
     if isinstance(asrs, dict) and str(asrs.get("level", "")).strip().lower() == "high":
         fragments.append(ADHD_HIGH_CONTEXT)
+    aq10 = neurodiversity_scores.get("aq10")
+    if isinstance(aq10, dict) and str(aq10.get("level", "")).strip().lower() == "high":
+        fragments.append(ASD_HIGH_CONTEXT)
 
     return fragments

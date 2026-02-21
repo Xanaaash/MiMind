@@ -72,6 +72,30 @@ class PromptStackUnitTests(unittest.TestCase):
         self.assertTrue(any("not clinical diagnoses" in item.lower() for item in fragments))
         self.assertTrue(any("adhd-adapted coaching guidance" in item.lower() for item in fragments))
 
+    def test_context_prompt_adds_asd_adaptation_fragment_for_high_aq10(self) -> None:
+        from modules.user.models import User
+
+        self.store.save_user(User(user_id="u1", email="u1@example.com", locale="en-US"))
+        self.store.save_test_result(
+            TestResult(
+                result_id="aq10-high-1",
+                user_id="u1",
+                test_id="aq10",
+                answers={"q1": 3},
+                summary={
+                    "total": 7,
+                    "maxTotal": 10,
+                    "level": "high",
+                },
+            )
+        )
+
+        context = build_context_prompt(self.store, "u1")
+        self.assertEqual(context["neurodiversity_scores"]["aq10"]["level"], "high")
+        fragments = context["neurodiversity_prompt_fragments"]
+        self.assertIsInstance(fragments, list)
+        self.assertTrue(any("asd-adapted coaching guidance" in item.lower() for item in fragments))
+
 
 if __name__ == "__main__":
     unittest.main()
