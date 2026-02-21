@@ -218,7 +218,7 @@
 
 - [✅] **T-715** 删除旧 `ToolsHub.tsx` 及相关无效引用，完成工具路由收口（`/tools` 过渡期保留 1 个迭代，随后移除）
 - [✅] **T-716** 更新 `zh-CN.json` 与 `en-US.json`：补充 `nav.rescue`、`nav.mindfulness`、`tools.rescue.*`、`tools.mindfulness.*`、`tools.manifestation.*` 等文案键值
-- [🔒 codex-0221a] **T-717** 前端回归验证（验收标准）：
+- [✅] **T-717** 前端回归验证（验收标准）：
   - 路由切换时白噪音不中断（`/home -> /coach -> /relief`）
   - 右侧工具栏开合状态跨页面保持
   - 急救舱首屏 1 次点击可启动（呼吸或感官急救）
