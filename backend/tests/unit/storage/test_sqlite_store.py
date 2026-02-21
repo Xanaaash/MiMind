@@ -8,6 +8,7 @@ from backend.tests.bootstrap import configure_import_path
 configure_import_path()
 
 from modules.assessment.models import AssessmentScoreSet, AssessmentSubmission, ReassessmentSchedule
+from modules.coach.models import CoachSession, CoachTurn
 from modules.observability.models import APIAuditLogRecord
 from modules.storage.sqlite_store import SQLiteStore
 from modules.tests.models import TestResult
@@ -39,11 +40,12 @@ class SQLiteStorePersistenceTests(unittest.TestCase):
                 connection.close()
 
             versions = [int(version) for version, _ in rows]
-            self.assertEqual(versions, [1, 2, 3, 4])
+            self.assertEqual(versions, [1, 2, 3, 4, 5])
             self.assertEqual(rows[0][1], "baseline_schema")
             self.assertEqual(rows[1][1], "api_audit_logs")
             self.assertEqual(rows[2][1], "user_password_auth_fields")
             self.assertEqual(rows[3][1], "auth_and_audit_compatibility_backfill")
+            self.assertEqual(rows[4][1], "encrypted_sensitive_storage")
 
     def test_api_audit_logs_persist_across_store_instances(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -72,6 +74,7 @@ class SQLiteStorePersistenceTests(unittest.TestCase):
             self.assertEqual(logs[0].path, "/api/register")
             self.assertEqual(logs[0].user_id, "u-audit")
             store_two.close()
+
     def test_scale_artifacts_persist_across_store_instances(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             db_path = f"{temp_dir}/mimind.db"
@@ -163,6 +166,104 @@ class SQLiteStorePersistenceTests(unittest.TestCase):
             self.assertEqual(user_results[0].result_id, "r-1")
             store_two.close()
 
+    def test_coach_sessions_persist_across_store_instances(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            db_path = f"{temp_dir}/mimind.db"
+
+            store_one = SQLiteStore(db_path=db_path)
+            session = CoachSession(
+                session_id="s-1",
+                user_id="u-coach",
+                style_id="warm_guide",
+                turns=[
+                    CoachTurn(role="user", message="sensitive-coach-message"),
+                    CoachTurn(role="coach", message="supportive reply"),
+                ],
+            )
+            store_one.save_coach_session(session)
+            store_one.close()
+
+            store_two = SQLiteStore(db_path=db_path)
+            restored = store_two.get_coach_session("s-1")
+            self.assertIsNotNone(restored)
+            self.assertEqual(restored.user_id, "u-coach")
+            self.assertEqual(len(restored.turns), 2)
+            self.assertEqual(restored.turns[0].message, "sensitive-coach-message")
+
+            history = store_two.list_user_coach_sessions("u-coach")
+            self.assertEqual(len(history), 1)
+            self.assertEqual(history[0].session_id, "s-1")
+            store_two.close()
+
+    def test_sensitive_payloads_are_encrypted_at_rest(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            db_path = f"{temp_dir}/mimind.db"
+
+            store = SQLiteStore(db_path=db_path)
+            store.add_submission(
+                AssessmentSubmission(
+                    submission_id="sub-secure",
+                    user_id="u-secure",
+                    responses={"notes": "plaintext-marker-submission"},
+                )
+            )
+            store.save_scores(
+                "u-secure",
+                AssessmentScoreSet(
+                    phq9_score=1,
+                    gad7_score=2,
+                    pss10_score=3,
+                    cssrs_positive=False,
+                    scl90_dimension_scores={"marker": 1.0},
+                    scl90_moderate_or_above=False,
+                ),
+            )
+            store.save_test_result(
+                TestResult(
+                    result_id="r-secure",
+                    user_id="u-secure",
+                    test_id="eq",
+                    answers={"marker": "plaintext-marker-test"},
+                    summary={"marker": "plaintext-marker-summary"},
+                )
+            )
+            store.save_coach_session(
+                CoachSession(
+                    session_id="s-secure",
+                    user_id="u-secure",
+                    style_id="warm_guide",
+                    turns=[CoachTurn(role="user", message="plaintext-marker-coach")],
+                )
+            )
+            store.close()
+
+            connection = sqlite3.connect(db_path)
+            try:
+                submission_cipher = connection.execute(
+                    "SELECT payload_encrypted FROM assessment_submissions_secure WHERE submission_id = ?",
+                    ("sub-secure",),
+                ).fetchone()[0]
+                score_cipher = connection.execute(
+                    "SELECT payload_encrypted FROM assessment_scores_secure WHERE user_id = ?",
+                    ("u-secure",),
+                ).fetchone()[0]
+                test_cipher = connection.execute(
+                    "SELECT payload_encrypted FROM test_results_secure WHERE result_id = ?",
+                    ("r-secure",),
+                ).fetchone()[0]
+                coach_cipher = connection.execute(
+                    "SELECT turns_encrypted FROM coach_sessions_secure WHERE session_id = ?",
+                    ("s-secure",),
+                ).fetchone()[0]
+            finally:
+                connection.close()
+
+            self.assertNotIn("plaintext-marker-submission", submission_cipher)
+            self.assertNotIn("plaintext-marker-test", test_cipher)
+            self.assertNotIn("plaintext-marker-summary", test_cipher)
+            self.assertNotIn("plaintext-marker-coach", coach_cipher)
+            self.assertTrue(str(score_cipher).startswith("enc:v1:"))
+
     def test_erase_user_data_removes_persisted_rows(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             db_path = f"{temp_dir}/mimind.db"
@@ -228,6 +329,7 @@ class SQLiteStorePersistenceTests(unittest.TestCase):
             self.assertEqual(deleted["assessment_scores"], 1)
             self.assertEqual(deleted["test_results"], 1)
             self.assertEqual(deleted["api_audit_logs"], 1)
+            self.assertEqual(deleted["coach_sessions"], 0)
 
             store.close()
 

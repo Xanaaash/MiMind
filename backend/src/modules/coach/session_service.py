@@ -69,6 +69,7 @@ class CoachSessionService:
             raise ValueError("user_message is required")
 
         session.turns.append(CoachTurn(role="user", message=user_message))
+        self._store.save_coach_session(session)
 
         scores = self._store.get_scores(session.user_id)
         if scores is None:
@@ -106,6 +107,7 @@ class CoachSessionService:
             session.turns.append(CoachTurn(role="coach", message=crisis_text))
             session.halted_for_safety = True
             session.active = False
+            self._store.save_coach_session(session)
             return {
                 "mode": "crisis",
                 "halted": True,
@@ -117,6 +119,7 @@ class CoachSessionService:
         if action["pause_topic"]:
             safe_text = action["message"]
             session.turns.append(CoachTurn(role="coach", message=safe_text))
+            self._store.save_coach_session(session)
             return {
                 "mode": "safety_pause",
                 "halted": False,
@@ -127,6 +130,7 @@ class CoachSessionService:
 
         reply, model_info = self._generate_coach_reply(session=session, user_message=user_message)
         session.turns.append(CoachTurn(role="coach", message=reply))
+        self._store.save_coach_session(session)
         return {
             "mode": "coaching",
             "halted": False,
@@ -143,6 +147,7 @@ class CoachSessionService:
 
         session.active = False
         session.ended_at = datetime.now(timezone.utc)
+        self._store.save_coach_session(session)
 
         summary = self._summary_service.build_summary(session)
         self._memory_service.index_summary(session.user_id, summary)

@@ -62,7 +62,9 @@ class InMemoryStore:
 
     def save_coach_session(self, session: CoachSession) -> None:
         self.coach_sessions[session.session_id] = session
-        self.user_coach_sessions.setdefault(session.user_id, []).append(session.session_id)
+        session_ids = self.user_coach_sessions.setdefault(session.user_id, [])
+        if session.session_id not in session_ids:
+            session_ids.append(session.session_id)
 
     def save_memory_summary(self, user_id: str, summary: str) -> None:
         self.memory_summaries.setdefault(user_id, []).append(summary)

@@ -3,13 +3,15 @@ from __future__ import annotations
 import json
 import os
 import sqlite3
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from threading import Lock
 from typing import Any, Dict, List, Optional
 
 from modules.admin.models import AdminSession
 from modules.assessment.models import AssessmentScoreSet, AssessmentSubmission, ReassessmentSchedule
+from modules.coach.models import CoachSession, CoachTurn
 from modules.observability.models import APIAuditLogRecord
+from modules.security.crypto import DataEncryptor
 from modules.storage.in_memory import InMemoryStore
 from modules.storage.migrations import apply_sqlite_migrations
 from modules.tests.models import TestResult
@@ -24,6 +26,7 @@ class SQLiteStore(InMemoryStore):
         super().__init__()
         self._db_path = db_path
         self._lock = Lock()
+        self._encryptor = DataEncryptor.from_env()
         self._connection = self._connect(db_path)
         self._initialize_schema()
 
@@ -44,6 +47,64 @@ class SQLiteStore(InMemoryStore):
     def _initialize_schema(self) -> None:
         with self._lock:
             apply_sqlite_migrations(self._connection)
+
+    def _encrypt_json(self, payload: Any) -> str:
+        return self._encryptor.encrypt_json(payload)
+
+    def _decrypt_json(self, value: str) -> Any:
+        return self._encryptor.decrypt_json(value)
+
+    @staticmethod
+    def _score_payload(scores: AssessmentScoreSet) -> Dict[str, Any]:
+        return {
+            "phq9_score": scores.phq9_score,
+            "gad7_score": scores.gad7_score,
+            "pss10_score": scores.pss10_score,
+            "cssrs_positive": bool(scores.cssrs_positive),
+            "scl90_global_index": scores.scl90_global_index,
+            "scl90_dimension_scores": scores.scl90_dimension_scores,
+            "scl90_moderate_or_above": bool(scores.scl90_moderate_or_above),
+        }
+
+    @staticmethod
+    def _hydrate_score_payload(payload: Dict[str, Any]) -> AssessmentScoreSet:
+        return AssessmentScoreSet(
+            phq9_score=int(payload["phq9_score"]),
+            gad7_score=int(payload["gad7_score"]),
+            pss10_score=int(payload["pss10_score"]),
+            cssrs_positive=bool(payload["cssrs_positive"]),
+            scl90_global_index=float(payload["scl90_global_index"])
+            if payload.get("scl90_global_index") is not None
+            else None,
+            scl90_dimension_scores=dict(payload["scl90_dimension_scores"])
+            if payload.get("scl90_dimension_scores") is not None
+            else None,
+            scl90_moderate_or_above=bool(payload.get("scl90_moderate_or_above", False)),
+        )
+
+    @staticmethod
+    def _serialize_turns(turns: List[CoachTurn]) -> List[dict]:
+        return [
+            {
+                "role": turn.role,
+                "message": turn.message,
+                "created_at": turn.created_at.isoformat(),
+            }
+            for turn in turns
+        ]
+
+    @staticmethod
+    def _hydrate_turns(items: List[dict]) -> List[CoachTurn]:
+        turns: List[CoachTurn] = []
+        for item in items:
+            turns.append(
+                CoachTurn(
+                    role=str(item.get("role", "")),
+                    message=str(item.get("message", "")),
+                    created_at=datetime.fromisoformat(str(item.get("created_at"))),
+                )
+            )
+        return turns
 
     def save_user(self, user: User) -> None:
         super().save_user(user)
@@ -135,16 +196,17 @@ class SQLiteStore(InMemoryStore):
 
     def add_submission(self, submission: AssessmentSubmission) -> None:
         super().add_submission(submission)
+        encrypted_payload = self._encrypt_json(submission.responses)
         with self._lock:
             self._connection.execute(
                 """
-                INSERT INTO assessment_submissions (submission_id, user_id, responses_json, submitted_at)
+                INSERT INTO assessment_submissions_secure (submission_id, user_id, payload_encrypted, submitted_at)
                 VALUES (?, ?, ?, ?)
                 """,
                 (
                     submission.submission_id,
                     submission.user_id,
-                    json.dumps(submission.responses, ensure_ascii=False),
+                    encrypted_payload,
                     submission.submitted_at.isoformat(),
                 ),
             )
@@ -161,9 +223,9 @@ class SQLiteStore(InMemoryStore):
                 SELECT
                     submission_id,
                     user_id,
-                    responses_json,
+                    payload_encrypted,
                     submitted_at
-                FROM assessment_submissions
+                FROM assessment_submissions_secure
                 WHERE user_id = ?
                 ORDER BY submitted_at ASC
                 """,
@@ -175,50 +237,87 @@ class SQLiteStore(InMemoryStore):
             submission = AssessmentSubmission(
                 submission_id=row["submission_id"],
                 user_id=row["user_id"],
-                responses=json.loads(row["responses_json"]),
+                responses=self._decrypt_json(row["payload_encrypted"]),
                 submitted_at=datetime.fromisoformat(row["submitted_at"]),
             )
             super().add_submission(submission)
             hydrated.append(submission)
 
-        return hydrated
+        if hydrated:
+            return hydrated
+
+        # Legacy fallback for historical plaintext rows.
+        with self._lock:
+            legacy_rows = self._connection.execute(
+                """
+                SELECT
+                    submission_id,
+                    user_id,
+                    responses_json,
+                    submitted_at
+                FROM assessment_submissions
+                WHERE user_id = ?
+                ORDER BY submitted_at ASC
+                """,
+                (user_id,),
+            ).fetchall()
+
+        migrated: List[AssessmentSubmission] = []
+        for row in legacy_rows:
+            submission = AssessmentSubmission(
+                submission_id=row["submission_id"],
+                user_id=row["user_id"],
+                responses=json.loads(row["responses_json"]),
+                submitted_at=datetime.fromisoformat(row["submitted_at"]),
+            )
+            migrated.append(submission)
+            super().add_submission(submission)
+            with self._lock:
+                self._connection.execute(
+                    """
+                    INSERT OR REPLACE INTO assessment_submissions_secure (
+                        submission_id,
+                        user_id,
+                        payload_encrypted,
+                        submitted_at
+                    )
+                    VALUES (?, ?, ?, ?)
+                    """,
+                    (
+                        submission.submission_id,
+                        submission.user_id,
+                        self._encrypt_json(submission.responses),
+                        submission.submitted_at.isoformat(),
+                    ),
+                )
+                self._connection.execute(
+                    "DELETE FROM assessment_submissions WHERE submission_id = ?",
+                    (submission.submission_id,),
+                )
+                self._connection.commit()
+
+        return migrated
 
     def save_scores(self, user_id: str, scores: AssessmentScoreSet) -> None:
         super().save_scores(user_id, scores)
+        encrypted_payload = self._encrypt_json(self._score_payload(scores))
         with self._lock:
             self._connection.execute(
                 """
-                INSERT INTO assessment_scores (
+                INSERT INTO assessment_scores_secure (
                     user_id,
-                    phq9_score,
-                    gad7_score,
-                    pss10_score,
-                    cssrs_positive,
-                    scl90_global_index,
-                    scl90_dimension_scores_json,
-                    scl90_moderate_or_above
+                    payload_encrypted,
+                    updated_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?)
                 ON CONFLICT(user_id) DO UPDATE SET
-                    phq9_score = excluded.phq9_score,
-                    gad7_score = excluded.gad7_score,
-                    pss10_score = excluded.pss10_score,
-                    cssrs_positive = excluded.cssrs_positive,
-                    scl90_global_index = excluded.scl90_global_index,
-                    scl90_dimension_scores_json = excluded.scl90_dimension_scores_json,
-                    scl90_moderate_or_above = excluded.scl90_moderate_or_above
+                    payload_encrypted = excluded.payload_encrypted,
+                    updated_at = excluded.updated_at
                 """,
                 (
                     user_id,
-                    scores.phq9_score,
-                    scores.gad7_score,
-                    scores.pss10_score,
-                    int(scores.cssrs_positive),
-                    scores.scl90_global_index,
-                    json.dumps(scores.scl90_dimension_scores, ensure_ascii=False)
-                    if scores.scl90_dimension_scores is not None
-                    else None,
-                    int(scores.scl90_moderate_or_above),
+                    encrypted_payload,
+                    datetime.now(timezone.utc).isoformat(),
                 ),
             )
             self._connection.commit()
@@ -233,6 +332,24 @@ class SQLiteStore(InMemoryStore):
                 """
                 SELECT
                     user_id,
+                    payload_encrypted
+                FROM assessment_scores_secure
+                WHERE user_id = ?
+                """,
+                (user_id,),
+            ).fetchone()
+
+        if row is not None:
+            payload = self._decrypt_json(row["payload_encrypted"])
+            scores = self._hydrate_score_payload(payload)
+            super().save_scores(user_id, scores)
+            return scores
+
+        # Legacy fallback for historical plaintext rows.
+        with self._lock:
+            legacy = self._connection.execute(
+                """
+                SELECT
                     phq9_score,
                     gad7_score,
                     pss10_score,
@@ -246,23 +363,38 @@ class SQLiteStore(InMemoryStore):
                 (user_id,),
             ).fetchone()
 
-        if row is None:
+        if legacy is None:
             return None
 
         scores = AssessmentScoreSet(
-            phq9_score=int(row["phq9_score"]),
-            gad7_score=int(row["gad7_score"]),
-            pss10_score=int(row["pss10_score"]),
-            cssrs_positive=bool(row["cssrs_positive"]),
-            scl90_global_index=float(row["scl90_global_index"])
-            if row["scl90_global_index"] is not None
+            phq9_score=int(legacy["phq9_score"]),
+            gad7_score=int(legacy["gad7_score"]),
+            pss10_score=int(legacy["pss10_score"]),
+            cssrs_positive=bool(legacy["cssrs_positive"]),
+            scl90_global_index=float(legacy["scl90_global_index"])
+            if legacy["scl90_global_index"] is not None
             else None,
-            scl90_dimension_scores=json.loads(row["scl90_dimension_scores_json"])
-            if row["scl90_dimension_scores_json"]
+            scl90_dimension_scores=json.loads(legacy["scl90_dimension_scores_json"])
+            if legacy["scl90_dimension_scores_json"]
             else None,
-            scl90_moderate_or_above=bool(row["scl90_moderate_or_above"]),
+            scl90_moderate_or_above=bool(legacy["scl90_moderate_or_above"]),
         )
         super().save_scores(user_id, scores)
+        with self._lock:
+            self._connection.execute(
+                """
+                INSERT OR REPLACE INTO assessment_scores_secure (user_id, payload_encrypted, updated_at)
+                VALUES (?, ?, ?)
+                """,
+                (
+                    user_id,
+                    self._encrypt_json(self._score_payload(scores)),
+                    datetime.now(timezone.utc).isoformat(),
+                ),
+            )
+            self._connection.execute("DELETE FROM assessment_scores WHERE user_id = ?", (user_id,))
+            self._connection.commit()
+
         return scores
 
     def save_triage(self, user_id: str, decision: TriageDecision) -> None:
@@ -375,32 +507,35 @@ class SQLiteStore(InMemoryStore):
 
     def save_test_result(self, result: TestResult) -> None:
         super().save_test_result(result)
+        encrypted_payload = self._encrypt_json(
+            {
+                "answers": result.answers,
+                "summary": result.summary,
+            }
+        )
 
         with self._lock:
             self._connection.execute(
                 """
-                INSERT INTO test_results (
+                INSERT INTO test_results_secure (
                     result_id,
                     user_id,
                     test_id,
-                    answers_json,
-                    summary_json,
+                    payload_encrypted,
                     created_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?)
                 ON CONFLICT(result_id) DO UPDATE SET
                     user_id = excluded.user_id,
                     test_id = excluded.test_id,
-                    answers_json = excluded.answers_json,
-                    summary_json = excluded.summary_json,
+                    payload_encrypted = excluded.payload_encrypted,
                     created_at = excluded.created_at
                 """,
                 (
                     result.result_id,
                     result.user_id,
                     result.test_id,
-                    json.dumps(result.answers, ensure_ascii=False),
-                    json.dumps(result.summary, ensure_ascii=False),
+                    encrypted_payload,
                     result.created_at.isoformat(),
                 ),
             )
@@ -418,6 +553,26 @@ class SQLiteStore(InMemoryStore):
                     result_id,
                     user_id,
                     test_id,
+                    payload_encrypted,
+                    created_at
+                FROM test_results_secure
+                WHERE result_id = ?
+                """,
+                (result_id,),
+            ).fetchone()
+
+        if row is not None:
+            result = self._hydrate_secure_test_result(row)
+            super().save_test_result(result)
+            return result
+
+        with self._lock:
+            legacy = self._connection.execute(
+                """
+                SELECT
+                    result_id,
+                    user_id,
+                    test_id,
                     answers_json,
                     summary_json,
                     created_at
@@ -427,11 +582,33 @@ class SQLiteStore(InMemoryStore):
                 (result_id,),
             ).fetchone()
 
-        if row is None:
+        if legacy is None:
             return None
 
-        result = self._hydrate_test_result(row)
+        result = self._hydrate_test_result(legacy)
         super().save_test_result(result)
+        with self._lock:
+            self._connection.execute(
+                """
+                INSERT OR REPLACE INTO test_results_secure (
+                    result_id,
+                    user_id,
+                    test_id,
+                    payload_encrypted,
+                    created_at
+                )
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    result.result_id,
+                    result.user_id,
+                    result.test_id,
+                    self._encrypt_json({"answers": result.answers, "summary": result.summary}),
+                    result.created_at.isoformat(),
+                ),
+            )
+            self._connection.execute("DELETE FROM test_results WHERE result_id = ?", (result_id,))
+            self._connection.commit()
         return result
 
     def list_user_test_results(self, user_id: str) -> List[TestResult]:
@@ -441,6 +618,31 @@ class SQLiteStore(InMemoryStore):
 
         with self._lock:
             rows = self._connection.execute(
+                """
+                SELECT
+                    result_id,
+                    user_id,
+                    test_id,
+                    payload_encrypted,
+                    created_at
+                FROM test_results_secure
+                WHERE user_id = ?
+                ORDER BY created_at ASC
+                """,
+                (user_id,),
+            ).fetchall()
+
+        hydrated: List[TestResult] = []
+        for row in rows:
+            result = self._hydrate_secure_test_result(row)
+            super().save_test_result(result)
+            hydrated.append(result)
+
+        if hydrated:
+            return hydrated
+
+        with self._lock:
+            legacy_rows = self._connection.execute(
                 """
                 SELECT
                     result_id,
@@ -456,13 +658,35 @@ class SQLiteStore(InMemoryStore):
                 (user_id,),
             ).fetchall()
 
-        hydrated: List[TestResult] = []
-        for row in rows:
+        migrated: List[TestResult] = []
+        for row in legacy_rows:
             result = self._hydrate_test_result(row)
+            migrated.append(result)
             super().save_test_result(result)
-            hydrated.append(result)
+            with self._lock:
+                self._connection.execute(
+                    """
+                    INSERT OR REPLACE INTO test_results_secure (
+                        result_id,
+                        user_id,
+                        test_id,
+                        payload_encrypted,
+                        created_at
+                    )
+                    VALUES (?, ?, ?, ?, ?)
+                    """,
+                    (
+                        result.result_id,
+                        result.user_id,
+                        result.test_id,
+                        self._encrypt_json({"answers": result.answers, "summary": result.summary}),
+                        result.created_at.isoformat(),
+                    ),
+                )
+                self._connection.execute("DELETE FROM test_results WHERE result_id = ?", (result.result_id,))
+                self._connection.commit()
 
-        return hydrated
+        return migrated
 
     def _hydrate_test_result(self, row: sqlite3.Row) -> TestResult:
         return TestResult(
@@ -472,6 +696,132 @@ class SQLiteStore(InMemoryStore):
             answers=json.loads(row["answers_json"]),
             summary=json.loads(row["summary_json"]),
             created_at=datetime.fromisoformat(row["created_at"]),
+        )
+
+    def _hydrate_secure_test_result(self, row: sqlite3.Row) -> TestResult:
+        payload = self._decrypt_json(row["payload_encrypted"])
+        return TestResult(
+            result_id=row["result_id"],
+            user_id=row["user_id"],
+            test_id=row["test_id"],
+            answers=dict(payload.get("answers", {})),
+            summary=dict(payload.get("summary", {})),
+            created_at=datetime.fromisoformat(row["created_at"]),
+        )
+
+    def save_coach_session(self, session: CoachSession) -> None:
+        super().save_coach_session(session)
+        encrypted_turns = self._encrypt_json(self._serialize_turns(session.turns))
+        with self._lock:
+            self._connection.execute(
+                """
+                INSERT INTO coach_sessions_secure (
+                    session_id,
+                    user_id,
+                    style_id,
+                    started_at,
+                    ended_at,
+                    active,
+                    halted_for_safety,
+                    turns_encrypted
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(session_id) DO UPDATE SET
+                    user_id = excluded.user_id,
+                    style_id = excluded.style_id,
+                    started_at = excluded.started_at,
+                    ended_at = excluded.ended_at,
+                    active = excluded.active,
+                    halted_for_safety = excluded.halted_for_safety,
+                    turns_encrypted = excluded.turns_encrypted
+                """,
+                (
+                    session.session_id,
+                    session.user_id,
+                    session.style_id,
+                    session.started_at.isoformat(),
+                    session.ended_at.isoformat() if session.ended_at else None,
+                    int(session.active),
+                    int(session.halted_for_safety),
+                    encrypted_turns,
+                ),
+            )
+            self._connection.commit()
+
+    def get_coach_session(self, session_id: str) -> Optional[CoachSession]:
+        in_memory = super().get_coach_session(session_id)
+        if in_memory is not None:
+            return in_memory
+
+        with self._lock:
+            row = self._connection.execute(
+                """
+                SELECT
+                    session_id,
+                    user_id,
+                    style_id,
+                    started_at,
+                    ended_at,
+                    active,
+                    halted_for_safety,
+                    turns_encrypted
+                FROM coach_sessions_secure
+                WHERE session_id = ?
+                """,
+                (session_id,),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        session = self._hydrate_secure_coach_session(row)
+        super().save_coach_session(session)
+        return session
+
+    def list_user_coach_sessions(self, user_id: str) -> List[CoachSession]:
+        cached = super().list_user_coach_sessions(user_id)
+        if cached:
+            return cached
+
+        with self._lock:
+            rows = self._connection.execute(
+                """
+                SELECT
+                    session_id,
+                    user_id,
+                    style_id,
+                    started_at,
+                    ended_at,
+                    active,
+                    halted_for_safety,
+                    turns_encrypted
+                FROM coach_sessions_secure
+                WHERE user_id = ?
+                ORDER BY started_at ASC
+                """,
+                (user_id,),
+            ).fetchall()
+
+        hydrated: List[CoachSession] = []
+        for row in rows:
+            session = self._hydrate_secure_coach_session(row)
+            super().save_coach_session(session)
+            hydrated.append(session)
+
+        return hydrated
+
+    def _hydrate_secure_coach_session(self, row: sqlite3.Row) -> CoachSession:
+        raw_turns = self._decrypt_json(row["turns_encrypted"])
+        turns_payload = raw_turns if isinstance(raw_turns, list) else []
+        return CoachSession(
+            session_id=row["session_id"],
+            user_id=row["user_id"],
+            style_id=row["style_id"],
+            started_at=datetime.fromisoformat(row["started_at"]),
+            ended_at=datetime.fromisoformat(row["ended_at"]) if row["ended_at"] else None,
+            active=bool(row["active"]),
+            halted_for_safety=bool(row["halted_for_safety"]),
+            turns=self._hydrate_turns(turns_payload),
         )
 
     def save_admin_session(self, session: AdminSession) -> None:
@@ -615,19 +965,27 @@ class SQLiteStore(InMemoryStore):
         with self._lock:
             persisted_counts = {
                 "assessment_submissions": self._count_rows("assessment_submissions", user_id),
+                "assessment_submissions_secure": self._count_rows("assessment_submissions_secure", user_id),
                 "assessment_scores": self._count_rows("assessment_scores", user_id),
+                "assessment_scores_secure": self._count_rows("assessment_scores_secure", user_id),
                 "triage_decisions": self._count_rows("triage_decisions", user_id),
                 "reassessment_schedules": self._count_rows("reassessment_schedules", user_id),
                 "test_results": self._count_rows("test_results", user_id),
+                "test_results_secure": self._count_rows("test_results_secure", user_id),
+                "coach_sessions_secure": self._count_rows("coach_sessions_secure", user_id),
                 "api_audit_logs": self._count_rows("api_audit_logs", user_id),
                 "user": self._count_rows("users", user_id),
             }
 
             self._connection.execute("DELETE FROM assessment_submissions WHERE user_id = ?", (user_id,))
+            self._connection.execute("DELETE FROM assessment_submissions_secure WHERE user_id = ?", (user_id,))
             self._connection.execute("DELETE FROM assessment_scores WHERE user_id = ?", (user_id,))
+            self._connection.execute("DELETE FROM assessment_scores_secure WHERE user_id = ?", (user_id,))
             self._connection.execute("DELETE FROM triage_decisions WHERE user_id = ?", (user_id,))
             self._connection.execute("DELETE FROM reassessment_schedules WHERE user_id = ?", (user_id,))
             self._connection.execute("DELETE FROM test_results WHERE user_id = ?", (user_id,))
+            self._connection.execute("DELETE FROM test_results_secure WHERE user_id = ?", (user_id,))
+            self._connection.execute("DELETE FROM coach_sessions_secure WHERE user_id = ?", (user_id,))
             self._connection.execute("DELETE FROM api_audit_logs WHERE user_id = ?", (user_id,))
             self._connection.execute("DELETE FROM users WHERE user_id = ?", (user_id,))
             self._connection.commit()
@@ -638,11 +996,17 @@ class SQLiteStore(InMemoryStore):
             **in_memory_counts,
             "assessment_submissions": max(
                 in_memory_counts.get("assessment_submissions", 0),
-                persisted_counts["assessment_submissions"],
+                max(
+                    persisted_counts["assessment_submissions"],
+                    persisted_counts["assessment_submissions_secure"],
+                ),
             ),
             "assessment_scores": max(
                 in_memory_counts.get("assessment_scores", 0),
-                persisted_counts["assessment_scores"],
+                max(
+                    persisted_counts["assessment_scores"],
+                    persisted_counts["assessment_scores_secure"],
+                ),
             ),
             "triage_decisions": max(
                 in_memory_counts.get("triage_decisions", 0),
@@ -654,7 +1018,14 @@ class SQLiteStore(InMemoryStore):
             ),
             "test_results": max(
                 in_memory_counts.get("test_results", 0),
-                persisted_counts["test_results"],
+                max(
+                    persisted_counts["test_results"],
+                    persisted_counts["test_results_secure"],
+                ),
+            ),
+            "coach_sessions": max(
+                in_memory_counts.get("coach_sessions", 0),
+                persisted_counts["coach_sessions_secure"],
             ),
             "api_audit_logs": max(
                 in_memory_counts.get("api_audit_logs", 0),

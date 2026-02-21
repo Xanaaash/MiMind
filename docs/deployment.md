@@ -25,6 +25,7 @@ cp .env.example .env
 
 - `ADMIN_PASSWORD`
 - `AUTH_JWT_SECRET`
+- `MIMIND_DATA_ENCRYPTION_KEY`
 
 若模型 provider 使用 `openai`，还需设置：
 

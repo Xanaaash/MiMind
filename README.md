@@ -80,6 +80,7 @@
 - 生产环境至少应配置：
   - `ADMIN_PASSWORD`
   - `AUTH_JWT_SECRET`
+  - `MIMIND_DATA_ENCRYPTION_KEY`
 - 当模型 provider 使用 `openai` 时，还需配置：
   - `OPENAI_API_KEY`
 - 音频资源托管可选配置：

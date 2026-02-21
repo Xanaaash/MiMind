@@ -163,6 +163,60 @@ MIGRATIONS: List[SQLiteMigration] = [
             """,
         ],
     ),
+    SQLiteMigration(
+        version=5,
+        name="encrypted_sensitive_storage",
+        statements=[
+            """
+            CREATE TABLE IF NOT EXISTS assessment_submissions_secure (
+                submission_id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                payload_encrypted TEXT NOT NULL,
+                submitted_at TEXT NOT NULL
+            )
+            """,
+            """
+            CREATE INDEX IF NOT EXISTS idx_assessment_submissions_secure_user_id
+            ON assessment_submissions_secure (user_id, submitted_at)
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS assessment_scores_secure (
+                user_id TEXT PRIMARY KEY,
+                payload_encrypted TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS test_results_secure (
+                result_id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                test_id TEXT NOT NULL,
+                payload_encrypted TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+            """,
+            """
+            CREATE INDEX IF NOT EXISTS idx_test_results_secure_user_id
+            ON test_results_secure (user_id, created_at)
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS coach_sessions_secure (
+                session_id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                style_id TEXT NOT NULL,
+                started_at TEXT NOT NULL,
+                ended_at TEXT,
+                active INTEGER NOT NULL,
+                halted_for_safety INTEGER NOT NULL,
+                turns_encrypted TEXT NOT NULL
+            )
+            """,
+            """
+            CREATE INDEX IF NOT EXISTS idx_coach_sessions_secure_user_id
+            ON coach_sessions_secure (user_id, started_at)
+            """,
+        ],
+    ),
 ]
 
 
