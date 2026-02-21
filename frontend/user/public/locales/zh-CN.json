@@ -300,10 +300,15 @@
   "relief": {
     "title": "急救舱",
     "subtitle": "当你感觉被压垮时，先停下来。这里提供最快可用的稳定工具，帮助你回到可承受节奏。",
+    "minimal_hint": "先做一件事就好。减少刺激，慢慢把身体带回安全区。",
+    "quick_pink_caption": "低频稳定",
+    "quick_pink_start": "一键启动粉红噪音",
+    "quick_pink_running": "粉红噪音播放中",
     "quick_sensory_title": "一键进入感官急救",
     "quick_sensory_desc": "优先降低噪音与刺激，快速建立安全感。",
     "quick_breath_title": "一键开始呼吸引导",
-    "quick_breath_desc": "跟随节奏呼吸，先把神经系统慢下来。"
+    "quick_breath_desc": "跟随节奏呼吸，先把神经系统慢下来。",
+    "stop_all_audio": "停止全部声音"
   },
   "journal": {
     "title": "情绪日记",

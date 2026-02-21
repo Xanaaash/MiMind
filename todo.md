@@ -201,7 +201,7 @@
 
 - [✅] **T-705** 新建 `frontend/user/src/pages/Relief/ReliefHub.tsx` + 路由 `/relief`，导航栏增加高优先级入口（急救舱）
 - [✅] **T-706** 迁移 `BreathingExercise.tsx`、`SensoryRelief.tsx` 到 Relief 模块，默认首屏提供一键启动的大按钮交互
-- [🔒 codex-0221b] **T-707** 急救模式 UX 强化：最少文字说明 + 防过载黑屏 + 低频粉红噪音快速入口（首屏 1 次点击即可启动）
+- [✅] **T-707** 急救模式 UX 强化：最少文字说明 + 防过载黑屏 + 低频粉红噪音快速入口（首屏 1 次点击即可启动）
 
 ### 7.4 执行批次 D（P1 心灵空间）
 
