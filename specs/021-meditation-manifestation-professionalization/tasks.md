@@ -29,10 +29,10 @@
 
 ### Phase 4: Testing & Validation
 
-- [ ] **T4.1 / T-809** Unit tests：补齐前端状态/组件与后端服务单元覆盖
-- [ ] **T4.2 / T-809** contract tests：补齐 API contract 与关键路由 E2E 冒烟
-- [ ] **T4.3 / T-809** Safety：验证专业问答与内容升级不突破安全红线
-- [ ] **T4.4 / T-809** 执行 `scripts/constitution-check.sh` 与 `scripts/spec-status.sh` 并输出回归报告 - `docs/qa/t809-regression-report.md`
+- [x] **T4.1 / T-809** Unit tests：补齐前端状态/组件与后端服务单元覆盖
+- [x] **T4.2 / T-809** contract tests：补齐 API contract 与关键路由 E2E 冒烟
+- [x] **T4.3 / T-809** Safety：验证专业问答与内容升级不突破安全红线
+- [x] **T4.4 / T-809** 执行 `scripts/constitution-check.sh` 与 `scripts/spec-status.sh` 并输出回归报告 - `docs/qa/t809-regression-report.md`
 
 ## Dependencies
 
