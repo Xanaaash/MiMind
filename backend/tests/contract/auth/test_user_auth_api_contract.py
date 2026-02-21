@@ -129,6 +129,40 @@ class UserAuthAPIContractTests(unittest.TestCase):
         self.assertTrue(body["data"]["email_verification"]["required"])
         self.assertIn("token", body["data"]["email_verification"])
 
+    def test_password_reset_request_and_confirm_contract(self) -> None:
+        email = f"reset-{uuid4().hex[:8]}@example.com"
+        self.api.post_register(
+            {
+                "email": email,
+                "password": "StrongPass123",
+                "locale": "en-US",
+                "policy_version": "2026.02",
+            }
+        )
+
+        status, body = self.api.post_forgot_password({"email": email})
+        self.assertEqual(status, 200)
+        self.assertTrue(body["data"]["reset_requested"])
+
+        user = self.store.get_user_by_email(email)
+        self.assertIsNotNone(user)
+        self.assertIsNotNone(user.password_reset_token)
+
+        reset_status, reset_body = self.api.post_reset_password(
+            {
+                "token": user.password_reset_token,
+                "password": "NewPass123",
+            }
+        )
+        self.assertEqual(reset_status, 200)
+        self.assertTrue(reset_body["data"]["reset"])
+
+        login_status, _, login_tokens = self.api.post_login(
+            {"email": email, "password": "NewPass123"}
+        )
+        self.assertEqual(login_status, 200)
+        self.assertIsNotNone(login_tokens)
+
 
 if __name__ == "__main__":
     unittest.main()

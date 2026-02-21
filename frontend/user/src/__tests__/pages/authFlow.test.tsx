@@ -4,7 +4,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Auth from '../../pages/Auth/Auth';
 import { useAuthStore } from '../../stores/auth';
-import { authLogin, authRegister, getEntitlements } from '../../api/auth';
+import { authLogin, authRegister, getEntitlements, requestPasswordReset, resetPassword } from '../../api/auth';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -17,6 +17,8 @@ vi.mock('../../api/auth', () => ({
   authLogin: vi.fn(),
   authRegister: vi.fn(),
   getEntitlements: vi.fn(),
+  requestPasswordReset: vi.fn(),
+  resetPassword: vi.fn(),
 }));
 
 describe('Auth page password flow', () => {
@@ -26,6 +28,8 @@ describe('Auth page password flow', () => {
     vi.mocked(authLogin).mockReset();
     vi.mocked(authRegister).mockReset();
     vi.mocked(getEntitlements).mockReset();
+    vi.mocked(requestPasswordReset).mockReset();
+    vi.mocked(resetPassword).mockReset();
   });
 
   it('logs in with /api/auth/login and stores user session fields', async () => {
@@ -88,5 +92,37 @@ describe('Auth page password flow', () => {
       expect(authRegister).toHaveBeenCalledWith('signup@example.com', 'Pass1234', 'en-US', '2026.02'),
     );
     await waitFor(() => expect(useAuthStore.getState().userId).toBe('u-auth-register'));
+  });
+
+  it('supports forgot password request flow', async () => {
+    vi.mocked(requestPasswordReset).mockResolvedValue({ reset_requested: true });
+
+    render(
+      <MemoryRouter>
+        <Auth />
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'auth.forgot_password' }));
+    fireEvent.change(screen.getByPlaceholderText('auth.email_placeholder'), { target: { value: 'forgot@example.com' } });
+    fireEvent.click(screen.getByRole('button', { name: 'auth.send_reset_link' }));
+
+    await waitFor(() => expect(requestPasswordReset).toHaveBeenCalledWith('forgot@example.com'));
+  });
+
+  it('supports reset password flow when token is present in query', async () => {
+    vi.mocked(resetPassword).mockResolvedValue({ reset: true });
+
+    render(
+      <MemoryRouter initialEntries={['/auth?token=reset-token-1']}>
+        <Auth />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('heading', { name: 'auth.reset_password' })).toBeInTheDocument();
+    fireEvent.change(screen.getByPlaceholderText('auth.password_placeholder'), { target: { value: 'Pass1234' } });
+    fireEvent.click(screen.getByRole('button', { name: 'auth.reset_password_submit' }));
+
+    await waitFor(() => expect(resetPassword).toHaveBeenCalledWith('reset-token-1', 'Pass1234'));
   });
 });

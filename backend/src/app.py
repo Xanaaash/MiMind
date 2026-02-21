@@ -289,6 +289,18 @@ def auth_resend_verification(payload: dict = Body(...)) -> dict:
     return _unwrap(status, body)
 
 
+@app.post("/api/auth/password/forgot")
+def auth_forgot_password(payload: dict = Body(...)) -> dict:
+    status, body = user_auth_api.post_forgot_password(payload)
+    return _unwrap(status, body)
+
+
+@app.post("/api/auth/password/reset")
+def auth_reset_password(payload: dict = Body(...)) -> dict:
+    status, body = user_auth_api.post_reset_password(payload)
+    return _unwrap(status, body)
+
+
 @app.post("/api/assessment/{user_id}")
 def submit_assessment(user_id: str, payload: dict = Body(...)) -> dict:
     status, body = onboarding_api.post_assessment(user_id=user_id, payload=payload)

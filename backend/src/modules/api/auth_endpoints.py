@@ -135,3 +135,28 @@ class UserAuthAPI:
             message = str(error)
             status = 400 if message in {"email is required", "Email verification not required"} else 404
             return status, {"error": message}
+
+    def post_forgot_password(self, payload: Dict[str, Any]) -> Tuple[int, Dict[str, Any]]:
+        try:
+            email = str(payload.get("email", "")).strip()
+            if not email:
+                raise ValueError("email is required")
+            self._auth.request_password_reset(email=email)
+            return 200, {"data": {"reset_requested": True}}
+        except ValueError as error:
+            return 400, {"error": str(error)}
+
+    def post_reset_password(self, payload: Dict[str, Any]) -> Tuple[int, Dict[str, Any]]:
+        try:
+            token = str(payload.get("token", "")).strip()
+            password = str(payload.get("password", ""))
+            if not token:
+                raise ValueError("token is required")
+            if not password:
+                raise ValueError("password is required")
+            self._auth.reset_password(token=token, password=password)
+            return 200, {"data": {"reset": True}}
+        except ValueError as error:
+            message = str(error)
+            status = 404 if message == "Password reset token is invalid" else 400
+            return status, {"error": message}

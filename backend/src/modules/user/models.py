@@ -13,4 +13,6 @@ class User:
     email_verified: bool = True
     email_verification_token: Optional[str] = None
     email_verification_expires_at: Optional[datetime] = None
+    password_reset_token: Optional[str] = None
+    password_reset_expires_at: Optional[datetime] = None
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))

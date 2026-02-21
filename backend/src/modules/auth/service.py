@@ -192,6 +192,41 @@ class AuthService:
         self._store.save_user(user)
         return user
 
+    def request_password_reset(self, email: str) -> None:
+        normalized = str(email).strip().lower()
+        if not normalized:
+            raise ValueError("email is required")
+
+        user = self._store.get_user_by_email(normalized)
+        if user is None or user.auth_provider != "password":
+            return
+
+        user.password_reset_token = uuid.uuid4().hex
+        user.password_reset_expires_at = datetime.now(timezone.utc) + timedelta(
+            minutes=self._config.password_reset_ttl_minutes
+        )
+        self._store.save_user(user)
+
+    def reset_password(self, token: str, password: str) -> User:
+        normalized = str(token).strip()
+        if not normalized:
+            raise ValueError("token is required")
+
+        user = self._store.get_user_by_password_reset_token(normalized)
+        if user is None:
+            raise ValueError("Password reset token is invalid")
+        if user.auth_provider != "password":
+            raise ValueError("Password reset token is invalid")
+        if user.password_reset_expires_at is not None and user.password_reset_expires_at <= datetime.now(timezone.utc):
+            raise ValueError("Password reset token expired")
+
+        validate_password_strength(password)
+        user.password_hash = hash_password(password)
+        user.password_reset_token = None
+        user.password_reset_expires_at = None
+        self._store.save_user(user)
+        return user
+
     @staticmethod
     def access_cookie_name() -> str:
         return "mc_access_token"

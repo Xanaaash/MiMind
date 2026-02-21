@@ -125,7 +125,14 @@
     "have_account": "Already have an account?",
     "no_account": "Don't have an account?",
     "go_login": "Log in",
-    "go_register": "Sign up"
+    "go_register": "Sign up",
+    "forgot_password": "Forgot password?",
+    "send_reset_link": "Send reset link",
+    "reset_password": "Reset password",
+    "reset_password_submit": "Set new password",
+    "reset_email_sent": "If this email is registered, we have sent a reset link.",
+    "reset_success": "Password reset successful. Please sign in with your new password.",
+    "reset_token_invalid": "Reset link is invalid or expired. Please request a new one."
   },
   "onboarding": {
     "title": "Complete Your Initial Screening",

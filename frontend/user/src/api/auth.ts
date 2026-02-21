@@ -34,6 +34,14 @@ export function authLogout() {
   return api.post<{ authenticated: boolean }>('/api/auth/logout');
 }
 
+export function requestPasswordReset(email: string) {
+  return api.post<{ reset_requested: boolean }>('/api/auth/password/forgot', { email });
+}
+
+export function resetPassword(token: string, password: string) {
+  return api.post<{ reset: boolean }>('/api/auth/password/reset', { token, password });
+}
+
 export function submitAssessment(userId: string, responses: Record<string, unknown>) {
   return api.post<{ scores: unknown; triage: unknown; schedule: unknown }>(
     `/api/assessment/${userId}`,

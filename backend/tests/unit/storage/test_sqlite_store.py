@@ -40,13 +40,14 @@ class SQLiteStorePersistenceTests(unittest.TestCase):
                 connection.close()
 
             versions = [int(version) for version, _ in rows]
-            self.assertEqual(versions, [1, 2, 3, 4, 5, 6])
+            self.assertEqual(versions, [1, 2, 3, 4, 5, 6, 7])
             self.assertEqual(rows[0][1], "baseline_schema")
             self.assertEqual(rows[1][1], "api_audit_logs")
             self.assertEqual(rows[2][1], "user_password_auth_fields")
             self.assertEqual(rows[3][1], "auth_and_audit_compatibility_backfill")
             self.assertEqual(rows[4][1], "encrypted_sensitive_storage")
             self.assertEqual(rows[5][1], "user_email_verification_fields")
+            self.assertEqual(rows[6][1], "user_password_reset_fields")
 
     def test_user_email_verification_fields_persist_across_store_instances(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -77,6 +78,34 @@ class SQLiteStorePersistenceTests(unittest.TestCase):
             by_token = store_two.get_user_by_email_verification_token("verify-token-1")
             self.assertIsNotNone(by_token)
             self.assertEqual(by_token.user_id, "u-verify")
+            store_two.close()
+
+    def test_user_password_reset_fields_persist_across_store_instances(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            db_path = f"{temp_dir}/mimind.db"
+
+            store_one = SQLiteStore(db_path=db_path)
+            expires_at = datetime(2026, 3, 2, tzinfo=timezone.utc)
+            user = User(
+                user_id="u-reset",
+                email="reset@example.com",
+                locale="en-US",
+                auth_provider="password",
+                password_reset_token="reset-token-1",
+                password_reset_expires_at=expires_at,
+            )
+            store_one.save_user(user)
+            store_one.close()
+
+            store_two = SQLiteStore(db_path=db_path)
+            restored = store_two.get_user("u-reset")
+            self.assertIsNotNone(restored)
+            self.assertEqual(restored.password_reset_token, "reset-token-1")
+            self.assertEqual(restored.password_reset_expires_at, expires_at)
+
+            by_token = store_two.get_user_by_password_reset_token("reset-token-1")
+            self.assertIsNotNone(by_token)
+            self.assertEqual(by_token.user_id, "u-reset")
             store_two.close()
 
     def test_api_audit_logs_persist_across_store_instances(self) -> None:

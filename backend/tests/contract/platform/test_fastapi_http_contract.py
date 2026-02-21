@@ -61,6 +61,50 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         session_after_logout = self.client.get("/api/auth/session")
         self.assertEqual(session_after_logout.status_code, 401)
 
+    def test_user_auth_password_reset_http(self) -> None:
+        email = f"auth-reset-{uuid4().hex[:8]}@example.com"
+        register = self.client.post(
+            "/api/auth/register",
+            json={
+                "email": email,
+                "password": "StrongPass123",
+                "locale": "en-US",
+                "policy_version": "2026.02",
+            },
+        )
+        self.assertEqual(register.status_code, 201)
+
+        forgot = self.client.post(
+            "/api/auth/password/forgot",
+            json={"email": email},
+        )
+        self.assertEqual(forgot.status_code, 200)
+        self.assertTrue(forgot.json()["reset_requested"])
+
+        verify_token = register.json()["email_verification"]["token"]
+        verify = self.client.post("/api/auth/verify-email", json={"token": verify_token})
+        self.assertEqual(verify.status_code, 200)
+
+        from app import store  # local import to avoid circular in module load
+
+        user = store.get_user_by_email(email)
+        self.assertIsNotNone(user)
+        self.assertIsNotNone(user.password_reset_token)
+
+        reset = self.client.post(
+            "/api/auth/password/reset",
+            json={"token": user.password_reset_token, "password": "NewPass123"},
+        )
+        self.assertEqual(reset.status_code, 200)
+        self.assertTrue(reset.json()["reset"])
+
+        login = self.client.post(
+            "/api/auth/login",
+            json={"email": email, "password": "NewPass123"},
+        )
+        self.assertEqual(login.status_code, 200)
+        self.assertTrue(login.json()["authenticated"])
+
     def test_prompt_catalog_http(self) -> None:
         packs = self.client.get("/api/prompts/packs")
         self.assertEqual(packs.status_code, 200)

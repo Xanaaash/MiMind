@@ -120,9 +120,11 @@ class SQLiteStore(InMemoryStore):
                     email_verified,
                     email_verification_token,
                     email_verification_expires_at,
+                    password_reset_token,
+                    password_reset_expires_at,
                     created_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(user_id) DO UPDATE SET
                     email = excluded.email,
                     locale = excluded.locale,
@@ -131,6 +133,8 @@ class SQLiteStore(InMemoryStore):
                     email_verified = excluded.email_verified,
                     email_verification_token = excluded.email_verification_token,
                     email_verification_expires_at = excluded.email_verification_expires_at,
+                    password_reset_token = excluded.password_reset_token,
+                    password_reset_expires_at = excluded.password_reset_expires_at,
                     created_at = excluded.created_at
                 """,
                 (
@@ -142,6 +146,8 @@ class SQLiteStore(InMemoryStore):
                     int(user.email_verified),
                     user.email_verification_token,
                     user.email_verification_expires_at.isoformat() if user.email_verification_expires_at else None,
+                    user.password_reset_token,
+                    user.password_reset_expires_at.isoformat() if user.password_reset_expires_at else None,
                     user.created_at.isoformat(),
                 ),
             )
@@ -164,6 +170,8 @@ class SQLiteStore(InMemoryStore):
                     email_verified,
                     email_verification_token,
                     email_verification_expires_at,
+                    password_reset_token,
+                    password_reset_expires_at,
                     created_at
                 FROM users
                 WHERE user_id = ?
@@ -184,6 +192,10 @@ class SQLiteStore(InMemoryStore):
             email_verification_token=row["email_verification_token"],
             email_verification_expires_at=datetime.fromisoformat(row["email_verification_expires_at"])
             if row["email_verification_expires_at"]
+            else None,
+            password_reset_token=row["password_reset_token"],
+            password_reset_expires_at=datetime.fromisoformat(row["password_reset_expires_at"])
+            if row["password_reset_expires_at"]
             else None,
             created_at=datetime.fromisoformat(row["created_at"]),
         )
@@ -211,6 +223,8 @@ class SQLiteStore(InMemoryStore):
                     email_verified,
                     email_verification_token,
                     email_verification_expires_at,
+                    password_reset_token,
+                    password_reset_expires_at,
                     created_at
                 FROM users
                 WHERE email = ?
@@ -232,6 +246,10 @@ class SQLiteStore(InMemoryStore):
             email_verification_token=row["email_verification_token"],
             email_verification_expires_at=datetime.fromisoformat(row["email_verification_expires_at"])
             if row["email_verification_expires_at"]
+            else None,
+            password_reset_token=row["password_reset_token"],
+            password_reset_expires_at=datetime.fromisoformat(row["password_reset_expires_at"])
+            if row["password_reset_expires_at"]
             else None,
             created_at=datetime.fromisoformat(row["created_at"]),
         )
@@ -259,6 +277,8 @@ class SQLiteStore(InMemoryStore):
                     email_verified,
                     email_verification_token,
                     email_verification_expires_at,
+                    password_reset_token,
+                    password_reset_expires_at,
                     created_at
                 FROM users
                 WHERE email_verification_token = ?
@@ -281,6 +301,64 @@ class SQLiteStore(InMemoryStore):
             email_verification_expires_at=datetime.fromisoformat(row["email_verification_expires_at"])
             if row["email_verification_expires_at"]
             else None,
+            password_reset_token=row["password_reset_token"],
+            password_reset_expires_at=datetime.fromisoformat(row["password_reset_expires_at"])
+            if row["password_reset_expires_at"]
+            else None,
+            created_at=datetime.fromisoformat(row["created_at"]),
+        )
+        super().save_user(user)
+        return user
+
+    def get_user_by_password_reset_token(self, token: str) -> Optional[User]:
+        in_memory = super().get_user_by_password_reset_token(token)
+        if in_memory is not None:
+            return in_memory
+
+        normalized = str(token).strip()
+        if not normalized:
+            return None
+
+        with self._lock:
+            row = self._connection.execute(
+                """
+                SELECT
+                    user_id,
+                    email,
+                    locale,
+                    password_hash,
+                    auth_provider,
+                    email_verified,
+                    email_verification_token,
+                    email_verification_expires_at,
+                    password_reset_token,
+                    password_reset_expires_at,
+                    created_at
+                FROM users
+                WHERE password_reset_token = ?
+                LIMIT 1
+                """,
+                (normalized,),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        user = User(
+            user_id=row["user_id"],
+            email=row["email"],
+            locale=row["locale"],
+            password_hash=row["password_hash"],
+            auth_provider=row["auth_provider"] or "guest",
+            email_verified=bool(row["email_verified"]),
+            email_verification_token=row["email_verification_token"],
+            email_verification_expires_at=datetime.fromisoformat(row["email_verification_expires_at"])
+            if row["email_verification_expires_at"]
+            else None,
+            password_reset_token=row["password_reset_token"],
+            password_reset_expires_at=datetime.fromisoformat(row["password_reset_expires_at"])
+            if row["password_reset_expires_at"]
+            else None,
             created_at=datetime.fromisoformat(row["created_at"]),
         )
         super().save_user(user)
@@ -300,6 +378,8 @@ class SQLiteStore(InMemoryStore):
                     email_verified,
                     email_verification_token,
                     email_verification_expires_at,
+                    password_reset_token,
+                    password_reset_expires_at,
                     created_at
                 FROM users
                 ORDER BY created_at DESC
@@ -320,6 +400,10 @@ class SQLiteStore(InMemoryStore):
                 email_verification_token=row["email_verification_token"],
                 email_verification_expires_at=datetime.fromisoformat(row["email_verification_expires_at"])
                 if row["email_verification_expires_at"]
+                else None,
+                password_reset_token=row["password_reset_token"],
+                password_reset_expires_at=datetime.fromisoformat(row["password_reset_expires_at"])
+                if row["password_reset_expires_at"]
                 else None,
                 created_at=datetime.fromisoformat(row["created_at"]),
             )

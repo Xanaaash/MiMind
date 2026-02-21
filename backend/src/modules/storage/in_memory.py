@@ -123,6 +123,15 @@ class InMemoryStore:
                 return user
         return None
 
+    def get_user_by_password_reset_token(self, token: str) -> Optional[User]:
+        normalized = str(token).strip()
+        if not normalized:
+            return None
+        for user in self.users.values():
+            if user.password_reset_token == normalized:
+                return user
+        return None
+
     def get_scores(self, user_id: str) -> Optional[AssessmentScoreSet]:
         return self.scores.get(user_id)
 
