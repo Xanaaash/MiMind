@@ -193,7 +193,7 @@
 > **依赖顺序**：`T-702 -> T-703`（依赖 `T-701/T-704`）
 
 - [✅] **T-702** 新建 `frontend/user/src/components/FloatingToolbar/` 右侧抽屉组件：包含迷你番茄钟 + 白噪音混音器（支持雨声/咖啡馆等叠加）
-- [ ] **T-703** 重构 `frontend/user/src/components/Layout/AppLayout.tsx`：将 `FloatingToolbar` 提升到 `<Outlet />` 之外，确保跨路由常驻
+- [🔒 codex-0221b] **T-703** 重构 `frontend/user/src/components/Layout/AppLayout.tsx`：将 `FloatingToolbar` 提升到 `<Outlet />` 之外，确保跨路由常驻
 
 ### 7.3 执行批次 C（P0 急救舱上线）
 
