@@ -52,3 +52,30 @@ class ObservabilityAPI:
             return 200, {"data": summary}
         except ValueError as error:
             return 400, {"error": str(error)}
+
+    def get_api_audit_logs(
+        self,
+        limit: int = 100,
+        method: Optional[str] = None,
+        path: Optional[str] = None,
+        status_code: Optional[int] = None,
+        user_id: Optional[str] = None,
+    ) -> Tuple[int, Dict[str, Any]]:
+        try:
+            safe_limit = int(limit)
+            if safe_limit <= 0:
+                raise ValueError("limit must be greater than 0")
+            if safe_limit > 1000:
+                raise ValueError("limit must be <= 1000")
+
+            normalized_status = int(status_code) if status_code is not None else None
+            logs = self._service.list_api_audit_logs(
+                limit=safe_limit,
+                method=method,
+                path=path,
+                status_code=normalized_status,
+                user_id=user_id,
+            )
+            return 200, {"data": logs}
+        except ValueError as error:
+            return 400, {"error": str(error)}

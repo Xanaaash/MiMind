@@ -8,6 +8,7 @@ from backend.tests.bootstrap import configure_import_path
 configure_import_path()
 
 from modules.assessment.models import AssessmentScoreSet, AssessmentSubmission, ReassessmentSchedule
+from modules.observability.models import APIAuditLogRecord
 from modules.storage.sqlite_store import SQLiteStore
 from modules.tests.models import TestResult
 from modules.triage.models import RiskLevel, TriageChannel, TriageDecision
@@ -37,9 +38,38 @@ class SQLiteStorePersistenceTests(unittest.TestCase):
             finally:
                 connection.close()
 
-            self.assertGreaterEqual(len(rows), 1)
-            self.assertEqual(rows[0][0], 1)
+            versions = [int(version) for version, _ in rows]
+            self.assertEqual(versions, [1, 2])
             self.assertEqual(rows[0][1], "baseline_schema")
+            self.assertEqual(rows[1][1], "api_audit_logs")
+
+    def test_api_audit_logs_persist_across_store_instances(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            db_path = f"{temp_dir}/mimind.db"
+
+            store_one = SQLiteStore(db_path=db_path)
+            store_one.save_api_audit_log(
+                APIAuditLogRecord(
+                    request_id="req-1",
+                    method="POST",
+                    path="/api/register",
+                    status_code=200,
+                    duration_ms=12.3,
+                    request_payload={"body": {"email": "te***@example.com"}},
+                    response_payload={"user_id": "u-audit"},
+                    user_id="u-audit",
+                    client_ref="127.0.0.1",
+                )
+            )
+            store_one.close()
+
+            store_two = SQLiteStore(db_path=db_path)
+            logs = store_two.list_api_audit_logs()
+            self.assertEqual(len(logs), 1)
+            self.assertEqual(logs[0].request_id, "req-1")
+            self.assertEqual(logs[0].path, "/api/register")
+            self.assertEqual(logs[0].user_id, "u-audit")
+            store_two.close()
 
     def test_scale_artifacts_persist_across_store_instances(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -177,12 +207,26 @@ class SQLiteStorePersistenceTests(unittest.TestCase):
                     summary={"overall_score": 73.0, "level": "high"},
                 )
             )
+            store.save_api_audit_log(
+                APIAuditLogRecord(
+                    request_id="req-erase",
+                    method="POST",
+                    path="/api/assessment/u-erase",
+                    status_code=200,
+                    duration_ms=8.5,
+                    request_payload={"body": {"phq9": [1] * 9}},
+                    response_payload={"triage": {"channel": "green"}},
+                    user_id="u-erase",
+                    client_ref="127.0.0.1",
+                )
+            )
 
             deleted = store.erase_user_data("u-erase")
             self.assertEqual(deleted["user"], 1)
             self.assertEqual(deleted["assessment_submissions"], 1)
             self.assertEqual(deleted["assessment_scores"], 1)
             self.assertEqual(deleted["test_results"], 1)
+            self.assertEqual(deleted["api_audit_logs"], 1)
 
             store.close()
 

@@ -4,6 +4,7 @@ from backend.tests.bootstrap import configure_import_path
 
 configure_import_path()
 
+from modules.observability.models import APIAuditLogRecord
 from modules.api.coach_endpoints import CoachAPI
 from modules.api.endpoints import OnboardingAPI
 from modules.api.observability_endpoints import ObservabilityAPI
@@ -117,6 +118,40 @@ class ModelInvocationObservabilityContractTests(unittest.TestCase):
         )
         self.assertEqual(filtered_status, 200)
         self.assertGreaterEqual(filtered_body["data"]["totals"]["total"], 1)
+
+    def test_api_audit_log_contract(self) -> None:
+        self.store.save_api_audit_log(
+            APIAuditLogRecord(
+                request_id="audit-1",
+                method="POST",
+                path="/api/register",
+                status_code=200,
+                duration_ms=10.2,
+                request_payload={"body": {"email": "te***@example.com", "password": "se***et"}},
+                response_payload={"user_id": "u-1"},
+                user_id="u-1",
+                client_ref="127.0.0.1",
+            )
+        )
+        self.store.save_api_audit_log(
+            APIAuditLogRecord(
+                request_id="audit-2",
+                method="GET",
+                path="/api/health",
+                status_code=200,
+                duration_ms=2.5,
+                request_payload={},
+                response_payload={"status": "ok"},
+                client_ref="127.0.0.1",
+            )
+        )
+
+        status, body = self.observability_api.get_api_audit_logs(limit=10, method="POST")
+        self.assertEqual(status, 200)
+        data = body["data"]
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["request_id"], "audit-1")
+        self.assertEqual(data[0]["path"], "/api/register")
 
 
 if __name__ == "__main__":

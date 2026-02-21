@@ -10,7 +10,7 @@ from modules.coach.models import CoachSession
 from modules.compliance.models import ConsentRecord
 from modules.journal.models import JournalEntry
 from modules.memory.models import MemoryVectorRecord
-from modules.observability.models import ModelInvocationRecord
+from modules.observability.models import APIAuditLogRecord, ModelInvocationRecord
 from modules.tests.models import TestResult
 from modules.triage.models import TriageDecision
 from modules.user.models import User
@@ -33,6 +33,7 @@ class InMemoryStore:
     journal_entries: Dict[str, List[JournalEntry]] = field(default_factory=dict)
     tool_events: Dict[str, List[dict]] = field(default_factory=dict)
     model_invocations: List[ModelInvocationRecord] = field(default_factory=list)
+    api_audit_logs: List[APIAuditLogRecord] = field(default_factory=list)
     subscriptions: Dict[str, SubscriptionRecord] = field(default_factory=dict)
     processed_webhooks: set = field(default_factory=set)
     admin_sessions: Dict[str, AdminSession] = field(default_factory=dict)
@@ -77,6 +78,9 @@ class InMemoryStore:
 
     def save_model_invocation(self, record: ModelInvocationRecord) -> None:
         self.model_invocations.append(record)
+
+    def save_api_audit_log(self, record: APIAuditLogRecord) -> None:
+        self.api_audit_logs.append(record)
 
     def save_subscription(self, subscription: SubscriptionRecord) -> None:
         self.subscriptions[subscription.user_id] = subscription
@@ -144,6 +148,9 @@ class InMemoryStore:
 
     def list_model_invocations(self) -> List[ModelInvocationRecord]:
         return list(self.model_invocations)
+
+    def list_api_audit_logs(self) -> List[APIAuditLogRecord]:
+        return list(self.api_audit_logs)
 
     def is_webhook_processed(self, event_id: str) -> bool:
         return event_id in self.processed_webhooks
@@ -251,6 +258,14 @@ class InMemoryStore:
         removed_tool_events = len(self.tool_events.pop(user_id, []))
         removed_memory_summaries = len(self.memory_summaries.pop(user_id, []))
         removed_memory_vectors = len(self.memory_vectors.pop(user_id, []))
+        removed_api_audit_logs = 0
+        retained_api_logs: List[APIAuditLogRecord] = []
+        for record in self.api_audit_logs:
+            if record.user_id == user_id:
+                removed_api_audit_logs += 1
+            else:
+                retained_api_logs.append(record)
+        self.api_audit_logs = retained_api_logs
         removed_subscription = 1 if self.subscriptions.pop(user_id, None) is not None else 0
         removed_user = 1 if self.users.pop(user_id, None) is not None else 0
 
@@ -267,5 +282,6 @@ class InMemoryStore:
             "tool_events": removed_tool_events,
             "memory_summaries": removed_memory_summaries,
             "memory_vectors": removed_memory_vectors,
+            "api_audit_logs": removed_api_audit_logs,
             "subscriptions": removed_subscription,
         }

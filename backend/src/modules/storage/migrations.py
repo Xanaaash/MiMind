@@ -87,6 +87,35 @@ MIGRATIONS: List[SQLiteMigration] = [
             """,
         ],
     ),
+    SQLiteMigration(
+        version=2,
+        name="api_audit_logs",
+        statements=[
+            """
+            CREATE TABLE IF NOT EXISTS api_audit_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                request_id TEXT NOT NULL,
+                method TEXT NOT NULL,
+                path TEXT NOT NULL,
+                status_code INTEGER NOT NULL,
+                duration_ms REAL NOT NULL,
+                request_payload_json TEXT NOT NULL,
+                response_payload_json TEXT NOT NULL,
+                user_id TEXT,
+                client_ref TEXT,
+                created_at TEXT NOT NULL
+            )
+            """,
+            """
+            CREATE INDEX IF NOT EXISTS idx_api_audit_logs_created_at
+            ON api_audit_logs (created_at)
+            """,
+            """
+            CREATE INDEX IF NOT EXISTS idx_api_audit_logs_user_id
+            ON api_audit_logs (user_id)
+            """,
+        ],
+    ),
 ]
 
 

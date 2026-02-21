@@ -1,5 +1,6 @@
-from modules.observability.models import ModelInvocationRecord
+from modules.observability.models import APIAuditLogRecord, ModelInvocationRecord
 
 __all__ = [
+    "APIAuditLogRecord",
     "ModelInvocationRecord",
 ]

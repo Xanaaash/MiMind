@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional
 
 from modules.admin.models import AdminSession
 from modules.assessment.models import AssessmentScoreSet, AssessmentSubmission, ReassessmentSchedule
+from modules.observability.models import APIAuditLogRecord
 from modules.storage.in_memory import InMemoryStore
 from modules.storage.migrations import apply_sqlite_migrations
 from modules.tests.models import TestResult
@@ -484,6 +485,83 @@ class SQLiteStore(InMemoryStore):
             )
             self._connection.commit()
 
+    def save_api_audit_log(self, record: APIAuditLogRecord) -> None:
+        super().save_api_audit_log(record)
+        with self._lock:
+            self._connection.execute(
+                """
+                INSERT INTO api_audit_logs (
+                    request_id,
+                    method,
+                    path,
+                    status_code,
+                    duration_ms,
+                    request_payload_json,
+                    response_payload_json,
+                    user_id,
+                    client_ref,
+                    created_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    record.request_id,
+                    record.method,
+                    record.path,
+                    int(record.status_code),
+                    float(record.duration_ms),
+                    json.dumps(record.request_payload, ensure_ascii=False),
+                    json.dumps(record.response_payload, ensure_ascii=False),
+                    record.user_id,
+                    record.client_ref,
+                    record.created_at.isoformat(),
+                ),
+            )
+            self._connection.commit()
+
+    def list_api_audit_logs(self) -> List[APIAuditLogRecord]:
+        cached = super().list_api_audit_logs()
+        if cached:
+            return cached
+
+        with self._lock:
+            rows = self._connection.execute(
+                """
+                SELECT
+                    request_id,
+                    method,
+                    path,
+                    status_code,
+                    duration_ms,
+                    request_payload_json,
+                    response_payload_json,
+                    user_id,
+                    client_ref,
+                    created_at
+                FROM api_audit_logs
+                ORDER BY created_at DESC, id DESC
+                """
+            ).fetchall()
+
+        hydrated: List[APIAuditLogRecord] = []
+        for row in rows:
+            record = APIAuditLogRecord(
+                request_id=row["request_id"],
+                method=row["method"],
+                path=row["path"],
+                status_code=int(row["status_code"]),
+                duration_ms=float(row["duration_ms"]),
+                request_payload=json.loads(row["request_payload_json"]),
+                response_payload=json.loads(row["response_payload_json"]),
+                user_id=row["user_id"],
+                client_ref=row["client_ref"],
+                created_at=datetime.fromisoformat(row["created_at"]),
+            )
+            super().save_api_audit_log(record)
+            hydrated.append(record)
+
+        return hydrated
+
     def erase_user_data(self, user_id: str) -> Dict[str, int]:
         with self._lock:
             persisted_counts = {
@@ -492,6 +570,7 @@ class SQLiteStore(InMemoryStore):
                 "triage_decisions": self._count_rows("triage_decisions", user_id),
                 "reassessment_schedules": self._count_rows("reassessment_schedules", user_id),
                 "test_results": self._count_rows("test_results", user_id),
+                "api_audit_logs": self._count_rows("api_audit_logs", user_id),
                 "user": self._count_rows("users", user_id),
             }
 
@@ -500,6 +579,7 @@ class SQLiteStore(InMemoryStore):
             self._connection.execute("DELETE FROM triage_decisions WHERE user_id = ?", (user_id,))
             self._connection.execute("DELETE FROM reassessment_schedules WHERE user_id = ?", (user_id,))
             self._connection.execute("DELETE FROM test_results WHERE user_id = ?", (user_id,))
+            self._connection.execute("DELETE FROM api_audit_logs WHERE user_id = ?", (user_id,))
             self._connection.execute("DELETE FROM users WHERE user_id = ?", (user_id,))
             self._connection.commit()
 
@@ -526,6 +606,10 @@ class SQLiteStore(InMemoryStore):
             "test_results": max(
                 in_memory_counts.get("test_results", 0),
                 persisted_counts["test_results"],
+            ),
+            "api_audit_logs": max(
+                in_memory_counts.get("api_audit_logs", 0),
+                persisted_counts["api_audit_logs"],
             ),
             "user": max(in_memory_counts.get("user", 0), persisted_counts["user"]),
         }

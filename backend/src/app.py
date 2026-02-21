@@ -1,4 +1,7 @@
 import json
+import time
+from typing import Optional
+from uuid import uuid4
 
 from fastapi import Body, FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -16,6 +19,8 @@ from modules.api.scales_endpoints import ClinicalScalesAPI
 from modules.api.tests_endpoints import InteractiveTestsAPI
 from modules.api.tools_endpoints import HealingToolsAPI
 from modules.onboarding.service import OnboardingService
+from modules.observability.http_audit import decode_json_payload, sanitize_mapping
+from modules.observability.models import APIAuditLogRecord
 from modules.storage import build_application_store
 
 store = build_application_store()
@@ -46,6 +51,20 @@ def _unwrap(status: int, body: dict) -> dict:
     return body.get("data", {})
 
 
+def _extract_user_id_from_request(request: Request) -> Optional[str]:
+    explicit_user = request.headers.get("x-user-id", "").strip()
+    if explicit_user:
+        return explicit_user[:128]
+
+    path_parts = request.url.path.strip("/").split("/")
+    if len(path_parts) >= 3 and path_parts[0] == "api":
+        if path_parts[1] in {"assessment", "entitlements", "reassessment", "billing", "tools", "compliance"}:
+            return path_parts[2][:128]
+        if path_parts[1] == "coach" and len(path_parts) >= 4 and path_parts[3] in {"start", "sessions"}:
+            return path_parts[2][:128]
+    return None
+
+
 @app.middleware("http")
 async def enforce_api_rate_limit(request: Request, call_next):
     if not request.url.path.startswith("/api/") or not api_rate_limiter.enabled:
@@ -68,6 +87,50 @@ async def enforce_api_rate_limit(request: Request, call_next):
     response.headers["X-RateLimit-Limit"] = str(decision.limit)
     response.headers["X-RateLimit-Remaining"] = str(decision.remaining)
     response.headers["X-RateLimit-Scope"] = decision.scope
+    return response
+
+
+@app.middleware("http")
+async def audit_api_requests(request: Request, call_next):
+    if not request.url.path.startswith("/api/"):
+        return await call_next(request)
+
+    started = time.perf_counter()
+    request_body = await request.body()
+    request_payload = {"query": sanitize_mapping(dict(request.query_params))}
+    if request_body:
+        request_payload["body"] = decode_json_payload(request_body)
+
+    response = await call_next(request)
+    elapsed_ms = (time.perf_counter() - started) * 1000
+
+    response_payload = {}
+    if isinstance(response, StreamingResponse):
+        response_payload = {"_streaming": True}
+    else:
+        body = getattr(response, "body", b"") or b""
+        if isinstance(body, str):
+            body = body.encode("utf-8", errors="ignore")
+        if isinstance(body, (bytes, bytearray)) and body:
+            response_payload = decode_json_payload(bytes(body))
+
+    client_ref = request.client.host if request.client is not None else None
+    record = APIAuditLogRecord(
+        request_id=uuid4().hex,
+        method=request.method,
+        path=request.url.path,
+        status_code=response.status_code,
+        duration_ms=elapsed_ms,
+        request_payload=request_payload,
+        response_payload=response_payload,
+        user_id=_extract_user_id_from_request(request),
+        client_ref=client_ref,
+    )
+    try:
+        store.save_api_audit_log(record)
+    except Exception:
+        pass
+
     return response
 
 
@@ -216,6 +279,28 @@ def get_model_invocation_summary(
         limit=limit,
         task_type=normalized_task,
         provider=normalized_provider,
+    )
+    return _unwrap(status, body)
+
+
+@app.get("/api/observability/http-audit")
+def get_http_audit_logs(
+    limit: int = Query(100, ge=1, le=1000),
+    method: str = Query("", alias="method"),
+    path: str = Query("", alias="path"),
+    status_code: int = Query(0, alias="status_code"),
+    user_id: str = Query("", alias="user_id"),
+) -> list[dict]:
+    normalized_method = method.strip() or None
+    normalized_path = path.strip() or None
+    normalized_user = user_id.strip() or None
+    normalized_status = status_code if status_code > 0 else None
+    status, body = observability_api.get_api_audit_logs(
+        limit=limit,
+        method=normalized_method,
+        path=normalized_path,
+        status_code=normalized_status,
+        user_id=normalized_user,
     )
     return _unwrap(status, body)
 

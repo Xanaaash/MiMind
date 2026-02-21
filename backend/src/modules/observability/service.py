@@ -43,6 +43,33 @@ class ModelObservabilityService:
             "by_provider": self._group_aggregate(records, key="provider"),
         }
 
+    def list_api_audit_logs(
+        self,
+        limit: int = 100,
+        method: Optional[str] = None,
+        path: Optional[str] = None,
+        status_code: Optional[int] = None,
+        user_id: Optional[str] = None,
+    ) -> List[dict]:
+        items = self._store.list_api_audit_logs()
+        ordered = sorted(items, key=lambda item: item.created_at, reverse=True)
+
+        normalized_method = str(method).strip().upper() if method is not None else None
+        normalized_path = str(path).strip() if path is not None else None
+        normalized_user = str(user_id).strip() if user_id is not None else None
+
+        if normalized_method:
+            ordered = [item for item in ordered if item.method.upper() == normalized_method]
+        if normalized_path:
+            ordered = [item for item in ordered if item.path == normalized_path]
+        if status_code is not None:
+            ordered = [item for item in ordered if int(item.status_code) == int(status_code)]
+        if normalized_user:
+            ordered = [item for item in ordered if item.user_id == normalized_user]
+
+        safe_limit = max(1, min(int(limit), 1000))
+        return [item.to_dict() for item in ordered[:safe_limit]]
+
     def _filtered_records(
         self,
         limit: int,
