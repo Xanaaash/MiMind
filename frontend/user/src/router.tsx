@@ -15,6 +15,7 @@ const TestResult = lazy(() => import('./pages/Tests/TestResult'));
 const CoachPage = lazy(() => import('./pages/Coach/CoachPage'));
 const CoachHistoryPage = lazy(() => import('./pages/Coach/CoachHistoryPage'));
 const ToolsHub = lazy(() => import('./pages/Tools/ToolsHub'));
+const ReliefHub = lazy(() => import('./pages/Relief/ReliefHub'));
 const BreathingExercise = lazy(() => import('./pages/Tools/BreathingExercise'));
 const SensoryRelief = lazy(() => import('./pages/Tools/SensoryRelief'));
 const PomodoroTimer = lazy(() => import('./pages/Tools/PomodoroTimer'));
@@ -49,6 +50,7 @@ export const routes: RouteObject[] = [
       { path: '/tests/:testId/result', element: <TestResult /> },
       { path: '/coach', element: <CoachPage /> },
       { path: '/coach/history', element: <CoachHistoryPage /> },
+      { path: '/relief', element: <ReliefHub /> },
       { path: '/tools', element: <ToolsHub /> },
       { path: '/tools/breathing', element: <BreathingExercise /> },
       { path: '/tools/sensory-relief', element: <SensoryRelief /> },

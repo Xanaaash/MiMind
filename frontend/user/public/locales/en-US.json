@@ -11,6 +11,7 @@
     "tests": "Tests",
     "coach": "AI Coach",
     "tools": "Tools",
+    "rescue": "Relief",
     "journal": "Journal",
     "billing": "Plans",
     "profile": "Profile",
@@ -295,6 +296,14 @@
     "stats_sessions_unit": "times",
     "stats_hour_short": "h",
     "stats_min_short": "m"
+  },
+  "relief": {
+    "title": "Relief Hub",
+    "subtitle": "When everything feels too much, pause here first. Use the fastest stabilization tools and return to a tolerable rhythm.",
+    "quick_sensory_title": "Start Sensory Relief",
+    "quick_sensory_desc": "Reduce overload and rebuild a sense of safety quickly.",
+    "quick_breath_title": "Start Guided Breathing",
+    "quick_breath_desc": "Follow the breathing cadence to downshift your nervous system."
   },
   "journal": {
     "title": "Mood Journal",

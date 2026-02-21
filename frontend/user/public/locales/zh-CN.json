@@ -11,6 +11,7 @@
     "tests": "互动测试",
     "coach": "AI 教练",
     "tools": "疗愈工具",
+    "rescue": "急救舱",
     "journal": "情绪日记",
     "billing": "订阅",
     "profile": "我的",
@@ -295,6 +296,14 @@
     "stats_sessions_unit": "次",
     "stats_hour_short": "小时",
     "stats_min_short": "分"
+  },
+  "relief": {
+    "title": "急救舱",
+    "subtitle": "当你感觉被压垮时，先停下来。这里提供最快可用的稳定工具，帮助你回到可承受节奏。",
+    "quick_sensory_title": "一键进入感官急救",
+    "quick_sensory_desc": "优先降低噪音与刺激，快速建立安全感。",
+    "quick_breath_title": "一键开始呼吸引导",
+    "quick_breath_desc": "跟随节奏呼吸，先把神经系统慢下来。"
   },
   "journal": {
     "title": "情绪日记",
