@@ -10,6 +10,7 @@ from modules.api.coach_endpoints import CoachAPI
 from modules.api.endpoints import OnboardingAPI
 from modules.api.observability_endpoints import ObservabilityAPI
 from modules.api.prompt_endpoints import PromptRegistryAPI
+from modules.api.rate_limit import APIRateLimiter, RateLimitConfig
 from modules.api.safety_endpoints import SafetyAPI
 from modules.api.scales_endpoints import ClinicalScalesAPI
 from modules.api.tests_endpoints import InteractiveTestsAPI
@@ -36,11 +37,38 @@ app = FastAPI(
     description="Constitution-aligned prototype backend for MiMind",
 )
 
+api_rate_limiter = APIRateLimiter(config=RateLimitConfig.from_env())
+
 
 def _unwrap(status: int, body: dict) -> dict:
     if status >= 400:
         raise HTTPException(status_code=status, detail=body.get("error", "request failed"))
     return body.get("data", {})
+
+
+@app.middleware("http")
+async def enforce_api_rate_limit(request: Request, call_next):
+    if not request.url.path.startswith("/api/") or not api_rate_limiter.enabled:
+        return await call_next(request)
+
+    decision = api_rate_limiter.evaluate(request)
+    if not decision.allowed:
+        return JSONResponse(
+            status_code=429,
+            content={"error": "Rate limit exceeded"},
+            headers={
+                "Retry-After": str(decision.retry_after_seconds),
+                "X-RateLimit-Limit": str(decision.limit),
+                "X-RateLimit-Remaining": "0",
+                "X-RateLimit-Scope": decision.scope,
+            },
+        )
+
+    response = await call_next(request)
+    response.headers["X-RateLimit-Limit"] = str(decision.limit)
+    response.headers["X-RateLimit-Remaining"] = str(decision.remaining)
+    response.headers["X-RateLimit-Scope"] = decision.scope
+    return response
 
 
 @app.get("/healthz")
