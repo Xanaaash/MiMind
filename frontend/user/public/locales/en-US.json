@@ -300,6 +300,7 @@
     "rescue": {
       "title": "Relief Hub",
       "subtitle": "When everything feels too much, pause here first. Use the fastest stabilization tools and return to a tolerable rhythm.",
+      "primary_action": "Stabilize first, process later",
       "minimal_hint": "Do one thing first. Lower stimulation and guide your body back to safety.",
       "quick_pink_caption": "Low-Frequency Support",
       "quick_pink_start": "Start Pink Noise",
@@ -320,6 +321,7 @@
     "manifestation": {
       "badge": "Live v1",
       "title": "Manifestation",
+      "subtitle": "Turn intention into written and visual anchors you can revisit daily.",
       "desc": "Capture affirmations and vision cards to reinforce positive momentum.",
       "audio_start": "Play Gentle Ocean Ambience",
       "audio_stop": "Stop Background Audio",

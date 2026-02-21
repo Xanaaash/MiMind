@@ -300,6 +300,7 @@
     "rescue": {
       "title": "急救舱",
       "subtitle": "当你感觉被压垮时，先停下来。这里提供最快可用的稳定工具，帮助你回到可承受节奏。",
+      "primary_action": "先稳住，再处理",
       "minimal_hint": "先做一件事就好。减少刺激，慢慢把身体带回安全区。",
       "quick_pink_caption": "低频稳定",
       "quick_pink_start": "一键启动粉红噪音",
@@ -320,6 +321,7 @@
     "manifestation": {
       "badge": "已上线 v1",
       "title": "显化练习",
+      "subtitle": "把想法落到文字和画面，重复强化你想成为的状态。",
       "desc": "记录肯定语和愿景卡片，建立持续的内在强化。",
       "audio_start": "播放轻柔海浪背景音",
       "audio_stop": "停止背景音",
