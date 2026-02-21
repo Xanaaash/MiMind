@@ -2,6 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/auth';
 import { useThemeStore } from '../../stores/theme';
+import { authLogout } from '../../api/auth';
 import SafetyDisclaimer from '../SafetyDisclaimer/SafetyDisclaimer';
 import FloatingToolbar from '../FloatingToolbar/FloatingToolbar';
 import { useEffect, useState } from 'react';
@@ -92,7 +93,11 @@ export default function AppLayout() {
               {t('layout.switch_label')}
             </button>
             <button
-              onClick={() => { logout(); navigate('/'); }}
+              onClick={() => {
+                void authLogout().catch(() => {});
+                logout();
+                navigate('/');
+              }}
               className="text-sm text-muted hover:text-accent px-2 py-1 rounded-lg hover:bg-cream transition-colors"
               aria-label={t('auth.logout')}
             >

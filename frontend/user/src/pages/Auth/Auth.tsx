@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../../stores/auth';
-import { adminLogin, getEntitlements, register } from '../../api/auth';
+import { authLogin, authRegister, getEntitlements } from '../../api/auth';
 import { toast } from '../../stores/toast';
 import type { TriageChannel } from '../../types';
 import Button from '../../components/Button/Button';
@@ -26,46 +26,43 @@ export default function Auth() {
   const navigate = useNavigate();
   const { setUser, setChannel } = useAuthStore();
 
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin');
+  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
-  const validateUsername = (value: string): string | null => {
+  const validateEmail = (value: string): string | null => {
     const normalized = value.trim();
-    const baseRuleError = runValidators(normalized, [
-      required(t('validation.required', { field: t('fields.account') })),
-      minLength(3, t('validation.min_length', { field: t('fields.account'), count: 3 })),
-      maxLength(64, t('validation.max_length', { field: t('fields.account'), count: 64 })),
+    return runValidators(normalized, [
+      required(t('validation.required', { field: t('auth.email') })),
+      emailFormat(t('validation.email')),
+      maxLength(128, t('validation.max_length', { field: t('auth.email'), count: 128 })),
     ]);
-    if (baseRuleError) return baseRuleError;
+  };
 
-    if (normalized.includes('@')) {
-      return runValidators(normalized, [emailFormat(t('validation.email'))]);
-    }
+  const validatePassword = (value: string): string | null => {
+    const baseError = runValidators(value, [
+      required(t('validation.required', { field: t('fields.password') })),
+      minLength(8, t('validation.min_length', { field: t('fields.password'), count: 8 })),
+      maxLength(128, t('validation.max_length', { field: t('fields.password'), count: 128 })),
+    ]);
+    if (baseError) return baseError;
 
-    if (!/^[a-zA-Z0-9._-]+$/.test(normalized)) {
-      return t('validation.account_chars');
+    if (!/[A-Za-z]/.test(value) || !/[0-9]/.test(value)) {
+      return t('auth.password_hint');
     }
 
     return null;
   };
 
-  const validatePassword = (value: string): string | null => {
-    return runValidators(value, [
-      required(t('validation.required', { field: t('fields.password') })),
-      minLength(4, t('validation.min_length', { field: t('fields.password'), count: 4 })),
-      maxLength(128, t('validation.max_length', { field: t('fields.password'), count: 128 })),
-    ]);
-  };
-
   const validateForm = (): boolean => {
     const nextErrors = {
-      username: validateUsername(username) ?? undefined,
+      email: validateEmail(email) ?? undefined,
       password: validatePassword(password) ?? undefined,
     };
     setErrors(nextErrors);
-    return !nextErrors.username && !nextErrors.password;
+    return !nextErrors.email && !nextErrors.password;
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -74,23 +71,25 @@ export default function Auth() {
     setLoading(true);
 
     try {
-      const normalized = username.trim();
-      const loginAccount = normalized.includes('@') ? normalized.split('@')[0] : normalized;
-      await adminLogin(loginAccount, password);
-
-      const email = normalized.includes('@') ? normalized : `${normalized}@mimind.ai`;
+      const normalizedEmail = email.trim().toLowerCase();
       const currentLocale = i18n.language === 'en-US' ? 'en-US' : 'zh-CN';
-      let userId = localStorage.getItem('mc_user_id');
-      let resolvedChannel: TriageChannel | null = null;
+      const authPayload =
+        mode === 'register'
+          ? await authRegister(normalizedEmail, password, currentLocale, '2026.02')
+          : await authLogin(normalizedEmail, password);
 
+      const userId = authPayload.user?.user_id ?? authPayload.user_id;
       if (!userId) {
-        const data = await register(email, currentLocale, '2026.02');
-        userId = data.user_id;
-        const triage = data.triage as { channel?: unknown } | undefined;
-        resolvedChannel = toChannel(triage?.channel);
+        throw new Error(t('common.error'));
       }
 
-      if (!resolvedChannel && userId) {
+      const resolvedEmail = authPayload.user?.email ?? authPayload.email ?? normalizedEmail;
+      const resolvedLocale = authPayload.user?.locale ?? currentLocale;
+      let resolvedChannel: TriageChannel | null = null;
+
+      resolvedChannel = toChannel(authPayload.channel);
+
+      if (!resolvedChannel) {
         try {
           const entitlements = await getEntitlements(userId);
           resolvedChannel = toChannel(entitlements.channel);
@@ -99,14 +98,14 @@ export default function Auth() {
         }
       }
 
-      setUser(userId!, email, currentLocale);
+      setUser(userId, resolvedEmail, resolvedLocale);
       setChannel(resolvedChannel);
 
       if (resolvedChannel) {
         localStorage.setItem('mc_assessment_ts', String(Date.now()));
       }
 
-      toast.success(t('auth.login_success'));
+      toast.success(mode === 'register' ? t('auth.register_success') : t('auth.login_success'));
       navigate('/home');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
@@ -127,29 +126,30 @@ export default function Auth() {
           <span className="font-heading text-2xl font-bold text-accent">MiMind</span>
         </Link>
 
-        <h1 className="font-heading text-2xl font-bold">{t('auth.login')}</h1>
+        <h1 className="font-heading text-2xl font-bold">{mode === 'register' ? t('auth.register') : t('auth.login')}</h1>
         <p className="text-muted text-sm mt-1 mb-6">{t('app.tagline')}</p>
 
         <form onSubmit={handleLogin} className="grid gap-4">
           <label className="grid gap-1.5">
-            <span className="text-sm font-medium text-muted">{t('fields.account')}</span>
+            <span className="text-sm font-medium text-muted">{t('auth.email')}</span>
             <input
-              type="text"
-              value={username}
+              type="email"
+              value={email}
               onChange={(e) => {
                 const value = e.target.value;
-                setUsername(value);
-                if (errors.username) {
-                  setErrors((prev) => ({ ...prev, username: validateUsername(value) ?? undefined }));
+                setEmail(value);
+                if (errors.email) {
+                  setErrors((prev) => ({ ...prev, email: validateEmail(value) ?? undefined }));
                 }
               }}
-              onBlur={() => setErrors((prev) => ({ ...prev, username: validateUsername(username) ?? undefined }))}
+              onBlur={() => setErrors((prev) => ({ ...prev, email: validateEmail(email) ?? undefined }))}
+              placeholder={t('auth.email_placeholder')}
               required
               className={`border rounded-xl px-4 py-3 bg-paper/90 text-ink focus:outline-none focus:ring-2 transition-shadow ${
-                errors.username ? 'border-danger focus:ring-danger/30' : 'border-line focus:ring-accent/30'
+                errors.email ? 'border-danger focus:ring-danger/30' : 'border-line focus:ring-accent/30'
               }`}
             />
-            <FieldError message={errors.username} />
+            <FieldError message={errors.email} />
           </label>
 
           <label className="grid gap-1.5">
@@ -165,18 +165,36 @@ export default function Auth() {
                 }
               }}
               onBlur={() => setErrors((prev) => ({ ...prev, password: validatePassword(password) ?? undefined }))}
+              placeholder={t('auth.password_placeholder')}
               required
               className={`border rounded-xl px-4 py-3 bg-paper/90 text-ink focus:outline-none focus:ring-2 transition-shadow ${
                 errors.password ? 'border-danger focus:ring-danger/30' : 'border-line focus:ring-accent/30'
               }`}
             />
             <FieldError message={errors.password} />
+            {mode === 'register' ? (
+              <p className="text-xs text-muted">{t('auth.password_hint')}</p>
+            ) : null}
           </label>
 
           <Button type="submit" loading={loading} className="w-full">
-            {t('auth.login')}
+            {mode === 'register' ? t('auth.submit_register') : t('auth.login')}
           </Button>
         </form>
+
+        <div className="text-xs text-muted text-center mt-4">
+          {mode === 'register' ? t('auth.have_account') : t('auth.no_account')}{' '}
+          <button
+            type="button"
+            className="text-accent hover:underline"
+            onClick={() => {
+              setMode((prev) => (prev === 'register' ? 'login' : 'register'));
+              setErrors({});
+            }}
+          >
+            {mode === 'register' ? t('auth.go_login') : t('auth.go_register')}
+          </button>
+        </div>
 
         <p className="text-xs text-muted text-center mt-6 leading-relaxed">
           {t('auth.agree_policy')}{' '}
