@@ -7,6 +7,23 @@ import Button from '../../components/Button/Button';
 import { generateShareCard, downloadShareCard, canShare, shareImage } from '../../utils/shareCard';
 import { getPairingReport } from '../../api/tests';
 import type { PairingReport } from '../../types';
+import { TEST_INTRO_KEYS, TEST_NAME_KEYS } from '../../utils/assessmentCopy';
+
+function formatSummaryValue(value: unknown, t: (key: string, options?: Record<string, unknown>) => string): string {
+  if (typeof value === 'string') {
+    return t(`tests.value_label.${value}`, { defaultValue: value });
+  }
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (Array.isArray(value)) {
+    return value.map((entry) => formatSummaryValue(entry, t)).join(', ');
+  }
+  if (value && typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+  return '';
+}
 
 export default function TestResult() {
   const { testId } = useParams();
@@ -66,8 +83,31 @@ export default function TestResult() {
   const chartData = summary
     ? Object.entries(summary)
         .filter(([, v]) => typeof v === 'number')
-        .map(([key, value]) => ({ dimension: key, value: value as number }))
+        .map(([key, value]) => ({
+          dimension: t(`tests.summary_label.${key}`, { defaultValue: key }),
+          value: value as number,
+        }))
     : [];
+  const summaryRows = useMemo(() => {
+    if (!summary) return [] as Array<{ label: string; value: string }>;
+
+    const rows: Array<{ label: string; value: string }> = [];
+    Object.entries(summary).forEach(([key, value]) => {
+      const label = t(`tests.summary_label.${key}`, { defaultValue: key });
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        Object.entries(value as Record<string, unknown>).forEach(([subKey, subValue]) => {
+          const subLabel = t(`tests.summary_label.${subKey}`, { defaultValue: subKey });
+          rows.push({
+            label: `${label} · ${subLabel}`,
+            value: formatSummaryValue(subValue, t),
+          });
+        });
+        return;
+      }
+      rows.push({ label, value: formatSummaryValue(value, t) });
+    });
+    return rows;
+  }, [summary, t]);
 
   return (
     <motion.div
@@ -76,7 +116,12 @@ export default function TestResult() {
       animate={{ opacity: 1, y: 0 }}
     >
       <h1 className="font-heading text-3xl font-bold mb-2">{t('tests.result_title')}</h1>
-      <p className="text-muted mb-8">{testId}</p>
+      <p className="text-muted">
+        {t(TEST_NAME_KEYS[testId ?? ''] ?? '', { defaultValue: testId ?? '' })}
+      </p>
+      <p className="text-xs text-muted leading-relaxed mb-8">
+        {t(TEST_INTRO_KEYS[testId ?? ''] ?? 'tests.intro.generic')}
+      </p>
 
       {chartData.length > 2 && (
         <div className="bg-panel border border-line rounded-2xl p-8 shadow-sm mb-6">
@@ -101,10 +146,10 @@ export default function TestResult() {
       {/* Summary details */}
       <div className="bg-panel border border-line rounded-2xl p-6 shadow-sm mb-6">
         <h3 className="font-heading font-bold mb-4">{t('tests.result_title')}</h3>
-        {summary && Object.entries(summary).map(([key, value]) => (
-          <div key={key} className="flex justify-between py-2 border-b border-line last:border-0">
-            <span className="text-muted text-sm">{key}</span>
-            <span className="font-semibold text-sm">{String(value)}</span>
+        {summaryRows.map((row, idx) => (
+          <div key={`${row.label}-${idx}`} className="flex justify-between py-2 border-b border-line last:border-0 gap-4">
+            <span className="text-muted text-sm">{row.label}</span>
+            <span className="font-semibold text-sm text-right">{row.value}</span>
           </div>
         ))}
       </div>
@@ -168,7 +213,11 @@ export default function TestResult() {
                 {t('tests.pair_score')}: <span className="font-semibold text-ink">{pairingReport.compatibility_score}</span>
               </p>
               <p className="text-sm text-muted mt-1">
-                {t('tests.pair_level')}: <span className="font-semibold text-ink">{pairingReport.compatibility_level}</span>
+                {t('tests.pair_level')}:
+                {' '}
+                <span className="font-semibold text-ink">
+                  {t(`tests.value_label.${pairingReport.compatibility_level}`, { defaultValue: pairingReport.compatibility_level })}
+                </span>
               </p>
               <p className="text-sm text-muted mt-3">{pairingReport.notes}</p>
             </div>

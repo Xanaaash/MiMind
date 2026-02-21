@@ -6,6 +6,7 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts
 import { useAuthStore } from '../../stores/auth';
 import { getEntitlements } from '../../api/billing';
 import Button from '../../components/Button/Button';
+import { SCALE_INTRO_KEYS, SCALE_NAME_KEYS } from '../../utils/assessmentCopy';
 
 const SEVERITY_COLORS: Record<string, string> = {
   minimal: '#4a9d6e',
@@ -20,7 +21,7 @@ export default function ScaleResult() {
   const { scaleId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const userId = useAuthStore((state) => state.userId);
   const [reportsEnabled, setReportsEnabled] = useState(false);
   const [entitlementsReady, setEntitlementsReady] = useState(false);
@@ -60,6 +61,7 @@ export default function ScaleResult() {
   const score = result.score as number ?? result.total_score as number ?? 0;
   const severity = (result.severity as string) ?? 'unknown';
   const interpretation = result.interpretation as Record<string, string> | undefined;
+  const lang = i18n.language === 'en-US' ? 'en-US' : 'zh-CN';
   const color = SEVERITY_COLORS[severity.toLowerCase()] ?? '#785c55';
   const isPaywalled = entitlementsReady && !reportsEnabled;
 
@@ -72,7 +74,12 @@ export default function ScaleResult() {
       animate={{ opacity: 1, y: 0 }}
     >
       <h1 className="font-heading text-3xl font-bold mb-2">{t('scales.result_title')}</h1>
-      <p className="text-muted mb-8">{scaleId?.toUpperCase()}</p>
+      <p className="text-muted">
+        {t(SCALE_NAME_KEYS[scaleId ?? ''] ?? '', { defaultValue: scaleId?.toUpperCase() ?? '' })}
+      </p>
+      <p className="text-xs text-muted leading-relaxed mb-8">
+        {t(SCALE_INTRO_KEYS[scaleId ?? ''] ?? 'scales.intro.generic')}
+      </p>
 
       <div className="bg-panel border border-line rounded-2xl p-8 shadow-sm mb-6 relative overflow-hidden">
         <div className={isPaywalled ? 'blur-[6px] select-none pointer-events-none' : ''}>
@@ -112,7 +119,7 @@ export default function ScaleResult() {
             </div>
             {interpretation && (
               <p className="text-muted text-sm mt-3">
-                {interpretation['zh-CN'] || interpretation['en-US'] || JSON.stringify(interpretation)}
+                {interpretation[lang] || interpretation['zh-CN'] || interpretation['en-US'] || JSON.stringify(interpretation)}
               </p>
             )}
           </div>

@@ -8,6 +8,7 @@ import Button from '../../components/Button/Button';
 import Loading from '../../components/Loading/Loading';
 import { useAuthStore } from '../../stores/auth';
 import { toast } from '../../stores/toast';
+import { SCALE_INTRO_KEYS, SCALE_NAME_KEYS } from '../../utils/assessmentCopy';
 
 type ScaleAnswer = number | boolean | null;
 
@@ -282,7 +283,11 @@ export default function ScaleQuiz() {
       {/* Progress bar */}
       <div className="mb-8">
         <div className="flex justify-between text-sm text-muted mb-2">
-          <span>{scale.display_name}</span>
+          <span>
+            {t(SCALE_NAME_KEYS[scaleId ?? ''] ?? '', {
+              defaultValue: scale.display_name || (scaleId ?? '').toUpperCase(),
+            })}
+          </span>
           <span>
             {isScl90
               ? t('scales.section_progress', { current: currentStep, total: totalPages })
@@ -296,8 +301,11 @@ export default function ScaleQuiz() {
             transition={{ duration: 0.3 }}
           />
         </div>
+        <p className="mt-3 text-xs text-muted leading-relaxed">
+          {t(SCALE_INTRO_KEYS[scaleId ?? ''] ?? 'scales.intro.generic')}
+        </p>
         {isScl90 ? (
-          <div className="mt-3 text-xs text-muted space-y-1">
+          <div className="mt-2 text-xs text-muted space-y-1">
             <p>{t('scales.answered_progress', { answered: answeredTotal, total })}</p>
             <p>{t('scales.resume_hint')}</p>
             {restored ? <p className="text-accent">{t('scales.draft_restored')}</p> : null}

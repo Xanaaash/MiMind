@@ -7,6 +7,7 @@ import { useAuthStore } from '../../stores/auth';
 import type { TestCatalogItem } from '../../types';
 import Button from '../../components/Button/Button';
 import Loading from '../../components/Loading/Loading';
+import { TEST_INTRO_KEYS, TEST_NAME_KEYS } from '../../utils/assessmentCopy';
 
 function inferRange(answerRange: string) {
   const text = answerRange.toLowerCase();
@@ -80,7 +81,7 @@ export default function TestQuiz() {
       {/* Progress */}
       <div className="mb-8">
         <div className="flex justify-between text-sm text-muted mb-2">
-          <span>{test.display_name}</span>
+          <span>{t(TEST_NAME_KEYS[testId ?? ''] ?? '', { defaultValue: test.display_name || (testId ?? '') })}</span>
           <span>{t('scales.progress', { current: currentIndex + 1, total })}</span>
         </div>
         <div className="h-2 bg-cream rounded-full overflow-hidden">
@@ -90,6 +91,9 @@ export default function TestQuiz() {
             transition={{ duration: 0.3 }}
           />
         </div>
+        <p className="mt-3 text-xs text-muted leading-relaxed">
+          {t(TEST_INTRO_KEYS[testId ?? ''] ?? 'tests.intro.generic')}
+        </p>
       </div>
 
       {/* Question */}

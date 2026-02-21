@@ -6,6 +6,7 @@ import { getCatalog } from '../../api/tests';
 import type { TestCatalogItem } from '../../types';
 import Card from '../../components/Card/Card';
 import Skeleton from '../../components/Skeleton/Skeleton';
+import { TEST_INTRO_KEYS, TEST_NAME_KEYS } from '../../utils/assessmentCopy';
 
 const TEST_ICONS: Record<string, string> = {
   mbti: '🎭',
@@ -19,20 +20,6 @@ const TEST_ICONS: Record<string, string> = {
   boundary: '🚧',
   psych_age: '🎂',
   mental_age: '🎂',
-};
-
-const TEST_INTRO_KEYS: Record<string, string> = {
-  mbti: 'tests.intro.mbti',
-  '16p': 'tests.intro.16p',
-  big5: 'tests.intro.big5',
-  attachment: 'tests.intro.attachment',
-  love_language: 'tests.intro.love_language',
-  stress_coping: 'tests.intro.stress_coping',
-  eq: 'tests.intro.eq',
-  inner_child: 'tests.intro.inner_child',
-  boundary: 'tests.intro.boundary',
-  psych_age: 'tests.intro.psych_age',
-  mental_age: 'tests.intro.psych_age',
 };
 
 export default function TestCenter() {
@@ -88,7 +75,9 @@ export default function TestCenter() {
               <div className="w-12 h-12 rounded-xl bg-warn-soft flex items-center justify-center text-2xl mb-3">
                 {TEST_ICONS[testId] ?? '🧩'}
               </div>
-              <h3 className="font-heading font-bold text-lg">{item.display_name}</h3>
+              <h3 className="font-heading font-bold text-lg">
+                {t(TEST_NAME_KEYS[testId] ?? '', { defaultValue: item.display_name || testId })}
+              </h3>
               <p className="text-xs text-muted mt-2 leading-relaxed">
                 {t(TEST_INTRO_KEYS[testId] ?? 'tests.intro.generic')}
               </p>

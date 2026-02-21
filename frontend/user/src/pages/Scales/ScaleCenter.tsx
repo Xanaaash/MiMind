@@ -6,6 +6,7 @@ import { getCatalog } from '../../api/scales';
 import type { ScaleCatalogItem } from '../../types';
 import Card from '../../components/Card/Card';
 import Skeleton from '../../components/Skeleton/Skeleton';
+import { SCALE_INTRO_KEYS, SCALE_NAME_KEYS } from '../../utils/assessmentCopy';
 
 const SCALE_ICONS: Record<string, string> = {
   phq9: '🧠',
@@ -13,14 +14,6 @@ const SCALE_ICONS: Record<string, string> = {
   pss10: '📊',
   cssrs: '🛡️',
   scl90: '📋',
-};
-
-const SCALE_INTRO_KEYS: Record<string, string> = {
-  phq9: 'scales.intro.phq9',
-  gad7: 'scales.intro.gad7',
-  pss10: 'scales.intro.pss10',
-  cssrs: 'scales.intro.cssrs',
-  scl90: 'scales.intro.scl90',
 };
 
 export default function ScaleCenter() {
@@ -77,8 +70,10 @@ export default function ScaleCenter() {
               <div className="w-12 h-12 rounded-xl bg-calm-soft flex items-center justify-center text-2xl mb-3">
                 {SCALE_ICONS[scaleId] ?? '📋'}
               </div>
-              <h3 className="font-heading font-bold text-lg uppercase">{scaleId}</h3>
-              <p className="text-muted text-sm mt-1">{item.display_name}</p>
+              <h3 className="font-heading font-bold text-lg">
+                {t(SCALE_NAME_KEYS[scaleId] ?? '', { defaultValue: item.display_name || scaleId.toUpperCase() })}
+              </h3>
+              <p className="text-muted text-xs mt-1 uppercase tracking-wide">{scaleId}</p>
               <p className="text-xs text-muted mt-2 leading-relaxed">
                 {t(SCALE_INTRO_KEYS[scaleId] ?? 'scales.intro.generic')}
               </p>
