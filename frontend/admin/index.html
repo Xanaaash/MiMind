@@ -63,6 +63,7 @@
           <button class="nav-btn" data-module="coach">AI 教练</button>
           <button class="nav-btn" data-module="safety">安全资源</button>
           <button class="nav-btn" data-module="observability">Observability</button>
+          <button class="nav-btn" data-module="prompt_registry">Prompt 管理</button>
           <button class="nav-btn" data-module="activity_logs">活动日志</button>
           <button class="nav-btn" data-module="settings">设置</button>
         </nav>
@@ -311,6 +312,17 @@
                 </table>
               </div>
             </article>
+          </section>
+
+          <section class="module" data-module-panel="prompt_registry">
+            <h3>Prompt Pack 管理</h3>
+            <p>查看当前 Prompt 版本并手动切换 active pack。</p>
+            <div class="inline-actions">
+              <button id="loadPromptRegistryBtn" type="button">加载 Prompt Packs</button>
+              <span id="promptActiveBadge" class="status-pill">active: -</span>
+            </div>
+            <div id="promptPackList" class="prompt-grid"></div>
+            <pre id="promptActivateResult" class="result">{}</pre>
           </section>
 
           <section class="module" data-module-panel="activity_logs">

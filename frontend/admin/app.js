@@ -33,6 +33,8 @@ const state = {
   meditations: [],
   observabilitySummary: null,
   observabilityRecords: [],
+  promptPacks: null,
+  activePromptVersion: "",
 };
 
 const nodes = {
@@ -110,6 +112,10 @@ const nodes = {
   obsTaskBreakdown: document.getElementById("obsTaskBreakdown"),
   obsProviderBreakdown: document.getElementById("obsProviderBreakdown"),
   obsRecentRows: document.getElementById("obsRecentRows"),
+  loadPromptRegistryBtn: document.getElementById("loadPromptRegistryBtn"),
+  promptActiveBadge: document.getElementById("promptActiveBadge"),
+  promptPackList: document.getElementById("promptPackList"),
+  promptActivateResult: document.getElementById("promptActivateResult"),
 
   checkAdminUsersBtn: document.getElementById("checkAdminUsersBtn"),
   adminUsersResult: document.getElementById("adminUsersResult"),
@@ -724,6 +730,78 @@ async function loadObservabilityDashboard() {
   });
 }
 
+function renderPromptRegistry() {
+  const packs = state.promptPacks || {};
+  const activeVersion = state.activePromptVersion || "-";
+  nodes.promptActiveBadge.textContent = `active: ${activeVersion}`;
+  nodes.promptPackList.innerHTML = "";
+
+  const versions = Object.keys(packs).sort().reverse();
+  if (!versions.length) {
+    const empty = document.createElement("p");
+    empty.textContent = "暂无 Prompt Pack 数据";
+    nodes.promptPackList.appendChild(empty);
+    return;
+  }
+
+  versions.forEach((version) => {
+    const pack = packs[version] || {};
+    const card = document.createElement("article");
+    card.className = "prompt-card";
+    const isActive = version === activeVersion;
+    const styles = Array.isArray(pack.style_ids) ? pack.style_ids : [];
+    card.innerHTML = `
+      <div class="prompt-card-head">
+        <h4>${version}</h4>
+        <span class="status-pill ${isActive ? "is-active" : ""}">${isActive ? "Active" : "Inactive"}</span>
+      </div>
+      <p>${pack.note || "No note"}</p>
+      <div class="style-chip-list">
+        ${styles.map((styleId) => `<span class="style-chip">${styleId}</span>`).join("") || '<span class="style-chip">no styles</span>'}
+      </div>
+      <button type="button" data-prompt-version="${version}" ${isActive ? "disabled" : ""}>
+        ${isActive ? "当前使用中" : "切换为 Active"}
+      </button>
+    `;
+    nodes.promptPackList.appendChild(card);
+  });
+
+  nodes.promptPackList.querySelectorAll("button[data-prompt-version]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const version = btn.dataset.promptVersion;
+      if (!version) {
+        return;
+      }
+      try {
+        const data = await api("/api/prompts/activate", {
+          method: "POST",
+          body: { version },
+        });
+        state.activePromptVersion = data.active_version || version;
+        nodes.promptActivateResult.textContent = JSON.stringify(data, null, 2);
+        renderPromptRegistry();
+        logActivity("prompt pack activated", data);
+      } catch (error) {
+        const payload = { version, error: String(error) };
+        nodes.promptActivateResult.textContent = JSON.stringify(payload, null, 2);
+        logActivity("prompt pack activation failed", payload, true);
+      }
+    });
+  });
+}
+
+async function loadPromptRegistry() {
+  const [packs, active] = await Promise.all([api("/api/prompts/packs"), api("/api/prompts/active")]);
+  state.promptPacks = packs || {};
+  state.activePromptVersion = String(active.active_version || "");
+  nodes.promptActivateResult.textContent = JSON.stringify(active, null, 2);
+  renderPromptRegistry();
+  logActivity("prompt registry loaded", {
+    active_version: state.activePromptVersion,
+    pack_count: Object.keys(state.promptPacks).length,
+  });
+}
+
 function bindNavigation() {
   nodes.moduleNav.querySelectorAll(".nav-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
@@ -734,6 +812,12 @@ function bindNavigation() {
           await loadObservabilityDashboard();
         } catch (error) {
           logActivity("observability dashboard failed", { error: String(error) }, true);
+        }
+      } else if (moduleId === "prompt_registry" && !state.promptPacks) {
+        try {
+          await loadPromptRegistry();
+        } catch (error) {
+          logActivity("prompt registry load failed", { error: String(error) }, true);
         }
       }
     });
@@ -994,6 +1078,14 @@ function bindEvents() {
       logActivity("observability dashboard failed", { error: String(error) }, true);
     }
   });
+
+  nodes.loadPromptRegistryBtn.addEventListener("click", async () => {
+    try {
+      await loadPromptRegistry();
+    } catch (error) {
+      logActivity("prompt registry load failed", { error: String(error) }, true);
+    }
+  });
 }
 
 async function init() {
@@ -1005,6 +1097,7 @@ async function init() {
   bindEvents();
   switchModule("home");
   renderObservabilityPanel();
+  renderPromptRegistry();
 
   const restored = await restoreSession();
   if (!restored) {
