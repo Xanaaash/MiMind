@@ -19,6 +19,11 @@ uv run --extra i18n python scripts/i18n/check_locale_consistency.py \
 python3 scripts/i18n/check_i18n_antipatterns.py --root frontend/user/src
 ```
 
+`check_i18n_antipatterns.py` blocks:
+- comparing `t(...)` results in code
+- language ternary branches with inline text literals
+- hardcoded CJK string literals in frontend source (except explicit whitelist)
+
 ## 3) Generate draft with OpenAI (preferred, natural tone)
 
 ```bash

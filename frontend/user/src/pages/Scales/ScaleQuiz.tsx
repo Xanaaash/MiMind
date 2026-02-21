@@ -9,7 +9,6 @@ import Loading from '../../components/Loading/Loading';
 import { useAuthStore } from '../../stores/auth';
 import { toast } from '../../stores/toast';
 
-type Locale = 'en-US' | 'zh-CN';
 type ScaleAnswer = number | boolean | null;
 
 type Scl90DraftPayload = {
@@ -26,16 +25,16 @@ type Scl90Group = {
   questions: Array<{ index: number; questionId: string }>;
 };
 
-const SCL90_DIMENSION_LABELS: Record<string, Record<Locale, string>> = {
-  somatization: { 'en-US': 'Somatic Discomfort', 'zh-CN': '躯体化不适' },
-  obsessive_compulsive: { 'en-US': 'Obsessive or Compulsive Experiences', 'zh-CN': '强迫体验' },
-  interpersonal_sensitivity: { 'en-US': 'Interpersonal Sensitivity', 'zh-CN': '人际敏感' },
-  depression: { 'en-US': 'Depressive Mood', 'zh-CN': '抑郁情绪' },
-  anxiety: { 'en-US': 'Anxiety', 'zh-CN': '焦虑体验' },
-  hostility: { 'en-US': 'Irritability or Hostility', 'zh-CN': '敌意或易怒' },
-  phobic_anxiety: { 'en-US': 'Phobic Anxiety', 'zh-CN': '恐惧焦虑' },
-  paranoid_ideation: { 'en-US': 'Paranoid Thoughts', 'zh-CN': '偏执想法' },
-  psychoticism: { 'en-US': 'Detachment or Unusual Thinking', 'zh-CN': '疏离与非常规思维' },
+const SCL90_DIMENSION_LABEL_KEYS: Record<string, string> = {
+  somatization: 'scales.dim_somatization',
+  obsessive_compulsive: 'scales.dim_obsessive_compulsive',
+  interpersonal_sensitivity: 'scales.dim_interpersonal_sensitivity',
+  depression: 'scales.dim_depression',
+  anxiety: 'scales.dim_anxiety',
+  hostility: 'scales.dim_hostility',
+  phobic_anxiety: 'scales.dim_phobic_anxiety',
+  paranoid_ideation: 'scales.dim_paranoid_ideation',
+  psychoticism: 'scales.dim_psychoticism',
 };
 
 const SCL90_DIMENSION_ORDER = [
@@ -91,7 +90,7 @@ export default function ScaleQuiz() {
   const [submitting, setSubmitting] = useState(false);
   const [restored, setRestored] = useState(false);
 
-  const lang: Locale = i18n.language === 'en-US' ? 'en-US' : 'zh-CN';
+  const lang = i18n.language === 'en-US' ? 'en-US' : 'zh-CN';
 
   useEffect(() => {
     if (!scaleId) return;
@@ -178,13 +177,13 @@ export default function ScaleQuiz() {
       const last = Math.max(...indexes);
       return {
         key,
-        title: SCL90_DIMENSION_LABELS[key]?.[lang] ?? key,
+        title: t(SCL90_DIMENSION_LABEL_KEYS[key] ?? '', { defaultValue: key }),
         start: first + 1,
         end: last + 1,
         questions: groupedQuestions,
       };
     });
-  }, [isScl90, questions, lang]);
+  }, [isScl90, questions, t]);
 
   useEffect(() => {
     if (!isScl90 || scl90Groups.length === 0) return;

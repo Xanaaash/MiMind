@@ -13,10 +13,15 @@ TRANSLATION_COMPARE_PATTERN = re.compile(r"t\([^)\n]*\)\s*(?:===|!==|==|!=)\s*([
 LANG_TERNARY_PATTERN = re.compile(
     r"i18n\.language\s*(?:===|!==|==|!=)\s*(['\"]).*?\1\s*\?\s*(['\"])(.*?)\2\s*:\s*(['\"])(.*?)\4"
 )
+STRING_WITH_CJK_PATTERN = re.compile(r"(['\"])([^'\"\n]*[\u4e00-\u9fff][^'\"\n]*)\1")
 LOCALE_LITERAL_PATTERN = re.compile(r"^[a-z]{2}(?:-[A-Z]{2})?$")
 TOKEN_LITERAL_PATTERN = re.compile(r"^[a-z0-9_-]+$")
 SHORT_CODE_PATTERN = re.compile(r"^[A-Z]{1,3}$")
 HAS_CJK_PATTERN = re.compile(r"[\u4e00-\u9fff]")
+ALLOW_CJK_LITERAL_PATH_SUFFIXES = (
+    "frontend/user/src/data/neuroScales.ts",
+    "frontend/user/src/utils/neuroCoachDisclaimer.ts",
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -57,6 +62,10 @@ def iter_source_files(root: Path) -> List[Path]:
 
 def check_file(path: Path) -> List[str]:
     errors: List[str] = []
+    normalized_path = path.as_posix()
+    allow_cjk_literals = any(
+        normalized_path.endswith(suffix) for suffix in ALLOW_CJK_LITERAL_PATH_SUFFIXES
+    )
     lines = path.read_text(encoding="utf-8").splitlines()
     for line_number, line in enumerate(lines, start=1):
         if "i18n-check-ignore" in line:
@@ -75,6 +84,15 @@ def check_file(path: Path) -> List[str]:
                 errors.append(
                     f"{path}:{line_number} avoid language-branch literals; move text to locale JSON"
                 )
+
+        if allow_cjk_literals:
+            continue
+        if "i18n-check-allow-cjk" in line:
+            continue
+        if STRING_WITH_CJK_PATTERN.search(line):
+            errors.append(
+                f"{path}:{line_number} avoid hardcoded CJK literals in source; move to locale JSON"
+            )
     return errors
 
 
