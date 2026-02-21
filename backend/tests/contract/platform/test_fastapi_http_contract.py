@@ -19,6 +19,37 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "ok")
 
+    def test_user_auth_cookie_session_http(self) -> None:
+        email = f"auth-http-{uuid4().hex[:8]}@example.com"
+        register = self.client.post(
+            "/api/auth/register",
+            json={
+                "email": email,
+                "password": "StrongPass123",
+                "locale": "en-US",
+                "policy_version": "2026.02",
+            },
+        )
+        self.assertEqual(register.status_code, 201)
+        self.assertIn("mc_access_token", register.cookies)
+        self.assertIn("mc_refresh_token", register.cookies)
+
+        session = self.client.get("/api/auth/session")
+        self.assertEqual(session.status_code, 200)
+        self.assertTrue(session.json()["authenticated"])
+        self.assertEqual(session.json()["email"], email)
+
+        refresh = self.client.post("/api/auth/refresh")
+        self.assertEqual(refresh.status_code, 200)
+        self.assertTrue(refresh.json()["authenticated"])
+
+        logout = self.client.post("/api/auth/logout")
+        self.assertEqual(logout.status_code, 200)
+        self.assertFalse(logout.json()["authenticated"])
+
+        session_after_logout = self.client.get("/api/auth/session")
+        self.assertEqual(session_after_logout.status_code, 401)
+
     def test_prompt_catalog_http(self) -> None:
         packs = self.client.get("/api/prompts/packs")
         self.assertEqual(packs.status_code, 200)

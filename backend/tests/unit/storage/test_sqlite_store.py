@@ -39,9 +39,11 @@ class SQLiteStorePersistenceTests(unittest.TestCase):
                 connection.close()
 
             versions = [int(version) for version, _ in rows]
-            self.assertEqual(versions, [1, 2])
+            self.assertEqual(versions, [1, 2, 3, 4])
             self.assertEqual(rows[0][1], "baseline_schema")
             self.assertEqual(rows[1][1], "api_audit_logs")
+            self.assertEqual(rows[2][1], "user_password_auth_fields")
+            self.assertEqual(rows[3][1], "auth_and_audit_compatibility_backfill")
 
     def test_api_audit_logs_persist_across_store_instances(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -70,7 +72,6 @@ class SQLiteStorePersistenceTests(unittest.TestCase):
             self.assertEqual(logs[0].path, "/api/register")
             self.assertEqual(logs[0].user_id, "u-audit")
             store_two.close()
-
     def test_scale_artifacts_persist_across_store_instances(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             db_path = f"{temp_dir}/mimind.db"

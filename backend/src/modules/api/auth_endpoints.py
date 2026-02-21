@@ -77,7 +77,16 @@ class UserAuthAPI:
             return 200, {"data": self._auth.auth_payload(user, tokens=tokens)}, tokens
         except ValueError as error:
             message = str(error)
-            status = 401 if message in {"Refresh token required", "Token expired", "Invalid token signature"} else 400
+            auth_errors = {
+                "Refresh token required",
+                "Token expired",
+                "Invalid token signature",
+                "Invalid token format",
+                "Invalid token type",
+                "Token missing subject",
+                "Unknown user_id",
+            }
+            status = 401 if message in auth_errors else 400
             return status, {"error": message}, None
 
     @staticmethod

@@ -50,14 +50,23 @@ class SQLiteStore(InMemoryStore):
         with self._lock:
             self._connection.execute(
                 """
-                INSERT INTO users (user_id, email, locale, created_at)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO users (user_id, email, locale, password_hash, auth_provider, created_at)
+                VALUES (?, ?, ?, ?, ?, ?)
                 ON CONFLICT(user_id) DO UPDATE SET
                     email = excluded.email,
                     locale = excluded.locale,
+                    password_hash = excluded.password_hash,
+                    auth_provider = excluded.auth_provider,
                     created_at = excluded.created_at
                 """,
-                (user.user_id, user.email, user.locale, user.created_at.isoformat()),
+                (
+                    user.user_id,
+                    user.email,
+                    user.locale,
+                    user.password_hash,
+                    user.auth_provider,
+                    user.created_at.isoformat(),
+                ),
             )
             self._connection.commit()
 
@@ -68,7 +77,11 @@ class SQLiteStore(InMemoryStore):
 
         with self._lock:
             row = self._connection.execute(
-                "SELECT user_id, email, locale, created_at FROM users WHERE user_id = ?",
+                """
+                SELECT user_id, email, locale, password_hash, auth_provider, created_at
+                FROM users
+                WHERE user_id = ?
+                """,
                 (user_id,),
             ).fetchone()
 
@@ -79,6 +92,42 @@ class SQLiteStore(InMemoryStore):
             user_id=row["user_id"],
             email=row["email"],
             locale=row["locale"],
+            password_hash=row["password_hash"],
+            auth_provider=row["auth_provider"] or "guest",
+            created_at=datetime.fromisoformat(row["created_at"]),
+        )
+        super().save_user(user)
+        return user
+
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        in_memory = super().get_user_by_email(email)
+        if in_memory is not None:
+            return in_memory
+
+        normalized = str(email).strip().lower()
+        if not normalized:
+            return None
+
+        with self._lock:
+            row = self._connection.execute(
+                """
+                SELECT user_id, email, locale, password_hash, auth_provider, created_at
+                FROM users
+                WHERE email = ?
+                LIMIT 1
+                """,
+                (normalized,),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        user = User(
+            user_id=row["user_id"],
+            email=row["email"],
+            locale=row["locale"],
+            password_hash=row["password_hash"],
+            auth_provider=row["auth_provider"] or "guest",
             created_at=datetime.fromisoformat(row["created_at"]),
         )
         super().save_user(user)

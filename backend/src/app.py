@@ -7,6 +7,7 @@ from fastapi import Body, FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from modules.api.admin_endpoints import AdminAPI
+from modules.api.auth_endpoints import UserAuthAPI
 from modules.api.billing_endpoints import BillingAPI
 from modules.api.compliance_endpoints import DataGovernanceAPI
 from modules.api.coach_endpoints import CoachAPI
@@ -25,7 +26,9 @@ from modules.storage import build_application_store
 
 store = build_application_store()
 admin_api = AdminAPI(store=store)
-onboarding_api = OnboardingAPI(service=OnboardingService(store))
+onboarding_service = OnboardingService(store)
+onboarding_api = OnboardingAPI(service=onboarding_service)
+user_auth_api = UserAuthAPI(store=store, onboarding_service=onboarding_service)
 interactive_tests_api = InteractiveTestsAPI(store=store)
 coach_api = CoachAPI(store=store)
 healing_tools_api = HealingToolsAPI(store=store)
@@ -63,6 +66,34 @@ def _extract_user_id_from_request(request: Request) -> Optional[str]:
         if path_parts[1] == "coach" and len(path_parts) >= 4 and path_parts[3] in {"start", "sessions"}:
             return path_parts[2][:128]
     return None
+
+
+def _set_user_auth_cookies(response: Response, tokens) -> None:
+    service = user_auth_api.service
+    response.set_cookie(
+        key=service.access_cookie_name(),
+        value=tokens.access_token,
+        max_age=service.access_cookie_max_age_seconds(),
+        httponly=True,
+        samesite=service.cookie_samesite(),
+        secure=service.cookie_secure(),
+        path=service.cookie_path(),
+    )
+    response.set_cookie(
+        key=service.refresh_cookie_name(),
+        value=tokens.refresh_token,
+        max_age=service.refresh_cookie_max_age_seconds(),
+        httponly=True,
+        samesite=service.cookie_samesite(),
+        secure=service.cookie_secure(),
+        path=service.cookie_path(),
+    )
+
+
+def _clear_user_auth_cookies(response: Response) -> None:
+    service = user_auth_api.service
+    response.delete_cookie(key=service.access_cookie_name(), path=service.cookie_path())
+    response.delete_cookie(key=service.refresh_cookie_name(), path=service.cookie_path())
 
 
 @app.middleware("http")
@@ -188,6 +219,52 @@ def admin_users(request: Request) -> JSONResponse:
 @app.post("/api/register")
 def register(payload: dict = Body(...)) -> dict:
     status, body = onboarding_api.post_register(payload)
+    return _unwrap(status, body)
+
+
+@app.post("/api/auth/register")
+def auth_register(response: Response, payload: dict = Body(...)) -> dict:
+    status, body, tokens = user_auth_api.post_register(payload)
+    if status >= 400:
+        raise HTTPException(status_code=status, detail=body.get("error", "request failed"))
+    if tokens is not None:
+        _set_user_auth_cookies(response, tokens)
+    response.status_code = status
+    return body.get("data", {})
+
+
+@app.post("/api/auth/login")
+def auth_login(response: Response, payload: dict = Body(...)) -> dict:
+    status, body, tokens = user_auth_api.post_login(payload)
+    if status >= 400:
+        raise HTTPException(status_code=status, detail=body.get("error", "request failed"))
+    if tokens is not None:
+        _set_user_auth_cookies(response, tokens)
+    return body.get("data", {})
+
+
+@app.get("/api/auth/session")
+def auth_session(request: Request) -> dict:
+    access_token = request.cookies.get(user_auth_api.service.access_cookie_name())
+    status, body = user_auth_api.get_session(access_token=access_token)
+    return _unwrap(status, body)
+
+
+@app.post("/api/auth/refresh")
+def auth_refresh(request: Request, response: Response) -> dict:
+    refresh_token = request.cookies.get(user_auth_api.service.refresh_cookie_name())
+    status, body, tokens = user_auth_api.post_refresh(refresh_token=refresh_token)
+    if status >= 400:
+        raise HTTPException(status_code=status, detail=body.get("error", "request failed"))
+    if tokens is not None:
+        _set_user_auth_cookies(response, tokens)
+    return body.get("data", {})
+
+
+@app.post("/api/auth/logout")
+def auth_logout(response: Response) -> dict:
+    status, body = user_auth_api.post_logout()
+    _clear_user_auth_cookies(response)
     return _unwrap(status, body)
 
 

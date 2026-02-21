@@ -116,6 +116,53 @@ MIGRATIONS: List[SQLiteMigration] = [
             """,
         ],
     ),
+    SQLiteMigration(
+        version=3,
+        name="user_password_auth_fields",
+        statements=[
+            "ALTER TABLE users ADD COLUMN password_hash TEXT",
+            "ALTER TABLE users ADD COLUMN auth_provider TEXT NOT NULL DEFAULT 'guest'",
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique
+            ON users(email)
+            """,
+        ],
+    ),
+    SQLiteMigration(
+        version=4,
+        name="auth_and_audit_compatibility_backfill",
+        statements=[
+            """
+            CREATE TABLE IF NOT EXISTS api_audit_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                request_id TEXT NOT NULL,
+                method TEXT NOT NULL,
+                path TEXT NOT NULL,
+                status_code INTEGER NOT NULL,
+                duration_ms REAL NOT NULL,
+                request_payload_json TEXT NOT NULL,
+                response_payload_json TEXT NOT NULL,
+                user_id TEXT,
+                client_ref TEXT,
+                created_at TEXT NOT NULL
+            )
+            """,
+            """
+            CREATE INDEX IF NOT EXISTS idx_api_audit_logs_created_at
+            ON api_audit_logs (created_at)
+            """,
+            """
+            CREATE INDEX IF NOT EXISTS idx_api_audit_logs_user_id
+            ON api_audit_logs (user_id)
+            """,
+            "ALTER TABLE users ADD COLUMN password_hash TEXT",
+            "ALTER TABLE users ADD COLUMN auth_provider TEXT NOT NULL DEFAULT 'guest'",
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique
+            ON users(email)
+            """,
+        ],
+    ),
 ]
 
 
@@ -146,7 +193,13 @@ def apply_sqlite_migrations(connection: sqlite3.Connection, migrations: Iterable
             continue
 
         for statement in migration.statements:
-            connection.execute(statement)
+            try:
+                connection.execute(statement)
+            except sqlite3.OperationalError as error:
+                message = str(error).lower()
+                if "duplicate column name" in message:
+                    continue
+                raise
 
         connection.execute(
             """

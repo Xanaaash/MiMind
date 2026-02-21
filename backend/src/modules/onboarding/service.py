@@ -21,8 +21,8 @@ class OnboardingService:
         self.triage_service = TriageService()
         self.entitlement_service = EntitlementService()
 
-    def register(self, email: str, locale: str, policy_version: str) -> dict:
-        user = self.auth_service.register_user(email=email, locale=locale)
+    def register(self, email: str, locale: str, policy_version: str, password: Optional[str] = None) -> dict:
+        user = self.auth_service.register_user(email=email, locale=locale, password=password)
         consent = self.compliance_service.capture_consent(user_id=user.user_id, policy_version=policy_version)
 
         return {

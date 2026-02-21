@@ -94,6 +94,15 @@ class InMemoryStore:
     def get_user(self, user_id: str) -> Optional[User]:
         return self.users.get(user_id)
 
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        normalized = str(email).strip().lower()
+        if not normalized:
+            return None
+        for user in self.users.values():
+            if user.email.lower() == normalized:
+                return user
+        return None
+
     def get_scores(self, user_id: str) -> Optional[AssessmentScoreSet]:
         return self.scores.get(user_id)
 
