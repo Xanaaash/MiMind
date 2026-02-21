@@ -303,7 +303,7 @@
 
 ### 8.5 回归与质量门禁
 
-- [ ] **T-809** 全链路回归：冥想显化升级、番茄钟小窗、量表扩充与 AI 专业答疑统一验收
+- [🔒 codex-0221a] **T-809** 全链路回归：冥想显化升级、番茄钟小窗、量表扩充与 AI 专业答疑统一验收
   - 验收标准：
     - `vitest`、关键 `playwright`、后端相关单测/契约测试全部通过
     - `scripts/constitution-check.sh` 与 `scripts/spec-status.sh` 通过
