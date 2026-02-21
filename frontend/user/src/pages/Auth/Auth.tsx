@@ -22,7 +22,7 @@ function toChannel(value: unknown): TriageChannel | null {
 }
 
 export default function Auth() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { setUser, setChannel } = useAuthStore();
 
@@ -79,11 +79,12 @@ export default function Auth() {
       await adminLogin(loginAccount, password);
 
       const email = normalized.includes('@') ? normalized : `${normalized}@mimind.ai`;
+      const currentLocale = i18n.language === 'en-US' ? 'en-US' : 'zh-CN';
       let userId = localStorage.getItem('mc_user_id');
       let resolvedChannel: TriageChannel | null = null;
 
       if (!userId) {
-        const data = await register(email, 'zh-CN', '2026.02');
+        const data = await register(email, currentLocale, '2026.02');
         userId = data.user_id;
         const triage = data.triage as { channel?: unknown } | undefined;
         resolvedChannel = toChannel(triage?.channel);
@@ -98,14 +99,14 @@ export default function Auth() {
         }
       }
 
-      setUser(userId!, email, 'zh-CN');
+      setUser(userId!, email, currentLocale);
       setChannel(resolvedChannel);
 
       if (resolvedChannel) {
         localStorage.setItem('mc_assessment_ts', String(Date.now()));
       }
 
-      toast.success(t('auth.login') === '登录' ? '登录成功' : 'Login successful');
+      toast.success(t('auth.login_success'));
       navigate('/home');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
@@ -131,7 +132,7 @@ export default function Auth() {
 
         <form onSubmit={handleLogin} className="grid gap-4">
           <label className="grid gap-1.5">
-            <span className="text-sm font-medium text-muted">{t('auth.login') === '登录' ? '账号' : 'Username'}</span>
+            <span className="text-sm font-medium text-muted">{t('fields.account')}</span>
             <input
               type="text"
               value={username}

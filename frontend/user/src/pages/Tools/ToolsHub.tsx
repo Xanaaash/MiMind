@@ -280,7 +280,7 @@ export default function ToolsHub() {
                     `}
                   >
                     {min === 0
-                      ? (t('tools.audio_title') === '白噪音' ? '不限' : '∞')
+                      ? t('tools.unlimited')
                       : `${min} ${t('tools.minutes')}`
                     }
                   </button>

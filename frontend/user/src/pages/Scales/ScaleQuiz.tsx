@@ -383,7 +383,7 @@ export default function ScaleQuiz() {
                         }
                       `}
                     >
-                      {val ? '是 / Yes' : '否 / No'}
+                      {val ? t('onboarding.yes') : t('onboarding.no')}
                     </button>
                   ))}
                 </div>

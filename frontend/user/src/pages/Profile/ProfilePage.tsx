@@ -24,7 +24,7 @@ export default function ProfilePage() {
         <p className="text-xs text-muted mt-2">ID: {userId ?? '-'}</p>
         {channel && (
           <div className="mt-3 flex items-center gap-2">
-            <span className="text-sm text-muted">通道:</span>
+            <span className="text-sm text-muted">{t('profile.channel_label')}</span>
             <span className={`text-sm font-semibold ${
               channel === 'GREEN' ? 'text-safe' : channel === 'YELLOW' ? 'text-warn' : 'text-danger'
             }`}>
@@ -35,7 +35,7 @@ export default function ProfilePage() {
       </Card>
 
       <Card className="mb-6">
-        <h3 className="font-heading font-bold mb-4">语言 / Language</h3>
+        <h3 className="font-heading font-bold mb-4">{t('profile.language')}</h3>
         <div className="flex gap-3">
           <Button
             variant={i18n.language === 'zh-CN' ? 'primary' : 'ghost'}
@@ -62,7 +62,7 @@ export default function ProfilePage() {
       </Card>
 
       <Button variant="danger" className="w-full" onClick={handleLogout}>
-        {i18n.language === 'zh-CN' ? '退出登录' : 'Log Out'}
+        {t('auth.logout')}
       </Button>
     </div>
   );

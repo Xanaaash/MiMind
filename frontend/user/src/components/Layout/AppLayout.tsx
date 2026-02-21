@@ -77,29 +77,29 @@ export default function AppLayout() {
             <button
               onClick={cycleTheme}
               className="text-sm px-2 py-1 rounded-lg hover:bg-cream transition-colors"
-              aria-label="Toggle theme"
-              title={theme === 'system' ? 'System' : theme === 'dark' ? 'Dark' : 'Light'}
+              aria-label={t('layout.toggle_theme')}
+              title={theme === 'system' ? t('layout.theme_system') : theme === 'dark' ? t('layout.theme_dark') : t('layout.theme_light')}
             >
               {themeIcon}
             </button>
             <button
               onClick={toggleLang}
               className="text-sm text-muted hover:text-ink px-2 py-1 rounded-lg hover:bg-cream transition-colors"
-              aria-label="Switch language"
+              aria-label={t('layout.switch_language')}
             >
               {i18n.language === 'zh-CN' ? 'EN' : '中文'}
             </button>
             <button
               onClick={() => { logout(); navigate('/'); }}
               className="text-sm text-muted hover:text-accent px-2 py-1 rounded-lg hover:bg-cream transition-colors"
-              aria-label="Log out"
+              aria-label={t('auth.logout')}
             >
-              {t('auth.login') === '登录' ? '退出' : 'Logout'}
+              {t('auth.logout')}
             </button>
             <button
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
               className="md:hidden text-xl p-1"
-              aria-label="Menu"
+              aria-label={t('layout.menu')}
               aria-expanded={mobileNavOpen}
               aria-controls="mobile-nav-menu"
             >

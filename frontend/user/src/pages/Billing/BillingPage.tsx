@@ -16,7 +16,7 @@ const PLAN_STYLES: Record<string, { icon: string; color: string; popular?: boole
 };
 
 export default function BillingPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const userId = useAuthStore((s) => s.userId);
   const [plans, setPlans] = useState<BillingPlan[]>([]);
   const [subscription, setSubscription] = useState<SubscriptionRecord | null>(null);
@@ -34,15 +34,20 @@ export default function BillingPage() {
     });
   }, [userId]);
 
+  const formatDate = (value: string) => {
+    const locale = i18n.language === 'en-US' ? 'en-US' : 'zh-CN';
+    return new Date(value).toLocaleDateString(locale);
+  };
+
   const handleTrial = async () => {
     if (!userId) return;
     setActionLoading('trial');
     try {
       const sub = await startTrial(userId);
       setSubscription(sub);
-      toast.success(t('billing.trial'));
+      toast.success(t('billing.trial_activated'));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed');
+      toast.error(err instanceof Error ? err.message : t('common.error'));
     } finally { setActionLoading(''); }
   };
 
@@ -84,7 +89,7 @@ export default function BillingPage() {
               <p className="font-semibold">{t('billing.current_plan')}: {subscription.plan_id}</p>
               <p className="text-sm text-muted">
                 {subscription.trial ? t('billing.trial') : subscription.status}
-                {subscription.ends_at && ` · 到期: ${new Date(subscription.ends_at).toLocaleDateString()}`}
+                {subscription.ends_at && ` · ${t('billing.ends_at')}: ${formatDate(subscription.ends_at)}`}
               </p>
             </div>
           </div>
@@ -104,7 +109,7 @@ export default function BillingPage() {
               <Card className={`relative ${style.popular ? 'border-accent border-2' : ''}`}>
                 {style.popular && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">
-                    推荐
+                    {t('billing.recommended')}
                   </span>
                 )}
                 <div className={`w-12 h-12 rounded-xl ${style.color} flex items-center justify-center text-2xl mb-4`}>
@@ -112,10 +117,10 @@ export default function BillingPage() {
                 </div>
                 <h3 className="font-heading font-bold text-xl">{plan.display_name}</h3>
                 <div className="mt-4 space-y-2 text-sm text-muted">
-                  <p>📊 {plan.reports_enabled ? '量表报告' : '仅量表填写'}</p>
-                  <p>🌿 {plan.tools_enabled ? '全部疗愈工具' : '基础工具'}</p>
-                  <p>💬 AI 教练: {plan.ai_sessions_per_month > 0 ? `${plan.ai_sessions_per_month} 次/月` : '不含'}</p>
-                  {plan.trial_days > 0 && <p>🎁 {plan.trial_days} 天免费试用</p>}
+                  <p>📊 {plan.reports_enabled ? t('billing.feature_reports_full') : t('billing.feature_reports_basic')}</p>
+                  <p>🌿 {plan.tools_enabled ? t('billing.feature_tools_full') : t('billing.feature_tools_basic')}</p>
+                  <p>💬 {t('billing.feature_ai_prefix')} {plan.ai_sessions_per_month > 0 ? t('billing.feature_ai_sessions', { count: plan.ai_sessions_per_month }) : t('billing.feature_ai_none')}</p>
+                  {plan.trial_days > 0 && <p>🎁 {t('billing.feature_trial_days', { days: plan.trial_days })}</p>}
                 </div>
                 <Button
                   className="w-full mt-6"
@@ -143,7 +148,7 @@ export default function BillingPage() {
                 <Card className={`relative ${style.popular ? 'border-accent border-2' : ''}`}>
                   {style.popular && (
                     <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">
-                      推荐
+                      {t('billing.recommended')}
                     </span>
                   )}
                   <div className={`w-12 h-12 rounded-xl ${style.color} flex items-center justify-center text-2xl mb-4`}>
@@ -151,10 +156,10 @@ export default function BillingPage() {
                   </div>
                   <h3 className="font-heading font-bold text-xl">{names[planId]}</h3>
                   <div className="mt-4 space-y-2 text-sm text-muted">
-                    <p>📊 {planId !== 'free' ? '量表报告' : '仅量表填写'}</p>
-                    <p>🌿 {planId !== 'free' ? '全部疗愈工具' : '基础工具'}</p>
-                    <p>💬 AI 教练: {planId === 'coach' ? '无限次/月' : '不含'}</p>
-                    {planId === 'basic' && <p>🎁 7 天免费试用</p>}
+                    <p>📊 {planId !== 'free' ? t('billing.feature_reports_full') : t('billing.feature_reports_basic')}</p>
+                    <p>🌿 {planId !== 'free' ? t('billing.feature_tools_full') : t('billing.feature_tools_basic')}</p>
+                    <p>💬 {t('billing.feature_ai_prefix')} {planId === 'coach' ? t('billing.feature_ai_unlimited') : t('billing.feature_ai_none')}</p>
+                    {planId === 'basic' && <p>🎁 {t('billing.feature_trial_days', { days: 7 })}</p>}
                   </div>
                   <Button
                     className="w-full mt-6"

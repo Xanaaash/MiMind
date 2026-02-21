@@ -17,6 +17,14 @@
     "safety": "安全资源",
     "neuro": "特质探索"
   },
+  "layout": {
+    "toggle_theme": "切换主题",
+    "theme_system": "跟随系统",
+    "theme_dark": "深色",
+    "theme_light": "浅色",
+    "switch_language": "切换语言",
+    "menu": "菜单"
+  },
   "landing": {
     "hero_title": "探索内心，了解自己",
     "hero_subtitle": "专业心理教练平台，陪伴你每一步自我成长",
@@ -206,6 +214,7 @@
     "back_to_tools": "返回疗愈工具",
     "start": "开始",
     "stop": "停止",
+    "unlimited": "不限",
     "minutes": "分钟",
     "cycles": "轮",
     "inhale": "吸气",
@@ -246,9 +255,25 @@
     "basic": "基础订阅",
     "premium": "教练订阅",
     "trial": "7 天免费试用",
+    "trial_activated": "免费试用已开启",
     "subscribe": "立即订阅",
     "current_plan": "当前方案",
-    "features": "包含功能"
+    "features": "包含功能",
+    "recommended": "推荐",
+    "ends_at": "到期",
+    "feature_reports_full": "量表报告",
+    "feature_reports_basic": "仅量表填写",
+    "feature_tools_full": "全部疗愈工具",
+    "feature_tools_basic": "基础工具",
+    "feature_ai_prefix": "AI 教练:",
+    "feature_ai_sessions": "{{count}} 次/月",
+    "feature_ai_unlimited": "无限次/月",
+    "feature_ai_none": "不含",
+    "feature_trial_days": "{{days}} 天免费试用"
+  },
+  "profile": {
+    "channel_label": "通道:",
+    "language": "语言 / Language"
   },
   "safety": {
     "title": "安全资源",

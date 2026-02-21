@@ -17,6 +17,14 @@
     "safety": "Safety",
     "neuro": "Traits"
   },
+  "layout": {
+    "toggle_theme": "Toggle theme",
+    "theme_system": "System",
+    "theme_dark": "Dark",
+    "theme_light": "Light",
+    "switch_language": "Switch language",
+    "menu": "Menu"
+  },
   "landing": {
     "hero_title": "Explore Your Inner World",
     "hero_subtitle": "Professional mental wellness coaching platform to support your personal growth",
@@ -206,6 +214,7 @@
     "back_to_tools": "Back to Tools",
     "start": "Start",
     "stop": "Stop",
+    "unlimited": "Unlimited",
     "minutes": "min",
     "cycles": "cycles",
     "inhale": "Inhale",
@@ -246,9 +255,25 @@
     "basic": "Basic",
     "premium": "Coach Plan",
     "trial": "7-Day Free Trial",
+    "trial_activated": "Free trial activated",
     "subscribe": "Subscribe Now",
     "current_plan": "Current Plan",
-    "features": "Features"
+    "features": "Features",
+    "recommended": "Recommended",
+    "ends_at": "Ends",
+    "feature_reports_full": "Assessment reports",
+    "feature_reports_basic": "Assessment submission only",
+    "feature_tools_full": "All healing tools",
+    "feature_tools_basic": "Basic tools",
+    "feature_ai_prefix": "AI Coach:",
+    "feature_ai_sessions": "{{count}} sessions/mo",
+    "feature_ai_unlimited": "Unlimited sessions/mo",
+    "feature_ai_none": "Not included",
+    "feature_trial_days": "{{days}}-day free trial"
+  },
+  "profile": {
+    "channel_label": "Channel:",
+    "language": "Language / 语言"
   },
   "safety": {
     "title": "Safety Resources",
