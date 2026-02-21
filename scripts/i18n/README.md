@@ -17,6 +17,7 @@ uv run --extra i18n python scripts/i18n/check_locale_consistency.py \
   --check-placeholders
 
 python3 scripts/i18n/check_i18n_antipatterns.py --root frontend/user/src
+python3 scripts/check_conflict_markers.py
 ```
 
 `check_i18n_antipatterns.py` blocks:

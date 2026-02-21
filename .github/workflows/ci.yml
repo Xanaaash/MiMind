@@ -24,6 +24,9 @@ jobs:
       - name: Install backend dependencies
         run: uv sync --extra dev
 
+      - name: Check unresolved merge markers
+        run: python3 scripts/check_conflict_markers.py
+
       - name: Run i18n anti-pattern guard
         run: python3 scripts/i18n/check_i18n_antipatterns.py --root frontend/user/src
 

@@ -56,9 +56,64 @@ describe('neurodiversity translations', () => {
       'nd_disclaimer.decline',
       'nd_disclaimer.banner_title',
       'nd_disclaimer.banner_body',
+      'nd_disclaimer.coach_message',
+      'legal.back_home',
+      'legal.privacy.title',
+      'legal.privacy.subtitle',
+      'legal.privacy.updated_at',
+      'legal.terms.title',
+      'legal.terms.subtitle',
+      'legal.terms.updated_at',
+      'neuro_share.card_title',
+      'neuro_share.score_label',
+      'neuro_share.insight_label',
+      'neuro_share.footer',
+      'neuro_share.fallback.title',
     ];
 
     baseKeys.forEach((key) => expectTranslation(key));
+  });
+
+  it('includes bilingual legal sections and neuro share archetype structures', () => {
+    const locales: Array<[string, LocaleResource]> = [
+      ['zh-CN', zhCN as LocaleResource],
+      ['en-US', enUS as LocaleResource],
+    ];
+
+    locales.forEach(([locale, resource]) => {
+      const privacySections = getByPath(resource, 'legal.privacy.sections');
+      const termsSections = getByPath(resource, 'legal.terms.sections');
+      const fallbackTags = getByPath(resource, 'neuro_share.fallback.tags');
+
+      expect(Array.isArray(privacySections), `${locale} legal.privacy.sections should be array`).toBe(true);
+      expect(Array.isArray(termsSections), `${locale} legal.terms.sections should be array`).toBe(true);
+      expect(Array.isArray(fallbackTags), `${locale} neuro_share.fallback.tags should be array`).toBe(true);
+
+      (privacySections as Array<Record<string, unknown>>).forEach((section, idx) => {
+        expect(typeof section.heading, `${locale} legal privacy heading ${idx}`).toBe('string');
+        expect(typeof section.body, `${locale} legal privacy body ${idx}`).toBe('string');
+      });
+      (termsSections as Array<Record<string, unknown>>).forEach((section, idx) => {
+        expect(typeof section.heading, `${locale} legal terms heading ${idx}`).toBe('string');
+        expect(typeof section.body, `${locale} legal terms body ${idx}`).toBe('string');
+      });
+      (fallbackTags as Array<unknown>).forEach((tag, idx) => {
+        expect(typeof tag, `${locale} neuro_share fallback tag ${idx}`).toBe('string');
+      });
+
+      ['asrs', 'aq10', 'hsp', 'catq'].forEach((scaleId) => {
+        ['low', 'moderate', 'high'].forEach((level) => {
+          const basePath = `neuro_share.archetypes.${scaleId}.${level}`;
+          const title = getByPath(resource, `${basePath}.title`);
+          const tags = getByPath(resource, `${basePath}.tags`);
+          expect(typeof title, `${locale} ${basePath}.title`).toBe('string');
+          expect(Array.isArray(tags), `${locale} ${basePath}.tags`).toBe(true);
+          (tags as Array<unknown>).forEach((tag, idx) => {
+            expect(typeof tag, `${locale} ${basePath}.tags[${idx}]`).toBe('string');
+          });
+        });
+      });
+    });
   });
 
   it('covers each neuro scale question, labels, and summary copy in zh-CN/en-US', () => {
