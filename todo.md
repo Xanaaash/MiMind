@@ -186,7 +186,7 @@
 > **依赖顺序**：`T-701 -> T-704`
 
 - [✅] **T-701** 新建 `frontend/user/src/stores/useToolStore.ts`（Zustand）：统一管理番茄钟、白噪音、右侧工具栏展开状态；固定状态契约字段 `pomodoro.remainingSec/isRunning/mode/preset`、`ambient.activeSoundIds/volumes/timerMin/isPlaying`、`ui.isRightSidebarOpen/activePanel`
-- [ ] **T-704** 音频上下文持久化：基于现有 `frontend/user/src/utils/ambientAudio.ts` 抽象全局音频服务并接入 `useToolStore`，避免页面跳转导致播放中断
+- [🔒 codex-0221b] **T-704** 音频上下文持久化：基于现有 `frontend/user/src/utils/ambientAudio.ts` 抽象全局音频服务并接入 `useToolStore`，避免页面跳转导致播放中断
 
 ### 7.2 执行批次 B（P0 全局 UI 挂载）
 
