@@ -25,3 +25,8 @@
 
 - T2.x depends on T1.x
 - T3.x depends on T2.x
+
+## Test Gate Alignment
+- Unit tests: covered by corresponding backend/frontend unit suites
+- contract tests: covered by API contract suites
+- Safety: covered by safety regression suites

@@ -24,3 +24,8 @@
 
 - T2.x depends on T1.x storage support.
 - T3.x depends on T1.x + T2.x completion.
+
+## Test Gate Alignment
+- Unit tests: covered by corresponding backend/frontend unit suites
+- contract tests: covered by API contract suites
+- Safety: covered by safety regression suites
