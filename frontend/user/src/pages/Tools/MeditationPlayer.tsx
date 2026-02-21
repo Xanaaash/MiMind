@@ -69,7 +69,7 @@ export default function MeditationPlayer() {
       await audio.play();
       setPlaying(true);
       if (userId) {
-        void startMeditation(userId, track.id).catch(() => {
+        void startMeditation(userId, track.sessionId).catch(() => {
           toast.warning(t('tools.meditation_log_failed'));
         });
       }
@@ -118,14 +118,46 @@ export default function MeditationPlayer() {
           <p className="text-sm text-cyan-100/75">{t('tools.meditation_local_audio_note')}</p>
           {activeTrack ? (
             <div className="mt-4 rounded-2xl border border-white/20 bg-white/5 px-4 py-4">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs text-cyan-100/70 uppercase tracking-wider">{t('tools.meditation_now_playing')}</p>
-                  <p className="font-semibold text-cyan-50">{t(activeTrack.titleKey)}</p>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3 min-w-0">
+                  <div
+                    className="mt-0.5 h-12 w-12 shrink-0 rounded-xl border border-white/30"
+                    style={{ background: activeTrack.coverGradient }}
+                    aria-hidden
+                  />
+                  <div className="min-w-0">
+                    <p className="text-xs text-cyan-100/70 uppercase tracking-wider">{t('tools.meditation_now_playing')}</p>
+                    <p className="font-semibold text-cyan-50">{t(activeTrack.titleKey)}</p>
+                    <p className="text-xs text-cyan-100/75 mt-0.5">{t(activeTrack.descKey)}</p>
+                  </div>
                 </div>
                 <span className="text-sm text-cyan-100/75">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </span>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="rounded-full border border-cyan-200/30 bg-cyan-200/10 px-2 py-0.5 text-[11px] text-cyan-100/90">
+                  {t(`tools.meditation_theme_${activeTrack.theme}`)}
+                </span>
+                {activeTrack.tagKeys.map((tagKey) => (
+                  <span key={`${activeTrack.id}-${tagKey}`} className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-[11px] text-cyan-100/85">
+                    {t(tagKey)}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-3 space-y-1 text-xs text-cyan-100/75">
+                <p>
+                  {t('tools.meditation_source_label')}: {activeTrack.sourceName}{' '}
+                  <a href={activeTrack.sourceUrl} target="_blank" rel="noreferrer" className="text-cyan-100 underline decoration-cyan-200/70 underline-offset-2">
+                    {t('tools.meditation_open_source')}
+                  </a>
+                </p>
+                <p>
+                  {t('tools.meditation_license_label')}: {activeTrack.licenseType}
+                </p>
+                <p>
+                  {t('tools.meditation_attribution_label')}: {t(activeTrack.attributionKey)}
+                </p>
               </div>
               <input
                 type="range"
@@ -154,11 +186,38 @@ export default function MeditationPlayer() {
                 <Card className={`bg-white/10 border-white/20 backdrop-blur-xl shadow-xl ${isActive ? 'border-cyan-300/60' : ''}`}>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="min-w-0">
-                      <h2 className="font-heading text-lg font-bold text-cyan-50">{t(track.titleKey)}</h2>
-                      <p className="text-sm text-cyan-100/75 mt-1">{t(track.descKey)}</p>
-                      <p className="text-xs text-cyan-100/65 mt-2">
-                        {track.minutes} {t('tools.minutes')}
-                      </p>
+                      <div className="flex items-start gap-3">
+                        <div
+                          className="mt-0.5 h-12 w-12 shrink-0 rounded-xl border border-white/30"
+                          style={{ background: track.coverGradient }}
+                          aria-hidden
+                        />
+                        <div className="min-w-0">
+                          <h2 className="font-heading text-lg font-bold text-cyan-50">{t(track.titleKey)}</h2>
+                          <p className="text-sm text-cyan-100/75 mt-1">{t(track.descKey)}</p>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            <span className="rounded-full border border-cyan-200/30 bg-cyan-200/10 px-2 py-0.5 text-[11px] text-cyan-100/90">
+                              {t(`tools.meditation_theme_${track.theme}`)}
+                            </span>
+                            {track.tagKeys.map((tagKey) => (
+                              <span key={`${track.id}-${tagKey}`} className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-[11px] text-cyan-100/85">
+                                {t(tagKey)}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="mt-2 space-y-1 text-xs text-cyan-100/70">
+                            <p>
+                              {track.minutes} {t('tools.minutes')}
+                            </p>
+                            <p>
+                              {t('tools.meditation_source_label')}: {track.sourceName}
+                            </p>
+                            <p>
+                              {t('tools.meditation_license_label')}: {track.licenseType}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                     <Button onClick={() => handleToggleTrack(track)} loading={isLoading}>
                       {isActive && playing ? t('tools.stop') : t('tools.start')}
