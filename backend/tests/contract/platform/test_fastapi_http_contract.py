@@ -309,6 +309,38 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         export_after_erase = self.client.get(f"/api/compliance/{user_id}/export")
         self.assertEqual(export_after_erase.status_code, 400)
 
+    def test_admin_auth_session_lifecycle_http(self) -> None:
+        unauth_session = self.client.get("/api/admin/session")
+        self.assertEqual(unauth_session.status_code, 401)
+
+        invalid_login = self.client.post(
+            "/api/admin/login",
+            json={"username": "admin", "password": "wrong-password"},
+        )
+        self.assertEqual(invalid_login.status_code, 401)
+
+        login = self.client.post(
+            "/api/admin/login",
+            json={"username": "admin", "password": "admin"},
+        )
+        self.assertEqual(login.status_code, 200)
+        login_payload = login.json()
+        self.assertTrue(login_payload["authenticated"])
+        self.assertIn("auth_config", login_payload)
+        self.assertIn("mc_admin_session", login.cookies)
+
+        authed_session = self.client.get("/api/admin/session")
+        self.assertEqual(authed_session.status_code, 200)
+        self.assertTrue(authed_session.json()["authenticated"])
+        self.assertEqual(authed_session.json()["username"], "admin")
+
+        logout = self.client.post("/api/admin/logout")
+        self.assertEqual(logout.status_code, 200)
+        self.assertFalse(logout.json()["authenticated"])
+
+        session_after_logout = self.client.get("/api/admin/session")
+        self.assertEqual(session_after_logout.status_code, 401)
+
     def test_admin_user_management_and_compliance_http(self) -> None:
         unauth_users = self.client.get("/api/admin/users")
         self.assertEqual(unauth_users.status_code, 401)
