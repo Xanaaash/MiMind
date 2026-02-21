@@ -163,6 +163,64 @@ function scoreHSP(answers: number[]): NeuroScoreResult {
   };
 }
 
+// ─── CAT-Q (Camouflaging Autistic Traits Questionnaire) ─────
+const CATQ_QUESTIONS: NeuroQuestion[] = [
+  { id: 'catq-1', dimension: 'compensation', text: { 'zh-CN': '在参加社交活动前，我会先准备几句可用的开场话。', 'en-US': 'Before social situations, I rehearse a few opening lines I can use.' } },
+  { id: 'catq-2', dimension: 'masking', text: { 'zh-CN': '即使不明白谈话在说什么，我也会假装自己跟上了。', 'en-US': 'Even when I do not fully follow a conversation, I pretend that I do.' } },
+  { id: 'catq-3', dimension: 'assimilation', text: { 'zh-CN': '我会刻意模仿周围人的说话节奏和反应方式，让自己更“合群”。', 'en-US': 'I deliberately mirror other people\'s speaking rhythm and reactions to fit in.' } },
+  { id: 'catq-4', dimension: 'compensation', text: { 'zh-CN': '我会提前学习社交规则（如眼神、轮流说话）再去实际场景中使用。', 'en-US': 'I learn social rules in advance (like eye contact or turn-taking) and apply them later.' } },
+  { id: 'catq-5', dimension: 'masking', text: { 'zh-CN': '当我感到紧张时，我会努力不让别人看出来。', 'en-US': 'When I feel overwhelmed, I work hard not to show it outwardly.' } },
+  { id: 'catq-6', dimension: 'assimilation', text: { 'zh-CN': '我会在社交中压低自己原本的表达方式，以避免被注意。', 'en-US': 'In social settings, I tone down my natural expression style to avoid standing out.' } },
+  { id: 'catq-7', dimension: 'compensation', text: { 'zh-CN': '我会把他人的社交反馈当作“线索”来修正自己的行为。', 'en-US': 'I treat other people\'s social feedback as cues to adjust how I act.' } },
+  { id: 'catq-8', dimension: 'masking', text: { 'zh-CN': '当我不确定该如何回应时，我会用微笑或点头来掩饰。', 'en-US': 'When I am unsure how to respond, I use smiling or nodding to cover uncertainty.' } },
+  { id: 'catq-9', dimension: 'assimilation', text: { 'zh-CN': '我会刻意选择与周围人相似的兴趣话题，以减少违和感。', 'en-US': 'I intentionally choose topics similar to those around me to reduce mismatch.' } },
+  { id: 'catq-10', dimension: 'compensation', text: { 'zh-CN': '我会把社交场景分步骤处理，而不是凭直觉应对。', 'en-US': 'I handle social situations step by step instead of relying on intuition.' } },
+  { id: 'catq-11', dimension: 'masking', text: { 'zh-CN': '我会刻意隐藏自己在感官上的不适（例如噪音、灯光、气味）。', 'en-US': 'I deliberately hide sensory discomfort (such as noise, lights, or smells).' } },
+  { id: 'catq-12', dimension: 'assimilation', text: { 'zh-CN': '我会在群体中不断观察自己是否“看起来正常”。', 'en-US': 'In groups, I constantly monitor whether I appear socially typical.' } },
+  { id: 'catq-13', dimension: 'compensation', text: { 'zh-CN': '我会复盘一场社交对话，找出下次可以改进的地方。', 'en-US': 'I review social conversations afterward to identify what to improve next time.' } },
+  { id: 'catq-14', dimension: 'masking', text: { 'zh-CN': '即使内心并不认同，我也会附和他人，以避免冲突。', 'en-US': 'Even when I disagree internally, I may go along to avoid social conflict.' } },
+  { id: 'catq-15', dimension: 'assimilation', text: { 'zh-CN': '我会调整自己的肢体动作，让它更符合当下社交氛围。', 'en-US': 'I adjust my body language so it better matches the social atmosphere.' } },
+  { id: 'catq-16', dimension: 'compensation', text: { 'zh-CN': '我会准备“安全话题”来避免在社交中突然卡住。', 'en-US': 'I prepare “safe topics” to avoid freezing in conversation.' } },
+  { id: 'catq-17', dimension: 'masking', text: { 'zh-CN': '我会压抑本能的小动作或习惯动作，以免显得不合群。', 'en-US': 'I suppress natural self-soothing or repetitive movements so I do not look out of place.' } },
+  { id: 'catq-18', dimension: 'assimilation', text: { 'zh-CN': '我会根据不同对象切换“社交角色”来适应场景。', 'en-US': 'I switch between different “social roles” depending on who I am with.' } },
+  { id: 'catq-19', dimension: 'compensation', text: { 'zh-CN': '我会通过记忆脚本化表达来减少即兴社交压力。', 'en-US': 'I memorize script-like phrases to reduce pressure during spontaneous social moments.' } },
+  { id: 'catq-20', dimension: 'masking', text: { 'zh-CN': '当我听不懂暗示或玩笑时，我会装作自己懂了。', 'en-US': 'When I miss implied meaning or jokes, I act as if I understood.' } },
+  { id: 'catq-21', dimension: 'assimilation', text: { 'zh-CN': '我会在社交后感到明显疲惫，因为一直在维持“合适状态”。', 'en-US': 'After social interactions, I feel drained because I have been maintaining a “socially acceptable mode.”' } },
+  { id: 'catq-22', dimension: 'compensation', text: { 'zh-CN': '我会把复杂社交情境拆成规则，帮助自己更稳定地应对。', 'en-US': 'I break down complex social situations into rules so I can respond more consistently.' } },
+  { id: 'catq-23', dimension: 'masking', text: { 'zh-CN': '我会刻意控制表情强度，避免显得“过度”或“冷淡”。', 'en-US': 'I intentionally control facial expression intensity so I do not seem “too much” or “too flat.”' } },
+  { id: 'catq-24', dimension: 'assimilation', text: { 'zh-CN': '我会主动改变穿着或说话方式，让自己更像群体中的一员。', 'en-US': 'I adjust clothing or speaking style so I look more like I belong in the group.' } },
+  { id: 'catq-25', dimension: 'masking', text: { 'zh-CN': '我会隐藏“我其实已经很累”这一状态，继续维持社交表现。', 'en-US': 'I hide the fact that I am already socially exhausted and keep performing.' } },
+];
+
+function scoreCATQ(answers: number[]): NeuroScoreResult {
+  const total = answers.reduce((s, v) => s + v, 0);
+  const byDimension: Record<string, number> = {
+    compensation: 0,
+    masking: 0,
+    assimilation: 0,
+  };
+
+  answers.forEach((value, index) => {
+    const question = CATQ_QUESTIONS[index];
+    byDimension[question.dimension] += value;
+  });
+
+  const level = total >= 95 ? 'high' : total >= 60 ? 'moderate' : 'low';
+
+  return {
+    total,
+    maxTotal: 150,
+    level,
+    levelKey: `neuro.level_${level}`,
+    dimensions: [
+      { key: 'compensation', nameKey: 'neuro.dim_compensation', score: byDimension.compensation, max: 48, color: '#6b8fd4' },
+      { key: 'masking', nameKey: 'neuro.dim_masking', score: byDimension.masking, max: 54, color: '#e07a60' },
+      { key: 'assimilation', nameKey: 'neuro.dim_assimilation', score: byDimension.assimilation, max: 48, color: '#9b7fd4' },
+    ],
+    summaryKey: `neuro.catq_summary_${level}`,
+  };
+}
+
 // ─── Scale Catalog ──────────────────────────────────────────
 
 export const NEURO_SCALES: NeuroScale[] = [
@@ -225,6 +283,25 @@ export const NEURO_SCALES: NeuroScale[] = [
       'en-US': ['Not at All', 'Barely', 'Slightly Not', 'Moderately', 'Slightly', 'Very Much', 'Extremely'],
     },
     score: scoreHSP,
+  },
+  {
+    id: 'catq',
+    nameKey: 'neuro.catq_name',
+    descKey: 'neuro.catq_desc',
+    emoji: '🎭',
+    color: 'bg-safe-soft',
+    itemCount: 25,
+    dimensions: [
+      { key: 'compensation', nameKey: 'neuro.dim_compensation', color: '#6b8fd4' },
+      { key: 'masking', nameKey: 'neuro.dim_masking', color: '#e07a60' },
+      { key: 'assimilation', nameKey: 'neuro.dim_assimilation', color: '#9b7fd4' },
+    ],
+    questions: CATQ_QUESTIONS,
+    answerLabels: {
+      'zh-CN': ['完全不符合', '较不符合', '略不符合', '一般', '略符合', '比较符合', '非常符合'],
+      'en-US': ['Not at all true', 'Mostly not true', 'Slightly not true', 'Neutral', 'Slightly true', 'Mostly true', 'Very true'],
+    },
+    score: scoreCATQ,
   },
 ];
 

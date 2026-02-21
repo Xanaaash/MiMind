@@ -368,6 +368,11 @@
     "hsp_summary_low": "Your sensitivity level is in the typical range. External stimuli have relatively little impact on you, and you likely handle busy environments with ease.",
     "hsp_summary_moderate": "You show moderate highly sensitive traits. You're likely responsive to environmental changes and have a rich inner life. Learning to recognize overstimulation signals and taking timely breaks will help.",
     "hsp_summary_high": "You are a highly sensitive person. You likely perceive sounds, lights, and emotional atmospheres more intensely. This is an innate temperament shared by 15-20% of the population. Use the Sensory Relief Kit and intentional alone time to protect your energy.",
+    "catq_name": "Social Camouflage & Energy Cost",
+    "catq_desc": "Understand how much strategy and energy you use to adapt your social presentation (based on CAT-Q)",
+    "catq_summary_low": "Your profile suggests that in most situations you can present yourself naturally without sustained social masking. Overall social energy cost appears manageable.",
+    "catq_summary_moderate": "You often adapt your expression style to keep interactions smooth. This can be an effective social strategy, but it may also consume extra energy. Plan recovery windows after high-intensity social settings.",
+    "catq_summary_high": "Your results indicate a high level of social camouflage effort (masking, compensation, and assimilation). This does not mean something is wrong with you. It suggests you may be carrying a high social regulation load over time. Prioritize lower-burden relationships, reduce back-to-back social blocks, and protect regular recovery time.",
     "dim_inattention": "Inattention",
     "dim_hyperactivity": "Hyperactivity",
     "dim_impulsivity": "Impulsivity",
@@ -379,7 +384,10 @@
     "dim_excitation": "Ease of Excitation",
     "dim_aesthetic": "Aesthetic Sensitivity",
     "dim_threshold": "Sensory Threshold",
-    "dim_processing": "Depth of Processing"
+    "dim_processing": "Depth of Processing",
+    "dim_compensation": "Compensation",
+    "dim_masking": "Masking",
+    "dim_assimilation": "Assimilation"
   },
   "nd_disclaimer": {
     "title": "Important: This Is Not a Clinical Diagnosis",

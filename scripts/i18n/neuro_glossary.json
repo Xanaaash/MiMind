@@ -1,0 +1,22 @@
+{
+  "en-US->zh-CN": {
+    "neurodiversity": "神经多样性",
+    "camouflage": "社交面具化",
+    "camouflaging": "社交面具化",
+    "masking": "掩饰",
+    "compensation": "补偿策略",
+    "assimilation": "同化适配",
+    "trait": "特质",
+    "traits": "特质",
+    "not a clinical diagnosis": "非临床诊断"
+  },
+  "zh-CN->en-US": {
+    "神经多样性": "neurodiversity",
+    "社交面具化": "social camouflaging",
+    "掩饰": "masking",
+    "补偿策略": "compensation",
+    "同化适配": "assimilation",
+    "特质": "traits",
+    "非临床诊断": "not a clinical diagnosis"
+  }
+}

@@ -40,6 +40,11 @@ const ARCHETYPE_COPY: Record<string, Record<string, { title: string; tags: strin
     moderate: { title: '敏锐感知型 / Sensitive Lean', tags: ['环境察觉快', '情绪共鸣强', '需要节奏留白'] },
     high: { title: '感知放大器 / Sensory Amplifier', tags: ['高分辨感知', '深度情绪加工', '恢复窗口重要'] },
   },
+  catq: {
+    low: { title: '自然呈现型 / Natural Presence', tags: ['表达较自然', '社交耗能较低', '适配压力较小'] },
+    moderate: { title: '适配协商型 / Adaptive Negotiator', tags: ['场景化调节', '策略性表达', '需要恢复时间'] },
+    high: { title: '高负荷适配者 / High Camouflage Adapter', tags: ['持续社交监控', '强适配驱动', '社交后耗竭明显'] },
+  },
 };
 
 function drawBackground(ctx: CanvasRenderingContext2D, width: number, height: number): void {
