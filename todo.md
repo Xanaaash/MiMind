@@ -173,35 +173,65 @@
 
 ---
 
-## 七、疗愈工具体系重构（下一步）
+## 七、疗愈工具体系重构（当前最高优先）
 
 > **目标**：将工具能力重组为「急救舱 + 心灵空间 + 全局伴随工具栏」，实现跨路由不中断体验。
 
-### 7.1 P0 — 全局悬浮工具栏（持久化伴随）
+### 7.0 P0 门禁（Spec Kit）
 
-- [🔒 codex-0221b] **T-701** 新建 `frontend/user/src/stores/useToolStore.ts`（Zustand）：统一管理番茄钟、白噪音、右侧工具栏展开状态
+- [ ] **T-700** 创建独立 spec：`specs/020-tools-rearchitecture/`（`spec.md`、`plan.md`、`tasks.md`），并完成 `/speckit.specify -> /speckit.plan -> /speckit.tasks` 后再进入开发认领
+
+### 7.1 执行批次 A（P0 基础状态层）
+
+> **依赖顺序**：`T-701 -> T-704`
+
+- [✅] **T-701** 新建 `frontend/user/src/stores/useToolStore.ts`（Zustand）：统一管理番茄钟、白噪音、右侧工具栏展开状态；固定状态契约字段 `pomodoro.remainingSec/isRunning/mode/preset`、`ambient.activeSoundIds/volumes/timerMin/isPlaying`、`ui.isRightSidebarOpen/activePanel`
+- [ ] **T-704** 音频上下文持久化：基于现有 `frontend/user/src/utils/ambientAudio.ts` 抽象全局音频服务并接入 `useToolStore`，避免页面跳转导致播放中断
+
+### 7.2 执行批次 B（P0 全局 UI 挂载）
+
+> **依赖顺序**：`T-702 -> T-703`（依赖 `T-701/T-704`）
+
 - [ ] **T-702** 新建 `frontend/user/src/components/FloatingToolbar/` 右侧抽屉组件：包含迷你番茄钟 + 白噪音混音器（支持雨声/咖啡馆等叠加）
 - [ ] **T-703** 重构 `frontend/user/src/components/Layout/AppLayout.tsx`：将 `FloatingToolbar` 提升到 `<Outlet />` 之外，确保跨路由常驻
-- [ ] **T-704** 音频上下文持久化：基于 HTML5 Audio API/Howler.js 管理全局音频实例，避免页面跳转中断播放
 
-### 7.2 P0 — 「急救舱 / 即刻平复」模块独立
+### 7.3 执行批次 C（P0 急救舱上线）
 
-- [ ] **T-705** 新建 `frontend/user/src/pages/Relief/ReliefHub.tsx` + 路由 `/relief`，导航栏增加高优先级入口（急救舱/即刻平复）
+> **依赖顺序**：`T-705 -> T-706 -> T-707`
+
+- [ ] **T-705** 新建 `frontend/user/src/pages/Relief/ReliefHub.tsx` + 路由 `/relief`，导航栏增加高优先级入口（急救舱）
 - [ ] **T-706** 迁移 `BreathingExercise.tsx`、`SensoryRelief.tsx` 到 Relief 模块，默认首屏提供一键启动的大按钮交互
-- [ ] **T-707** 急救模式 UX 强化：最少文字说明 + 防过载黑屏 + 低频粉红噪音快速入口
+- [ ] **T-707** 急救模式 UX 强化：最少文字说明 + 防过载黑屏 + 低频粉红噪音快速入口（首屏 1 次点击即可启动）
 
-### 7.3 P1 — 「心灵空间 / 正念与显化」精装修
+### 7.4 执行批次 D（P1 心灵空间）
+
+> **依赖顺序**：`T-711 -> T-712 -> T-713 -> T-714`
 
 - [ ] **T-711** 新建 `frontend/user/src/pages/Mindfulness/MindfulnessHub.tsx` + 路由 `/mindfulness`，承接冥想与显化能力
-- [ ] **T-712** 冥想音频源升级：替换 `public/audio/meditation/` 现有素材，改为可配置播放列表（高质量可商用音频）
+- [ ] **T-712** 冥想音频源升级：替换 `public/audio/meditation/` 现有素材，改为前端可配置播放列表（高质量可商用音频）
 - [ ] **T-713** 升级 `MeditationPlayer.tsx`：引入沉浸式动态背景（渐变/毛玻璃/星空或海浪视频）
-- [ ] **T-714** 开发「Manifestation」工具 v1：肯定语记录 + 愿景卡片展示（配合轻柔背景音）
+- [ ] **T-714** 开发 `Manifestation` 工具 v1：肯定语记录 + 愿景卡片展示（配合轻柔背景音）
 
-### 7.4 P1 — 清理与国际化
+### 7.5 执行批次 E（P1 收口）
 
-- [ ] **T-715** 删除旧 `ToolsHub.tsx` 及相关无效引用，完成工具路由收口
-- [ ] **T-716** 更新 `zh-CN.json` 与 `en-US.json`：补充 `nav.rescue`、`nav.mindfulness`、`tools.manifestation` 等文案键值
-- [ ] **T-717** 前端回归验证：重点覆盖“跨页面音频不中断 / 工具栏状态持久化 / 新旧路由可达性”
+> **依赖顺序**：`T-715 -> T-716 -> T-717`
+
+- [ ] **T-715** 删除旧 `ToolsHub.tsx` 及相关无效引用，完成工具路由收口（`/tools` 过渡期保留 1 个迭代，随后移除）
+- [ ] **T-716** 更新 `zh-CN.json` 与 `en-US.json`：补充 `nav.rescue`、`nav.mindfulness`、`tools.rescue.*`、`tools.mindfulness.*`、`tools.manifestation.*` 等文案键值
+- [ ] **T-717** 前端回归验证（验收标准）：
+  - 路由切换时白噪音不中断（`/home -> /coach -> /relief`）
+  - 右侧工具栏开合状态跨页面保持
+  - 急救舱首屏 1 次点击可启动（呼吸或感官急救）
+  - 心灵空间音频播放列表可配置、可播放、可切换
+  - `zh-CN/en-US` 新键完整，无 missing key
+  - 回归范围包含 `vitest`（store + 组件）与关键路由冒烟
+
+### 7.6 默认假设（实现前锁定）
+
+- 不新增后端接口，冥想播放列表先走前端配置文件
+- 维持现有任务 ID（新增仅 `T-700`），不重编号、不拆分
+- 按 `autodev` 流程执行认领：主目录仅编排，开发在 worktree 进行
+- 公共接口锁定：新增路由 `/relief`、`/mindfulness`，并在 `T-715` 完成 `/tools` 路由收口
 
 ---
 
@@ -209,13 +239,13 @@
 
 | 批次 | 任务 ID | 说明 |
 |------|---------|------|
+| **P0 当前冲刺（最高优先）** | T-700~T-707 | Spec 门禁 + 全局伴随工具栏 + 急救舱上线 |
 | **P0 上线必须** | T-101, T-102, T-103, T-111, T-112, T-113, T-201, T-301, T-401, T-402 | 认证、基础体验、测试、部署 |
 | **P0 安全红线** | T-203, T-221, T-223, T-304 | 安全加固 |
-| **P0 下一步工具重构** | T-701~T-707 | 右侧全局工具栏 + 急救舱独立入口 + 跨路由不中断 |
 | **P1 体验优化** | T-114~T-116, T-121~T-124, T-131~T-134, T-141~T-145, T-161~T-163 | 打磨 UX |
 | **P1 心灵空间升级** | T-711~T-714 | 冥想与显化沉浸式体验升级 |
 | **P1 重构收尾** | T-715~T-717 | 清理旧模块 + i18n + 关键回归验证 |
 | **P1 增长** | T-151~T-153, T-211~T-213 | 社交分享、支付 |
 | **P1 神经多样性核心** | T-601, T-602, T-603, T-611, T-621~T-624 | 三大量表 + 合规 + AI 适配 |
 | **P2 神经多样性进阶** | T-604, T-612, T-631, T-632, T-641, T-642, T-651, T-652 | CAT-Q + 工具 + 分享 + i18n |
-| **P2 管理** | T-501~T-504 | Admin 增强 |
+| **P2 管理（当前冲刺后）** | T-503~T-504 | Admin 增强（在 `T-700~T-707` 完成后执行） |
