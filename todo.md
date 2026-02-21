@@ -179,7 +179,7 @@
 
 ### 7.0 P0 门禁（Spec Kit）
 
-- [🔒 codex-0221a] **T-700** 创建独立 spec：`specs/020-tools-rearchitecture/`（`spec.md`、`plan.md`、`tasks.md`），并完成 `/speckit.specify -> /speckit.plan -> /speckit.tasks` 后再进入开发认领
+- [✅] **T-700** 创建独立 spec：`specs/020-tools-rearchitecture/`（`spec.md`、`plan.md`、`tasks.md`），并完成 `/speckit.specify -> /speckit.plan -> /speckit.tasks` 后再进入开发认领
 
 ### 7.1 执行批次 A（P0 基础状态层）
 
