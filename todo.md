@@ -241,7 +241,7 @@
 
 ### 8.0 P0 门禁（Spec Kit）
 
-- [ ] **T-801** 创建独立 spec：`specs/021-meditation-manifestation-professionalization/`（`spec.md`、`plan.md`、`tasks.md`），并明确版权、专业边界与验收口径
+- [🔒 codex-0221a] **T-801** 创建独立 spec：`specs/021-meditation-manifestation-professionalization/`（`spec.md`、`plan.md`、`tasks.md`），并明确版权、专业边界与验收口径
   - 验收标准：
     - 存在 `spec/plan/tasks` 三件套
     - `scripts/constitution-check.sh` 通过
