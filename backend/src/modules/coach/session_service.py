@@ -275,16 +275,31 @@ class CoachSessionService:
     @staticmethod
     def _compose_system_prompt(context_prompt: dict) -> str:
         base_prompt = get_system_prompt()
+        expert_qa = context_prompt.get("expert_qa")
+        expert_policy = None
+        if isinstance(expert_qa, dict):
+            policy_candidate = expert_qa.get("policy")
+            if isinstance(policy_candidate, str):
+                expert_policy = policy_candidate.strip()
+
+        composed_prompt = base_prompt
+        if expert_policy:
+            composed_prompt = (
+                f"{composed_prompt}\n\n"
+                "Additional expert educational Q&A guidance:\n"
+                f"{expert_policy}"
+            )
+
         fragments = context_prompt.get("neurodiversity_prompt_fragments")
         if not isinstance(fragments, list):
-            return base_prompt
+            return composed_prompt
 
         cleaned = [str(item).strip() for item in fragments if str(item).strip()]
         if not cleaned:
-            return base_prompt
+            return composed_prompt
 
         return (
-            f"{base_prompt}\n\n"
+            f"{composed_prompt}\n\n"
             "Additional neurodiversity adaptation guidance:\n"
             "\n\n".join(cleaned)
         )

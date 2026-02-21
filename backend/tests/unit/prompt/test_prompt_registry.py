@@ -19,9 +19,10 @@ class PromptRegistryUnitTests(unittest.TestCase):
         packs = service.list_packs()
         self.assertIn("2026.02.0", packs)
         self.assertIn("2026.02.1", packs)
+        self.assertIn("2026.02.2", packs)
 
         active_before = service.get_active_version()
-        self.assertEqual(active_before, "2026.02.1")
+        self.assertEqual(active_before, "2026.02.2")
 
         service.activate("2026.02.0")
         self.assertEqual(service.get_active_version(), "2026.02.0")
@@ -50,10 +51,14 @@ class PromptRegistryUnitTests(unittest.TestCase):
         system_prompt = get_system_prompt().lower()
         self.assertIn("never provide clinical diagnosis", system_prompt)
         self.assertIn("stop normal coaching flow", system_prompt)
+        registry.activate("2026.02.2")
+        expert_prompt = get_system_prompt().lower()
+        self.assertIn("academic or professional psychology questions", expert_prompt)
+        self.assertIn("plain language", expert_prompt)
 
     def test_invalid_default_version_falls_back_to_latest(self) -> None:
         service = PromptRegistryService(default_active_version="1999.01.0")
-        self.assertEqual(service.get_active_version(), "2026.02.1")
+        self.assertEqual(service.get_active_version(), "2026.02.2")
 
 
 if __name__ == "__main__":

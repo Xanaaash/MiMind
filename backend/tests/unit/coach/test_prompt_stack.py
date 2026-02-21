@@ -5,6 +5,7 @@ from backend.tests.bootstrap import configure_import_path
 configure_import_path()
 
 from modules.memory.service import MemoryService
+from modules.coach.session_service import CoachSessionService
 from modules.prompt.context.builder import build_context_prompt
 from modules.prompt.styles.registry import get_style_prompt
 from modules.prompt.system.prompt import get_system_prompt
@@ -119,6 +120,28 @@ class PromptStackUnitTests(unittest.TestCase):
         fragments = context["neurodiversity_prompt_fragments"]
         self.assertIsInstance(fragments, list)
         self.assertTrue(any("hsp-adapted coaching guidance" in item.lower() for item in fragments))
+
+    def test_context_prompt_includes_expert_qa_bundle(self) -> None:
+        from modules.user.models import User
+
+        self.store.save_user(User(user_id="u-expert", email="u-expert@example.com", locale="en-US"))
+        context = build_context_prompt(self.store, "u-expert")
+        expert_qa = context.get("expert_qa")
+        self.assertIsInstance(expert_qa, dict)
+        self.assertGreaterEqual(expert_qa.get("regression_question_count", 0), 20)
+        self.assertIn("policy", expert_qa)
+        self.assertIn("diagnosis", str(expert_qa["policy"]).lower())
+
+    def test_compose_system_prompt_appends_expert_qa_policy(self) -> None:
+        composed = CoachSessionService._compose_system_prompt(
+            {
+                "expert_qa": {
+                    "policy": "Expert educational Q&A policy line.",
+                }
+            }
+        )
+        self.assertIn("Additional expert educational Q&A guidance", composed)
+        self.assertIn("Expert educational Q&A policy line.", composed)
 
 
 if __name__ == "__main__":

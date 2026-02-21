@@ -1,3 +1,4 @@
+from modules.prompt.context.expert_qa import build_expert_qa_context
 from modules.journal.context_adapter import build_journal_context_summary
 from modules.prompt.context.neurodiversity import build_neurodiversity_scores
 from modules.prompt.styles.neurodiversity import build_neurodiversity_prompt_fragments
@@ -25,6 +26,7 @@ def build_context_prompt(store: InMemoryStore, user_id: str) -> dict:
         "latest_triage": triage.to_dict() if triage else None,
         "neurodiversity_scores": neurodiversity_scores,
         "neurodiversity_prompt_fragments": neurodiversity_prompt_fragments or None,
+        "expert_qa": build_expert_qa_context(),
         "memory_summaries": memory_items,
         "journal_summary": build_journal_context_summary(store, user_id),
     }

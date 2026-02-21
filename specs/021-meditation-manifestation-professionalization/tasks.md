@@ -24,8 +24,8 @@
 
 ### Phase 3: Coach Expert Upgrade
 
-- [ ] **T3.1 / T-808** 增强 AI Coach 专业问答 Prompt Pack 与术语解释能力 - `backend/src/modules/prompt/*`, `backend/src/modules/coach/*`
-- [ ] **T3.2 / T-808** 增加专业问答样例集与边界守卫策略 - `backend/tests/*`, `docs/qa/*`
+- [x] **T3.1 / T-808** 增强 AI Coach 专业问答 Prompt Pack 与术语解释能力 - `backend/src/modules/prompt/*`, `backend/src/modules/coach/*`
+- [x] **T3.2 / T-808** 增加专业问答样例集与边界守卫策略 - `backend/tests/*`, `docs/qa/*`
 
 ### Phase 4: Testing & Validation
 
