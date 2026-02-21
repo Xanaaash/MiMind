@@ -64,8 +64,10 @@ export default function ScaleResult() {
   const lang = i18n.language === 'en-US' ? 'en-US' : 'zh-CN';
   const color = SEVERITY_COLORS[severity.toLowerCase()] ?? '#785c55';
   const isPaywalled = entitlementsReady && !reportsEnabled;
+  const localizedScaleName = t(SCALE_NAME_KEYS[scaleId ?? ''] ?? '', { defaultValue: scaleId?.toUpperCase() ?? '' });
+  const severityLabel = t(`scales.severity_label.${severity.toLowerCase()}`, { defaultValue: severity });
 
-  const chartData = [{ name: scaleId?.toUpperCase(), value: score }];
+  const chartData = [{ name: localizedScaleName, value: score }];
 
   return (
     <motion.div
@@ -74,9 +76,7 @@ export default function ScaleResult() {
       animate={{ opacity: 1, y: 0 }}
     >
       <h1 className="font-heading text-3xl font-bold mb-2">{t('scales.result_title')}</h1>
-      <p className="text-muted">
-        {t(SCALE_NAME_KEYS[scaleId ?? ''] ?? '', { defaultValue: scaleId?.toUpperCase() ?? '' })}
-      </p>
+      <p className="text-muted">{localizedScaleName}</p>
       <p className="text-xs text-muted leading-relaxed mb-8">
         {t(SCALE_INTRO_KEYS[scaleId ?? ''] ?? 'scales.intro.generic')}
       </p>
@@ -114,7 +114,7 @@ export default function ScaleResult() {
                 className="px-3 py-1 rounded-full text-sm font-semibold text-white"
                 style={{ backgroundColor: color }}
               >
-                {severity}
+                {severityLabel}
               </span>
             </div>
             {interpretation && (

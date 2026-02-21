@@ -175,6 +175,15 @@
     "result_title": "Results",
     "score": "Score",
     "severity": "Severity",
+    "severity_label": {
+      "minimal": "Minimal",
+      "none": "None",
+      "mild": "Mild",
+      "moderate": "Moderate",
+      "moderately severe": "Moderately Severe",
+      "severe": "Severe",
+      "unknown": "Unrated"
+    },
     "dim_somatization": "Somatic Discomfort",
     "dim_obsessive_compulsive": "Obsessive or Compulsive Experiences",
     "dim_interpersonal_sensitivity": "Interpersonal Sensitivity",

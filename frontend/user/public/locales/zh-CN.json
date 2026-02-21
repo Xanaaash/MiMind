@@ -175,6 +175,15 @@
     "result_title": "测评结果",
     "score": "得分",
     "severity": "程度",
+    "severity_label": {
+      "minimal": "极轻",
+      "none": "无明显",
+      "mild": "轻度",
+      "moderate": "中度",
+      "moderately severe": "中重度",
+      "severe": "重度",
+      "unknown": "未分级"
+    },
     "dim_somatization": "躯体化不适",
     "dim_obsessive_compulsive": "强迫体验",
     "dim_interpersonal_sensitivity": "人际敏感",
