@@ -31,6 +31,8 @@ const state = {
   coachSessionId: "",
   audioTracks: [],
   meditations: [],
+  observabilitySummary: null,
+  observabilityRecords: [],
 };
 
 const nodes = {
@@ -94,6 +96,20 @@ const nodes = {
   coachReply: document.getElementById("coachReply"),
 
   crisisBanner: document.getElementById("crisisBanner"),
+  loadObservabilityBtn: document.getElementById("loadObservabilityBtn"),
+  obsLimit: document.getElementById("obsLimit"),
+  obsTaskType: document.getElementById("obsTaskType"),
+  obsProvider: document.getElementById("obsProvider"),
+  obsTotalInvocations: document.getElementById("obsTotalInvocations"),
+  obsSuccessRate: document.getElementById("obsSuccessRate"),
+  obsErrorRate: document.getElementById("obsErrorRate"),
+  obsAvgLatency: document.getElementById("obsAvgLatency"),
+  obsP95Latency: document.getElementById("obsP95Latency"),
+  obsEstimatedCost: document.getElementById("obsEstimatedCost"),
+  obsLatencyHistogram: document.getElementById("obsLatencyHistogram"),
+  obsTaskBreakdown: document.getElementById("obsTaskBreakdown"),
+  obsProviderBreakdown: document.getElementById("obsProviderBreakdown"),
+  obsRecentRows: document.getElementById("obsRecentRows"),
 
   checkAdminUsersBtn: document.getElementById("checkAdminUsersBtn"),
   adminUsersResult: document.getElementById("adminUsersResult"),
@@ -541,9 +557,186 @@ function maybeShowCrisisBanner(payload) {
   nodes.crisisBanner.classList.remove("hidden");
 }
 
+function obsQueryParams() {
+  const limitRaw = Number(nodes.obsLimit.value || 200);
+  const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(Math.round(limitRaw), 10), 500) : 200;
+  nodes.obsLimit.value = String(limit);
+  const taskType = String(nodes.obsTaskType.value || "").trim();
+  const provider = String(nodes.obsProvider.value || "").trim();
+  const query = new URLSearchParams();
+  query.set("limit", String(limit));
+  if (taskType) {
+    query.set("task_type", taskType);
+  }
+  if (provider) {
+    query.set("provider", provider);
+  }
+  return query.toString();
+}
+
+function formatPercent(value) {
+  const numeric = Number(value || 0);
+  return `${(numeric * 100).toFixed(1)}%`;
+}
+
+function renderBreakdownList(target, groupedData) {
+  target.innerHTML = "";
+  const entries = Object.entries(groupedData || {});
+  if (!entries.length) {
+    const li = document.createElement("li");
+    li.textContent = "暂无数据";
+    target.appendChild(li);
+    return;
+  }
+
+  entries
+    .sort((a, b) => Number(b[1]?.total || 0) - Number(a[1]?.total || 0))
+    .forEach(([group, totals]) => {
+      const li = document.createElement("li");
+      li.className = "mini-item";
+      const left = document.createElement("span");
+      left.textContent = group;
+      const right = document.createElement("span");
+      const total = Number(totals?.total || 0);
+      const successRate = formatPercent(Number(totals?.success_rate || 0));
+      right.textContent = `${total} / ${successRate}`;
+      li.appendChild(left);
+      li.appendChild(right);
+      target.appendChild(li);
+    });
+}
+
+function renderLatencyHistogram(records) {
+  const buckets = [
+    { label: "0-100ms", min: 0, max: 100, count: 0 },
+    { label: "101-300ms", min: 101, max: 300, count: 0 },
+    { label: "301-600ms", min: 301, max: 600, count: 0 },
+    { label: "601-1000ms", min: 601, max: 1000, count: 0 },
+    { label: ">1000ms", min: 1001, max: Number.POSITIVE_INFINITY, count: 0 },
+  ];
+
+  (records || []).forEach((item) => {
+    const latency = Number(item.latency_ms || 0);
+    const bucket = buckets.find((entry) => latency >= entry.min && latency <= entry.max);
+    if (bucket) {
+      bucket.count += 1;
+    }
+  });
+
+  const maxCount = Math.max(...buckets.map((item) => item.count), 1);
+  nodes.obsLatencyHistogram.innerHTML = "";
+
+  buckets.forEach((bucket) => {
+    const row = document.createElement("div");
+    row.className = "latency-row";
+
+    const label = document.createElement("span");
+    label.className = "latency-label";
+    label.textContent = bucket.label;
+
+    const barTrack = document.createElement("div");
+    barTrack.className = "latency-track";
+    const bar = document.createElement("div");
+    bar.className = "latency-bar";
+    const widthPercent = bucket.count === 0 ? 0 : Math.round((bucket.count / maxCount) * 100);
+    bar.style.width = `${widthPercent}%`;
+    barTrack.appendChild(bar);
+
+    const count = document.createElement("span");
+    count.className = "latency-count";
+    count.textContent = String(bucket.count);
+
+    row.appendChild(label);
+    row.appendChild(barTrack);
+    row.appendChild(count);
+    nodes.obsLatencyHistogram.appendChild(row);
+  });
+}
+
+function renderRecentInvocations(records) {
+  nodes.obsRecentRows.innerHTML = "";
+  const items = records || [];
+  if (!items.length) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 6;
+    cell.textContent = "暂无调用记录";
+    row.appendChild(cell);
+    nodes.obsRecentRows.appendChild(row);
+    return;
+  }
+
+  items.slice(0, 30).forEach((record) => {
+    const row = document.createElement("tr");
+    const createdAt = new Date(record.created_at);
+    const cells = [
+      Number.isNaN(createdAt.getTime()) ? "-" : createdAt.toLocaleString(),
+      record.task_type || "-",
+      record.provider || "-",
+      String(record.latency_ms ?? "-"),
+      record.success ? "success" : "failure",
+      record.error || "-",
+    ];
+
+    cells.forEach((value) => {
+      const cell = document.createElement("td");
+      cell.textContent = String(value);
+      row.appendChild(cell);
+    });
+    if (!record.success) {
+      row.classList.add("error-row");
+    }
+    nodes.obsRecentRows.appendChild(row);
+  });
+}
+
+function renderObservabilityPanel() {
+  const totals = state.observabilitySummary?.totals || {};
+  const total = Number(totals.total || 0);
+  const successRate = Number(totals.success_rate || 0);
+  const errorRate = total > 0 ? 1 - successRate : 0;
+
+  nodes.obsTotalInvocations.textContent = String(total);
+  nodes.obsSuccessRate.textContent = formatPercent(successRate);
+  nodes.obsErrorRate.textContent = formatPercent(errorRate);
+  nodes.obsAvgLatency.textContent = `${Number(totals.avg_latency_ms || 0).toFixed(1)} ms`;
+  nodes.obsP95Latency.textContent = `${Number(totals.p95_latency_ms || 0).toFixed(1)} ms`;
+  nodes.obsEstimatedCost.textContent = `$${Number(totals.estimated_cost_usd || 0).toFixed(6)}`;
+
+  renderBreakdownList(nodes.obsTaskBreakdown, state.observabilitySummary?.by_task_type || {});
+  renderBreakdownList(nodes.obsProviderBreakdown, state.observabilitySummary?.by_provider || {});
+  renderLatencyHistogram(state.observabilityRecords || []);
+  renderRecentInvocations(state.observabilityRecords || []);
+}
+
+async function loadObservabilityDashboard() {
+  const query = obsQueryParams();
+  const [summaryData, recordsData] = await Promise.all([
+    api(`/api/observability/model-invocations/summary?${query}`),
+    api(`/api/observability/model-invocations?${query}`),
+  ]);
+  state.observabilitySummary = summaryData;
+  state.observabilityRecords = recordsData;
+  renderObservabilityPanel();
+  logActivity("observability dashboard loaded", {
+    total: Number(summaryData?.totals?.total || 0),
+    records: Array.isArray(recordsData) ? recordsData.length : 0,
+  });
+}
+
 function bindNavigation() {
   nodes.moduleNav.querySelectorAll(".nav-btn").forEach((btn) => {
-    btn.addEventListener("click", () => switchModule(btn.dataset.module));
+    btn.addEventListener("click", async () => {
+      const moduleId = btn.dataset.module;
+      switchModule(moduleId);
+      if (moduleId === "observability") {
+        try {
+          await loadObservabilityDashboard();
+        } catch (error) {
+          logActivity("observability dashboard failed", { error: String(error) }, true);
+        }
+      }
+    });
   });
   nodes.jumpButtons.forEach((btn) => {
     btn.addEventListener("click", () => switchModule(btn.dataset.jump));
@@ -793,6 +986,14 @@ function bindEvents() {
       logActivity("admin users endpoint response", content, true);
     }
   });
+
+  nodes.loadObservabilityBtn.addEventListener("click", async () => {
+    try {
+      await loadObservabilityDashboard();
+    } catch (error) {
+      logActivity("observability dashboard failed", { error: String(error) }, true);
+    }
+  });
 }
 
 async function init() {
@@ -803,6 +1004,7 @@ async function init() {
   bindNavigation();
   bindEvents();
   switchModule("home");
+  renderObservabilityPanel();
 
   const restored = await restoreSession();
   if (!restored) {

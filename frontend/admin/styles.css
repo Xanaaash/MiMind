@@ -356,6 +356,136 @@ code {
   padding: 3px 8px;
 }
 
+.obs-filter-row {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+}
+
+.obs-kpi-grid {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.metric-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff8ee;
+}
+
+.metric-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.metric-card strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.2rem;
+}
+
+.obs-split-grid {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1.35fr 1fr;
+}
+
+.obs-box {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff7eb;
+}
+
+.obs-breakdown-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mini-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.mini-item {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  font-size: 0.88rem;
+}
+
+.latency-bars {
+  display: grid;
+  gap: 8px;
+}
+
+.latency-row {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 90px 1fr 34px;
+  align-items: center;
+}
+
+.latency-label,
+.latency-count {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.latency-track {
+  background: #f2ddca;
+  border-radius: 999px;
+  height: 9px;
+  overflow: hidden;
+}
+
+.latency-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #d67d63 0%, #c6674f 100%);
+  border-radius: 999px;
+}
+
+.obs-table-wrap {
+  overflow-x: auto;
+}
+
+.obs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+}
+
+.obs-table th,
+.obs-table td {
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  padding: 7px 6px;
+  vertical-align: top;
+}
+
+.obs-table th {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.obs-table .error-row td {
+  background: #fff2f2;
+}
+
 .footer-note {
   margin-top: 10px;
   color: var(--muted);
@@ -379,6 +509,22 @@ code {
   }
 
   .entry-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .obs-filter-row {
+    grid-template-columns: 1fr;
+  }
+
+  .obs-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .obs-split-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .obs-breakdown-grid {
     grid-template-columns: 1fr;
   }
 

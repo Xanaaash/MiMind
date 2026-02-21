@@ -30,6 +30,7 @@ export ADMIN_SESSION_TTL_HOURS="8"
 ## Notes
 
 - UI is login-gated and module-driven (sidebar on desktop, top tabs on mobile).
+- Includes admin observability dashboard for model invocation totals, latency distribution and error rate.
 - Homepage includes both entry cards:
   - Clinical Scales Center
   - Interactive Tests Center

@@ -62,6 +62,7 @@
           <button class="nav-btn" data-module="journal">情绪日记</button>
           <button class="nav-btn" data-module="coach">AI 教练</button>
           <button class="nav-btn" data-module="safety">安全资源</button>
+          <button class="nav-btn" data-module="observability">Observability</button>
           <button class="nav-btn" data-module="activity_logs">活动日志</button>
           <button class="nav-btn" data-module="settings">设置</button>
         </nav>
@@ -223,6 +224,93 @@
             <p>若存在即时危险，请优先联系当地紧急服务。</p>
             <ul id="hotlineList" class="hotline-list"></ul>
             <div id="crisisBanner" class="crisis-banner hidden" role="alert"></div>
+          </section>
+
+          <section class="module" data-module-panel="observability">
+            <h3>Observability 面板</h3>
+            <p>模型调用统计、延迟分布、错误率。用于运营与稳定性排查。</p>
+
+            <div class="obs-filter-row">
+              <label>
+                <span>最近记录数</span>
+                <input id="obsLimit" type="number" min="10" max="500" step="10" value="200" />
+              </label>
+              <label>
+                <span>任务类型 task_type</span>
+                <input id="obsTaskType" type="text" placeholder="如 coach_generation" />
+              </label>
+              <label>
+                <span>provider</span>
+                <input id="obsProvider" type="text" placeholder="如 local 或 openai" />
+              </label>
+              <button id="loadObservabilityBtn" type="button">刷新面板</button>
+            </div>
+
+            <div class="obs-kpi-grid">
+              <article class="metric-card">
+                <p>调用总数</p>
+                <strong id="obsTotalInvocations">0</strong>
+              </article>
+              <article class="metric-card">
+                <p>成功率</p>
+                <strong id="obsSuccessRate">0%</strong>
+              </article>
+              <article class="metric-card">
+                <p>错误率</p>
+                <strong id="obsErrorRate">0%</strong>
+              </article>
+              <article class="metric-card">
+                <p>平均延迟</p>
+                <strong id="obsAvgLatency">0 ms</strong>
+              </article>
+              <article class="metric-card">
+                <p>P95 延迟</p>
+                <strong id="obsP95Latency">0 ms</strong>
+              </article>
+              <article class="metric-card">
+                <p>估算成本</p>
+                <strong id="obsEstimatedCost">$0</strong>
+              </article>
+            </div>
+
+            <div class="obs-split-grid">
+              <article class="obs-box">
+                <h4>延迟分布</h4>
+                <div id="obsLatencyHistogram" class="latency-bars"></div>
+              </article>
+              <article class="obs-box">
+                <h4>任务/Provider 分布</h4>
+                <div class="obs-breakdown-grid">
+                  <div>
+                    <h5>By Task</h5>
+                    <ul id="obsTaskBreakdown" class="mini-list"></ul>
+                  </div>
+                  <div>
+                    <h5>By Provider</h5>
+                    <ul id="obsProviderBreakdown" class="mini-list"></ul>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <article class="obs-box">
+              <h4>最近模型调用</h4>
+              <div class="obs-table-wrap">
+                <table class="obs-table">
+                  <thead>
+                    <tr>
+                      <th>时间</th>
+                      <th>task</th>
+                      <th>provider</th>
+                      <th>latency(ms)</th>
+                      <th>状态</th>
+                      <th>error</th>
+                    </tr>
+                  </thead>
+                  <tbody id="obsRecentRows"></tbody>
+                </table>
+              </div>
+            </article>
           </section>
 
           <section class="module" data-module-panel="activity_logs">
