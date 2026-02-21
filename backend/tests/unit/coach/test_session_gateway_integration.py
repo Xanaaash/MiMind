@@ -9,6 +9,7 @@ from modules.api.endpoints import OnboardingAPI
 from modules.memory.service import MemoryService
 from modules.onboarding.service import OnboardingService
 from modules.storage.in_memory import InMemoryStore
+from modules.tests.models import TestResult
 
 
 class CoachGatewayIntegrationUnitTests(unittest.TestCase):
@@ -119,6 +120,29 @@ class CoachGatewayIntegrationUnitTests(unittest.TestCase):
         self.assertEqual(chat_status, 200)
         self.assertEqual(chat_body["data"]["mode"], "coaching")
         self.assertIn("memory_retrieval_error", chat_body["data"]["model"])
+
+    def test_start_session_appends_neuro_adaptation_to_system_prompt(self) -> None:
+        self.store.save_test_result(
+            TestResult(
+                result_id="asrs-high-1",
+                user_id=self.user_id,
+                test_id="asrs",
+                answers={"q1": 4},
+                summary={"total": 17, "maxTotal": 24, "level": "high"},
+            )
+        )
+
+        start_status, start_body = self.coach_api.post_start_session(
+            user_id=self.user_id,
+            payload={
+                "style_id": "action_coach",
+                "subscription_active": True,
+            },
+        )
+        self.assertEqual(start_status, 200)
+        prompt_stack = start_body["data"]["prompt_stack"]
+        self.assertIn("additional neurodiversity adaptation guidance", prompt_stack["system"].lower())
+        self.assertEqual(prompt_stack["context"]["neurodiversity_scores"]["asrs"]["level"], "high")
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ from modules.prompt.context.builder import build_context_prompt
 from modules.prompt.styles.registry import get_style_prompt
 from modules.prompt.system.prompt import get_system_prompt
 from modules.storage.in_memory import InMemoryStore
+from modules.tests.models import TestResult
 
 
 class PromptStackUnitTests(unittest.TestCase):
@@ -45,6 +46,31 @@ class PromptStackUnitTests(unittest.TestCase):
 
         context = build_context_prompt(self.store, "u1")
         self.assertEqual(context["memory_summaries"], ["summary-2", "summary-3", "summary-4"])
+
+    def test_context_prompt_adds_adhd_adaptation_fragment_for_high_asrs(self) -> None:
+        from modules.user.models import User
+
+        self.store.save_user(User(user_id="u1", email="u1@example.com", locale="en-US"))
+        self.store.save_test_result(
+            TestResult(
+                result_id="asrs-high-1",
+                user_id="u1",
+                test_id="asrs",
+                answers={"q1": 4},
+                summary={
+                    "total": 18,
+                    "maxTotal": 24,
+                    "level": "high",
+                },
+            )
+        )
+
+        context = build_context_prompt(self.store, "u1")
+        self.assertEqual(context["neurodiversity_scores"]["asrs"]["level"], "high")
+        fragments = context["neurodiversity_prompt_fragments"]
+        self.assertIsInstance(fragments, list)
+        self.assertTrue(any("not clinical diagnoses" in item.lower() for item in fragments))
+        self.assertTrue(any("adhd-adapted coaching guidance" in item.lower() for item in fragments))
 
 
 if __name__ == "__main__":

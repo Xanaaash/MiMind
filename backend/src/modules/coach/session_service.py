@@ -37,6 +37,7 @@ class CoachSessionService:
 
         style = get_style_prompt(style_id)
         context = build_context_prompt(self._store, user_id)
+        system_prompt = self._compose_system_prompt(context)
         prompt_pack_version = get_prompt_registry().get_active_version()
 
         session = CoachSession(
@@ -49,7 +50,7 @@ class CoachSessionService:
         return {
             "session": session.to_dict(),
             "prompt_stack": {
-                "system": get_system_prompt(),
+                "system": system_prompt,
                 "style": style,
                 "context": context,
             },
@@ -206,6 +207,7 @@ class CoachSessionService:
 
         style_prompt = get_style_prompt(session.style_id)
         context_prompt = build_context_prompt(self._store, session.user_id)
+        system_prompt = self._compose_system_prompt(context_prompt)
         retrieval_error = None
         relevant_memories = []
         try:
@@ -230,7 +232,7 @@ class CoachSessionService:
                     "session_id": session.session_id,
                     "user_id": session.user_id,
                     "style_id": session.style_id,
-                    "system_prompt": get_system_prompt(),
+                    "system_prompt": system_prompt,
                     "style_prompt": style_prompt,
                     "context_prompt": context_prompt,
                     "relevant_memories": list(relevant_memories),
@@ -264,6 +266,23 @@ class CoachSessionService:
                 model_info["memory_retrieval_error"] = retrieval_error
 
             return fallback, model_info
+
+    @staticmethod
+    def _compose_system_prompt(context_prompt: dict) -> str:
+        base_prompt = get_system_prompt()
+        fragments = context_prompt.get("neurodiversity_prompt_fragments")
+        if not isinstance(fragments, list):
+            return base_prompt
+
+        cleaned = [str(item).strip() for item in fragments if str(item).strip()]
+        if not cleaned:
+            return base_prompt
+
+        return (
+            f"{base_prompt}\n\n"
+            "Additional neurodiversity adaptation guidance:\n"
+            "\n\n".join(cleaned)
+        )
 
     @staticmethod
     def _fallback_coach_reply(style_id: str, user_message: str) -> str:
