@@ -24,6 +24,9 @@ jobs:
       - name: Install backend dependencies
         run: uv sync --extra dev
 
+      - name: Run i18n anti-pattern guard
+        run: python3 scripts/i18n/check_i18n_antipatterns.py --root frontend/user/src
+
       - name: Run backend lint (blocking rules)
         run: uv run ruff check backend/src --select E9,F63,F7,F82
 

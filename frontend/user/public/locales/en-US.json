@@ -23,6 +23,7 @@
     "theme_dark": "Dark",
     "theme_light": "Light",
     "switch_language": "Switch language",
+    "switch_label": "中文",
     "menu": "Menu"
   },
   "landing": {
@@ -44,7 +45,13 @@
     "reassessment_overdue_body": "{{scales}} are overdue by {{days}} days. Please retake soon to refresh your assessment.",
     "reassessment_upcoming_title": "Assessment Retest Due Soon",
     "reassessment_upcoming_body": "{{scales}} are due in {{days}} days. Consider retaking early.",
-    "reassessment_cta": "Retake Now"
+    "reassessment_cta": "Retake Now",
+    "channel_green": "All features available",
+    "channel_yellow": "Some features are limited · professional support is recommended",
+    "channel_red": "Please prioritize professional mental health support",
+    "channel_yellow_hint": "AI Coach is currently unavailable, while other features remain available.",
+    "channel_red_hint": "Please seek professional mental health support immediately.",
+    "view_safety": "View safety resources"
   },
   "auth": {
     "login": "Log In",
@@ -274,12 +281,18 @@
   },
   "profile": {
     "channel_label": "Channel:",
-    "language": "Language / 语言"
+    "language": "Language / 语言",
+    "lang_zh": "中文",
+    "lang_en": "English"
   },
   "safety": {
     "title": "Safety Resources",
     "subtitle": "If you or someone you know needs help",
     "call_now": "Call Now",
+    "hotline_label_cn": "China Mental Health Hotline",
+    "hotline_label_cn_beijing": "Beijing Crisis Center",
+    "hotline_label_us": "US 988 Suicide & Crisis Lifeline",
+    "hotline_label_emergency": "Emergency",
     "hotlines": {
       "china": "China Mental Health Hotline: 400-161-9995",
       "china_2": "Beijing Crisis Center: 800-810-1117",
@@ -442,6 +455,18 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "save": "Save",
+    "share": "Share",
+    "download_image": "Download image",
     "close": "Close"
+  },
+  "error_boundary": {
+    "title_server": "Service unavailable",
+    "title_network": "Network issue",
+    "title_runtime": "Something went wrong",
+    "hint_server": "The server may be under maintenance. Please try again later.",
+    "hint_network": "Please check your network and retry. If the issue continues, reopen the app later.",
+    "hint_runtime": "The app hit an unexpected error. Reloading usually resolves it.",
+    "reload": "Reload",
+    "home": "Home"
   }
 }

@@ -42,14 +42,14 @@ export default function ProfilePage() {
             size="sm"
             onClick={() => i18n.changeLanguage('zh-CN')}
           >
-            中文
+            {t('profile.lang_zh')}
           </Button>
           <Button
             variant={i18n.language === 'en-US' ? 'primary' : 'ghost'}
             size="sm"
             onClick={() => i18n.changeLanguage('en-US')}
           >
-            English
+            {t('profile.lang_en')}
           </Button>
         </div>
       </Card>

@@ -15,6 +15,8 @@ uv run --extra i18n python scripts/i18n/check_locale_consistency.py \
   --source frontend/user/public/locales/zh-CN.json \
   --target frontend/user/public/locales/en-US.json \
   --check-placeholders
+
+python3 scripts/i18n/check_i18n_antipatterns.py --root frontend/user/src
 ```
 
 ## 3) Generate draft with OpenAI (preferred, natural tone)

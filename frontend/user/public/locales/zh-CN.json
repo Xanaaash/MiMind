@@ -23,6 +23,7 @@
     "theme_dark": "深色",
     "theme_light": "浅色",
     "switch_language": "切换语言",
+    "switch_label": "EN",
     "menu": "菜单"
   },
   "landing": {
@@ -44,7 +45,13 @@
     "reassessment_overdue_body": "{{scales}} 已到期 {{days}} 天，请尽快重测以更新评估结果。",
     "reassessment_upcoming_title": "量表重测即将到期",
     "reassessment_upcoming_body": "{{scales}} 将在 {{days}} 天后到期，建议提前完成重测。",
-    "reassessment_cta": "去重测"
+    "reassessment_cta": "去重测",
+    "channel_green": "全功能开放",
+    "channel_yellow": "部分功能受限 · 建议咨询专业人士",
+    "channel_red": "请优先联系专业心理健康服务",
+    "channel_yellow_hint": "AI 教练功能暂不可用，其他功能正常使用",
+    "channel_red_hint": "请立即联系专业心理健康服务。",
+    "view_safety": "查看安全资源"
   },
   "auth": {
     "login": "登录",
@@ -274,12 +281,18 @@
   },
   "profile": {
     "channel_label": "通道:",
-    "language": "语言 / Language"
+    "language": "语言 / Language",
+    "lang_zh": "中文",
+    "lang_en": "English"
   },
   "safety": {
     "title": "安全资源",
     "subtitle": "如果你或身边的人需要帮助",
     "call_now": "立即拨打",
+    "hotline_label_cn": "中国心理援助热线",
+    "hotline_label_cn_beijing": "北京心理危机研究与干预中心",
+    "hotline_label_us": "US 988 Suicide & Crisis Lifeline",
+    "hotline_label_emergency": "紧急服务 / Emergency",
     "hotlines": {
       "china": "中国心理援助热线: 400-161-9995",
       "china_2": "北京心理危机研究与干预中心: 800-810-1117",
@@ -442,6 +455,18 @@
     "cancel": "取消",
     "confirm": "确认",
     "save": "保存",
+    "share": "分享",
+    "download_image": "下载图片",
     "close": "关闭"
+  },
+  "error_boundary": {
+    "title_server": "服务暂时不可用",
+    "title_network": "网络连接异常",
+    "title_runtime": "页面出现错误",
+    "hint_server": "服务器可能正在维护，请稍后重试。",
+    "hint_network": "请检查网络后重试。若问题持续，可稍后重新打开应用。",
+    "hint_runtime": "应用遇到未预期错误，刷新后通常可恢复。",
+    "reload": "刷新页面",
+    "home": "返回首页"
   }
 }

@@ -49,15 +49,16 @@ export default function Landing() {
           <button
             onClick={cycleTheme}
             className="text-sm px-2 py-1.5 rounded-lg hover:bg-cream/50 transition-colors"
-            aria-label="Toggle theme"
+            aria-label={t('layout.toggle_theme')}
           >
             {themeIcon}
           </button>
           <button
             onClick={toggleLang}
             className="text-sm text-muted hover:text-ink px-3 py-1.5 rounded-lg hover:bg-cream/50 transition-colors"
+            aria-label={t('layout.switch_language')}
           >
-            {i18n.language === 'zh-CN' ? 'EN' : '中文'}
+            {t('layout.switch_label')}
           </button>
           <Link to="/auth">
             <Button size="sm">{t('auth.login')}</Button>

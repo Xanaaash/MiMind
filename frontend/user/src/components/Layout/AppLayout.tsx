@@ -87,7 +87,7 @@ export default function AppLayout() {
               className="text-sm text-muted hover:text-ink px-2 py-1 rounded-lg hover:bg-cream transition-colors"
               aria-label={t('layout.switch_language')}
             >
-              {i18n.language === 'zh-CN' ? 'EN' : '中文'}
+              {t('layout.switch_label')}
             </button>
             <button
               onClick={() => { logout(); navigate('/'); }}

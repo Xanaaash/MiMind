@@ -15,10 +15,10 @@ const MODULES = [
   { path: '/billing', labelKey: 'nav.billing', icon: '💎', descKey: 'billing.subtitle', color: 'bg-calm-soft' },
 ];
 
-const CHANNEL_CONFIG: Record<string, { label: string; color: string; bg: string; icon: string }> = {
-  GREEN: { label: '全功能开放', color: 'text-safe', bg: 'bg-safe-soft', icon: '🟢' },
-  YELLOW: { label: '部分功能受限 · 建议咨询专业人士', color: 'text-warn', bg: 'bg-warn-soft', icon: '🟡' },
-  RED: { label: '请优先联系专业心理健康服务', color: 'text-danger', bg: 'bg-danger-soft', icon: '🔴' },
+const CHANNEL_CONFIG: Record<string, { labelKey: string; color: string; bg: string; icon: string }> = {
+  GREEN: { labelKey: 'home.channel_green', color: 'text-safe', bg: 'bg-safe-soft', icon: '🟢' },
+  YELLOW: { labelKey: 'home.channel_yellow', color: 'text-warn', bg: 'bg-warn-soft', icon: '🟡' },
+  RED: { labelKey: 'home.channel_red', color: 'text-danger', bg: 'bg-danger-soft', icon: '🔴' },
 };
 
 const SCALE_LABELS: Record<string, string> = {
@@ -159,18 +159,18 @@ export default function Home() {
         >
           <span className="text-2xl">{channelInfo.icon}</span>
           <div>
-            <p className={`font-semibold ${channelInfo.color}`}>{channelInfo.label}</p>
+            <p className={`font-semibold ${channelInfo.color}`}>{t(channelInfo.labelKey)}</p>
             {channel === 'YELLOW' && (
-              <p className="text-sm text-muted mt-0.5">AI 教练功能暂不可用，其他功能正常使用</p>
+              <p className="text-sm text-muted mt-0.5">{t('home.channel_yellow_hint')}</p>
             )}
             {channel === 'RED' && (
               <p className="text-sm text-danger mt-0.5">
-                请立即联系专业心理健康服务。
+                {t('home.channel_red_hint')}
                 <button
                   onClick={() => navigate('/safety')}
                   className="underline ml-1"
                 >
-                  查看安全资源
+                  {t('home.view_safety')}
                 </button>
               </p>
             )}

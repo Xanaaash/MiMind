@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import SafetyDisclaimer from '../../components/SafetyDisclaimer/SafetyDisclaimer';
 
 const HOTLINES = [
-  { label: '中国心理援助热线', number: '400-161-9995', region: 'CN' },
-  { label: '北京心理危机研究与干预中心', number: '800-810-1117', region: 'CN' },
-  { label: 'US 988 Suicide & Crisis Lifeline', number: '988', region: 'US' },
-  { label: '紧急服务 / Emergency', number: '120 / 911', region: 'ALL' },
+  { labelKey: 'safety.hotline_label_cn', number: '400-161-9995', region: 'CN' },
+  { labelKey: 'safety.hotline_label_cn_beijing', number: '800-810-1117', region: 'CN' },
+  { labelKey: 'safety.hotline_label_us', number: '988', region: 'US' },
+  { labelKey: 'safety.hotline_label_emergency', number: '120 / 911', region: 'ALL' },
 ];
 
 export default function SafetyPage() {
@@ -34,7 +34,7 @@ export default function SafetyPage() {
               className="bg-panel border border-line rounded-2xl p-5 flex items-center justify-between"
             >
               <div>
-                <p className="font-semibold text-ink">{h.label}</p>
+                <p className="font-semibold text-ink">{t(h.labelKey)}</p>
                 <p className="text-muted text-sm">{h.region}</p>
               </div>
               <a

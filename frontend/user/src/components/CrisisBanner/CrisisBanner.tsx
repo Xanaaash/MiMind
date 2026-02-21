@@ -8,8 +8,8 @@ interface CrisisBannerProps {
 }
 
 const HOTLINES = [
-  { label: '中国心理援助热线', number: '400-161-9995' },
-  { label: 'US 988 Lifeline', number: '988' },
+  { labelKey: 'safety.hotline_label_cn', number: '400-161-9995' },
+  { labelKey: 'safety.hotline_label_us', number: '988' },
 ];
 
 export default function CrisisBanner({ visible, message }: CrisisBannerProps) {
@@ -35,7 +35,7 @@ export default function CrisisBanner({ visible, message }: CrisisBannerProps) {
                 href={`tel:${h.number}`}
                 className="inline-flex items-center gap-2 bg-danger text-white font-semibold px-4 py-2 rounded-xl hover:bg-danger/90 transition-colors"
               >
-                📞 {h.label}: {h.number}
+                📞 {t(h.labelKey)}: {h.number}
               </a>
             ))}
           </div>

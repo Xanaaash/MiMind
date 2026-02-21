@@ -117,13 +117,13 @@ export default function TestResult() {
             <Button size="sm" onClick={() => {
               if (canvasRef.current) downloadShareCard(canvasRef.current, `mimind-${testId}`);
             }}>
-              下载图片
+              {t('common.download_image')}
             </Button>
             {canShare() && (
               <Button size="sm" variant="secondary" onClick={() => {
                 if (canvasRef.current) shareImage(canvasRef.current, testId ?? 'result');
               }}>
-                分享
+                {t('common.share')}
               </Button>
             )}
           </div>

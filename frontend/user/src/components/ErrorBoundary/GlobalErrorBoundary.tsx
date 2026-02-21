@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { withTranslation, type WithTranslation } from 'react-i18next';
 
 type BoundaryKind = 'runtime' | 'server' | 'network';
 
@@ -10,7 +11,7 @@ type State = {
 
 type Props = {
   children: ReactNode;
-};
+} & WithTranslation;
 
 function classify(reason: unknown): State {
   const status = typeof reason === 'object' && reason !== null && 'status' in reason
@@ -35,23 +36,23 @@ function classify(reason: unknown): State {
   return { hasError: true, kind: 'runtime', message };
 }
 
-function titleByKind(kind: BoundaryKind): string {
-  if (kind === 'server') return '服务暂时不可用 / Service unavailable';
-  if (kind === 'network') return '网络连接异常 / Network issue';
-  return '页面出现错误 / Something went wrong';
+function titleByKind(kind: BoundaryKind, t: WithTranslation['t']): string {
+  if (kind === 'server') return t('error_boundary.title_server');
+  if (kind === 'network') return t('error_boundary.title_network');
+  return t('error_boundary.title_runtime');
 }
 
-function hintByKind(kind: BoundaryKind): string {
+function hintByKind(kind: BoundaryKind, t: WithTranslation['t']): string {
   if (kind === 'server') {
-    return '服务器可能正在维护，请稍后重试。';
+    return t('error_boundary.hint_server');
   }
   if (kind === 'network') {
-    return '请检查网络后重试。若问题持续，可稍后重新打开应用。';
+    return t('error_boundary.hint_network');
   }
-  return '应用遇到未预期错误，刷新后通常可恢复。';
+  return t('error_boundary.hint_runtime');
 }
 
-export default class GlobalErrorBoundary extends Component<Props, State> {
+class GlobalErrorBoundary extends Component<Props, State> {
   state: State = {
     hasError: false,
     kind: 'runtime',
@@ -91,6 +92,7 @@ export default class GlobalErrorBoundary extends Component<Props, State> {
     if (!this.state.hasError) {
       return this.props.children;
     }
+    const { t } = this.props;
 
     return (
       <div className="min-h-screen flex items-center justify-center px-4 py-10">
@@ -98,8 +100,8 @@ export default class GlobalErrorBoundary extends Component<Props, State> {
           <div className="w-14 h-14 rounded-2xl bg-danger-soft text-danger text-3xl flex items-center justify-center mx-auto">
             !
           </div>
-          <h1 className="font-heading text-2xl font-bold mt-5">{titleByKind(this.state.kind)}</h1>
-          <p className="text-muted mt-2">{hintByKind(this.state.kind)}</p>
+          <h1 className="font-heading text-2xl font-bold mt-5">{titleByKind(this.state.kind, t)}</h1>
+          <p className="text-muted mt-2">{hintByKind(this.state.kind, t)}</p>
 
           <div className="grid sm:grid-cols-2 gap-3 mt-7">
             <button
@@ -107,14 +109,14 @@ export default class GlobalErrorBoundary extends Component<Props, State> {
               onClick={this.handleReload}
               className="px-4 py-3 rounded-xl bg-accent text-white font-semibold hover:opacity-95 transition-opacity"
             >
-              刷新页面 / Reload
+              {t('error_boundary.reload')}
             </button>
             <button
               type="button"
               onClick={this.handleGoHome}
               className="px-4 py-3 rounded-xl border border-line bg-paper text-ink font-semibold hover:bg-cream transition-colors"
             >
-              返回首页 / Home
+              {t('error_boundary.home')}
             </button>
           </div>
 
@@ -128,3 +130,5 @@ export default class GlobalErrorBoundary extends Component<Props, State> {
     );
   }
 }
+
+export default withTranslation()(GlobalErrorBoundary);
