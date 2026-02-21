@@ -11,6 +11,7 @@ type TermsCopy = {
   title: string;
   subtitle: string;
   updatedAt: string;
+  backHome: string;
   sections: Section[];
 };
 
@@ -19,6 +20,7 @@ const COPY: Record<'zh-CN' | 'en-US', TermsCopy> = {
     title: '服务条款',
     subtitle: '使用 MindCoach AI 前请阅读以下条款',
     updatedAt: '最后更新：2026-02-20',
+    backHome: '返回首页',
     sections: [
       {
         heading: '1. 服务性质',
@@ -42,6 +44,7 @@ const COPY: Record<'zh-CN' | 'en-US', TermsCopy> = {
     title: 'Terms of Service',
     subtitle: 'Please review these terms before using MindCoach AI',
     updatedAt: 'Last updated: 2026-02-20',
+    backHome: 'Back to home',
     sections: [
       {
         heading: '1. Nature of Service',
@@ -92,7 +95,7 @@ export default function TermsPage() {
 
         <div className="mt-8">
           <Link to="/" className="text-sm font-semibold text-accent hover:underline">
-            {lang === 'zh-CN' ? '返回首页' : 'Back to home'}
+            {copy.backHome}
           </Link>
         </div>
       </motion.div>

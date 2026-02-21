@@ -11,6 +11,7 @@ type PrivacyCopy = {
   title: string;
   subtitle: string;
   updatedAt: string;
+  backHome: string;
   sections: Section[];
 };
 
@@ -19,6 +20,7 @@ const COPY: Record<'zh-CN' | 'en-US', PrivacyCopy> = {
     title: '隐私政策',
     subtitle: '我们如何收集、使用与保护你的信息',
     updatedAt: '最后更新：2026-02-20',
+    backHome: '返回首页',
     sections: [
       {
         heading: '1. 收集的信息',
@@ -42,6 +44,7 @@ const COPY: Record<'zh-CN' | 'en-US', PrivacyCopy> = {
     title: 'Privacy Policy',
     subtitle: 'How we collect, use, and protect your information',
     updatedAt: 'Last updated: 2026-02-20',
+    backHome: 'Back to home',
     sections: [
       {
         heading: '1. Information We Collect',
@@ -92,7 +95,7 @@ export default function PrivacyPage() {
 
         <div className="mt-8">
           <Link to="/" className="text-sm font-semibold text-accent hover:underline">
-            {lang === 'zh-CN' ? '返回首页' : 'Back to home'}
+            {copy.backHome}
           </Link>
         </div>
       </motion.div>

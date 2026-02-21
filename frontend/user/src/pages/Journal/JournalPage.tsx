@@ -65,7 +65,7 @@ export default function JournalPage() {
       await createJournalEntry(userId, mood, energy, note);
       setNote('');
       setNoteError(null);
-      toast.success(t('journal.save') === '保存' ? '日记已保存' : 'Entry saved');
+      toast.success(t('journal.saved'));
       const data = await getJournalTrend(userId, 7);
       if (data.entries) {
         setTrendData(data.entries.map((e) => ({
