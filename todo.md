@@ -210,7 +210,7 @@
 - [✅] **T-711** 新建 `frontend/user/src/pages/Mindfulness/MindfulnessHub.tsx` + 路由 `/mindfulness`，承接冥想与显化能力
 - [✅] **T-712** 冥想音频源升级：替换 `public/audio/meditation/` 现有素材，改为前端可配置播放列表（高质量可商用音频）
 - [✅] **T-713** 升级 `MeditationPlayer.tsx`：引入沉浸式动态背景（渐变/毛玻璃/星空或海浪视频）
-- [🔒 codex-0221b] **T-714** 开发 `Manifestation` 工具 v1：肯定语记录 + 愿景卡片展示（配合轻柔背景音）
+- [✅] **T-714** 开发 `Manifestation` 工具 v1：肯定语记录 + 愿景卡片展示（配合轻柔背景音）
 
 ### 7.5 执行批次 E（P1 收口）
 

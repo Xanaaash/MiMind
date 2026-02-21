@@ -32,7 +32,7 @@ export default function MindfulnessHub() {
           <p className="mt-1 text-sm text-muted">{t('mindfulness.meditation_desc')}</p>
         </Card>
 
-        <Card>
+        <Card hoverable onClick={() => navigate('/mindfulness/manifestation')}>
           <div className="text-sm text-muted">{t('mindfulness.manifestation_badge')}</div>
           <div className="mt-1 text-xl font-heading font-bold">{t('mindfulness.manifestation_title')}</div>
           <p className="mt-1 text-sm text-muted">{t('mindfulness.manifestation_desc')}</p>
