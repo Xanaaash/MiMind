@@ -313,6 +313,12 @@ def get_scales_catalog() -> dict:
     return _unwrap(status, body)
 
 
+@app.get("/api/scales/professional-library")
+def get_scales_professional_library() -> dict:
+    status, body = scales_api.get_professional_library()
+    return _unwrap(status, body)
+
+
 @app.post("/api/scales/score")
 def score_single_clinical_scale(payload: dict = Body(...)) -> dict:
     status, body = scales_api.post_score_scale(payload)

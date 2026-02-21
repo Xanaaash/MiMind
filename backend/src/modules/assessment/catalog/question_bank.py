@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import Dict, List
 
-from modules.assessment.catalog.scales import SCL90
+from modules.assessment.catalog.scales import SCL90, WHO5
 
 SUPPORTED_LOCALES = ["en-US", "zh-CN"]
 
@@ -34,6 +34,25 @@ LIKERT_0_4 = {
         "有时",
         "相当经常",
         "非常经常",
+    ],
+}
+
+LIKERT_0_5 = {
+    "en-US": [
+        "At no time",
+        "Some of the time",
+        "Less than half of the time",
+        "More than half of the time",
+        "Most of the time",
+        "All of the time",
+    ],
+    "zh-CN": [
+        "从未",
+        "偶尔",
+        "少于一半时间",
+        "超过一半时间",
+        "大多数时间",
+        "一直如此",
     ],
 }
 
@@ -175,6 +194,21 @@ SCALE_QUESTION_BANKS = {
             _q("q4", "Have you had these thoughts and some intention of acting on them?", "你是否既有这些想法，也有过付诸行动的意图？"),
             _q("q5", "Have you started to work out details of a plan and intend to carry it out?", "你是否制定过具体计划并打算执行？"),
             _q("q6", "Have you ever done anything, started to do anything, or prepared to do anything to end your life?", "你是否曾做过、开始做过，或准备做过任何结束自己生命的行为？"),
+        ],
+    },
+    WHO5: {
+        "supported_locales": SUPPORTED_LOCALES,
+        "instructions": {
+            "en-US": "Over the last two weeks, indicate how often each statement matched your experience.",
+            "zh-CN": "在过去两周内，请选择以下描述符合你的频率。",
+        },
+        "answer_labels": LIKERT_0_5,
+        "questions": [
+            _q("q1", "I have felt cheerful and in good spirits.", "我感到心情愉快、精神状态良好。"),
+            _q("q2", "I have felt calm and relaxed.", "我感到平静和放松。"),
+            _q("q3", "I have felt active and energetic.", "我感到有活力、有精力。"),
+            _q("q4", "I woke up feeling fresh and rested.", "我醒来时感到神清气爽、休息充分。"),
+            _q("q5", "My daily life has been filled with things that interest me.", "我的日常生活充满让我感兴趣的事情。"),
         ],
     },
     SCL90: {

@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional, Tuple
 
+from modules.assessment.catalog.professional_library import list_professional_scales
 from modules.assessment.catalog.service import ClinicalScaleCatalogService
 from modules.assessment.scoring_service import score_single_scale
 
@@ -10,6 +11,9 @@ class ClinicalScalesAPI:
 
     def get_catalog(self) -> Tuple[int, Dict[str, Any]]:
         return 200, {"data": self._catalog.list_scales()}
+
+    def get_professional_library(self) -> Tuple[int, Dict[str, Any]]:
+        return 200, {"data": list_professional_scales()}
 
     def post_score_scale(self, payload: Dict[str, Any]) -> Tuple[int, Dict[str, Any]]:
         try:

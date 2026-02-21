@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { getCatalog } from '../../api/scales';
-import type { ScaleCatalogItem } from '../../types';
+import { getCatalog, getProfessionalLibrary } from '../../api/scales';
+import type { ProfessionalScaleLibraryItem, ScaleCatalogItem } from '../../types';
 import Card from '../../components/Card/Card';
 import Skeleton from '../../components/Skeleton/Skeleton';
 import { SCALE_INTRO_KEYS, SCALE_NAME_KEYS } from '../../utils/assessmentCopy';
@@ -14,20 +14,30 @@ const SCALE_ICONS: Record<string, string> = {
   pss10: '📊',
   cssrs: '🛡️',
   scl90: '📋',
+  who5: '🌤️',
 };
 
 export default function ScaleCenter() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [catalog, setCatalog] = useState<Record<string, ScaleCatalogItem> | null>(null);
+  const [professionalLibrary, setProfessionalLibrary] = useState<Record<string, ProfessionalScaleLibraryItem> | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getCatalog()
-      .then(setCatalog)
-      .catch(() => {})
+    Promise.allSettled([getCatalog(), getProfessionalLibrary()])
+      .then(([catalogResult, libraryResult]) => {
+        if (catalogResult.status === 'fulfilled') {
+          setCatalog(catalogResult.value);
+        }
+        if (libraryResult.status === 'fulfilled') {
+          setProfessionalLibrary(libraryResult.value);
+        }
+      })
       .finally(() => setLoading(false));
   }, []);
+
+  const localeKey = i18n.language === 'en-US' ? 'en-US' : 'zh-CN';
 
   if (loading) {
     return (
@@ -87,6 +97,68 @@ export default function ScaleCenter() {
           </motion.div>
         ))}
       </div>
+
+      {professionalLibrary ? (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-10">
+          <h2 className="font-heading text-2xl font-bold">{t('scales.professional_library_title')}</h2>
+          <p className="text-muted mt-1 mb-5">{t('scales.professional_library_subtitle')}</p>
+          <div className="grid md:grid-cols-2 gap-5">
+            {Object.entries(professionalLibrary).map(([scaleId, item], i) => {
+              const name = item.names[localeKey] ?? item.names['en-US'] ?? scaleId.toUpperCase();
+              const useCase = item.use_cases[localeKey] ?? item.use_cases['en-US'] ?? '';
+              const scoring = item.scoring_logic[localeKey] ?? item.scoring_logic['en-US'] ?? '';
+              const disclaimer = item.disclaimer[localeKey] ?? item.disclaimer['en-US'] ?? '';
+              const firstRef = item.references?.[0];
+              const canOpen = item.interactive_available && Boolean(catalog?.[scaleId]);
+              return (
+                <motion.div
+                  key={scaleId}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.04 }}
+                >
+                  <Card hoverable={canOpen} onClick={canOpen ? () => navigate(`/scales/${scaleId}`) : undefined}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="font-heading font-bold text-lg">{name}</h3>
+                        <p className="text-xs text-muted mt-1 uppercase tracking-wide">{scaleId}</p>
+                      </div>
+                      <span className="text-xs rounded-full bg-calm-soft px-2 py-1">{item.item_count} {t('scales.items')}</span>
+                    </div>
+                    <p className="text-sm text-muted mt-3">
+                      <span className="font-semibold text-ink">{t('scales.use_case_label')}: </span>
+                      {useCase}
+                    </p>
+                    <p className="text-sm text-muted mt-2">
+                      <span className="font-semibold text-ink">{t('scales.scoring_label')}: </span>
+                      {scoring}
+                    </p>
+                    <p className="text-sm text-muted mt-2">
+                      <span className="font-semibold text-ink">{t('scales.disclaimer_label')}: </span>
+                      {disclaimer}
+                    </p>
+                    {firstRef ? (
+                      <a
+                        href={firstRef.source_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex mt-3 text-sm text-accent font-semibold hover:underline"
+                      >
+                        {t('scales.reference_label')}
+                      </a>
+                    ) : null}
+                    {canOpen ? (
+                      <button className="mt-3 text-accent font-semibold text-sm hover:underline">
+                        {t('scales.start')} →
+                      </button>
+                    ) : null}
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+      ) : null}
     </div>
   );
 }

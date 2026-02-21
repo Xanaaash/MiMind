@@ -157,7 +157,8 @@
       "gad7": "GAD-7 Anxiety Screening",
       "pss10": "PSS-10 Perceived Stress",
       "cssrs": "C-SSRS Safety Risk Screening",
-      "scl90": "SCL-90 Symptom Checklist"
+      "scl90": "SCL-90 Symptom Checklist",
+      "who5": "WHO-5 Well-Being Index"
     },
     "start": "Start Assessment",
     "items": "items",
@@ -197,12 +198,19 @@
     "paywall_subtitle": "Your current plan includes submissions only. Subscribe to view full score interpretation and insights.",
     "unlock_reports": "Upgrade to Unlock",
     "back_to_list": "Back to List",
+    "professional_library_title": "Professional Scale Library",
+    "professional_library_subtitle": "Evidence-based scale references with citation, use-case, scoring logic, and boundary notes.",
+    "use_case_label": "Use case",
+    "scoring_label": "Scoring",
+    "disclaimer_label": "Disclaimer",
+    "reference_label": "View Source Reference",
     "intro": {
       "phq9": "PHQ-9 is aligned with DSM depressive symptom criteria and screens symptom severity over the past two weeks.",
       "gad7": "GAD-7 is a widely validated anxiety screener for estimating anxiety severity in the past two weeks.",
       "pss10": "PSS-10 measures perceived stress appraisal and is commonly used in stress research.",
       "cssrs": "C-SSRS uses structured risk items to identify recent self-harm or suicidal ideation and behavior risk.",
       "scl90": "SCL-90 spans multiple symptom domains and supports broad screening of overall psychological distress.",
+      "who5": "WHO-5 tracks positive well-being in the last two weeks and is useful for observing emotional recovery trend.",
       "generic": "This scale follows standardized psychometric design for preliminary status screening."
     },
     "errors": {

@@ -9,6 +9,7 @@ from modules.assessment.catalog.scales import (
     QUESTION_COUNTS,
     SCL90,
     SCL90_DIMENSIONS,
+    WHO5,
 )
 from modules.assessment.models import AssessmentScoreSet
 
@@ -107,6 +108,33 @@ def score_scl90(answers: Any) -> Tuple[float, Optional[Dict[str, float]]]:
     return global_index, parsed
 
 
+def score_who5(answers: Iterable[int]) -> Tuple[int, int, str, Dict[str, str]]:
+    validated = _validate_likert_answers(WHO5, answers, QUESTION_COUNTS[WHO5], 0, 5)
+    raw_score = sum(validated)
+    score_100 = raw_score * 4
+
+    if score_100 <= 28:
+        severity = "severe"
+        interpretation = {
+            "en-US": "Current well-being appears low. Consider adding structured support and checking in with a professional if this pattern persists.",
+            "zh-CN": "当前主观幸福感偏低。建议增加结构化支持，并在持续低迷时寻求专业支持。",
+        }
+    elif score_100 <= 50:
+        severity = "moderate"
+        interpretation = {
+            "en-US": "Well-being is in a middle range. Daily recovery habits and regular mood tracking may help improve stability.",
+            "zh-CN": "当前主观幸福感处于中间区间。建议通过日常恢复习惯和持续追踪来提升稳定性。",
+        }
+    else:
+        severity = "minimal"
+        interpretation = {
+            "en-US": "Well-being is currently in a relatively healthy range. Keep protective routines and regular self-checks.",
+            "zh-CN": "当前主观幸福感总体处于较健康区间。建议保持保护性习惯并定期自我检查。",
+        }
+
+    return raw_score, score_100, severity, interpretation
+
+
 def score_single_scale(scale_id: str, answers: Any) -> dict:
     if scale_id == PHQ9:
         score = score_phq9(answers)
@@ -131,6 +159,16 @@ def score_single_scale(scale_id: str, answers: Any) -> dict:
             "global_index": global_index,
             "moderate_or_above": global_index >= 2.0,
             "dimension_scores": dimensions,
+        }
+
+    if scale_id == WHO5:
+        raw_score, score_100, severity, interpretation = score_who5(answers)
+        return {
+            "scale_id": WHO5,
+            "score": score_100,
+            "raw_score": raw_score,
+            "severity": severity,
+            "interpretation": interpretation,
         }
 
     raise ValueError(f"Unsupported scale_id: {scale_id}")

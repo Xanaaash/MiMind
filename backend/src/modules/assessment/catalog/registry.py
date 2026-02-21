@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, List
 
-from modules.assessment.catalog.scales import CSSRS, GAD7, PHQ9, PSS10, SCL90
+from modules.assessment.catalog.scales import CSSRS, GAD7, PHQ9, PSS10, SCL90, WHO5
 
 
 @dataclass
@@ -71,5 +71,14 @@ CLINICAL_SCALE_DEFINITIONS: Dict[str, ClinicalScaleDefinition] = {
         required_for_triage=False,
         theory_reference="Symptom Checklist-90-Revised",
         supported_input=["likert_0_4_list_90", "dimension_score_map"],
+    ),
+    WHO5: ClinicalScaleDefinition(
+        scale_id=WHO5,
+        display_name="WHO-5 Well-Being Index",
+        item_count=5,
+        cadence_days=30,
+        required_for_triage=False,
+        theory_reference="WHO-5 World Health Organization Well-Being Index",
+        supported_input=["likert_0_5_list"],
     ),
 }

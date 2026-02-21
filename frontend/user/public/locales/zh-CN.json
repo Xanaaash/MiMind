@@ -157,7 +157,8 @@
       "gad7": "GAD-7 焦虑筛查",
       "pss10": "PSS-10 压力量表",
       "cssrs": "C-SSRS 安全风险筛查",
-      "scl90": "SCL-90 症状自评"
+      "scl90": "SCL-90 症状自评",
+      "who5": "WHO-5 主观幸福感指数"
     },
     "start": "开始测评",
     "items": "题",
@@ -197,12 +198,19 @@
     "paywall_subtitle": "当前方案仅支持填写量表。订阅后可查看完整得分解读与趋势。",
     "unlock_reports": "去订阅解锁",
     "back_to_list": "返回量表列表",
+    "professional_library_title": "权威量表库",
+    "professional_library_subtitle": "集中展示文献来源、适用场景、计分逻辑与边界说明。",
+    "use_case_label": "适用场景",
+    "scoring_label": "计分逻辑",
+    "disclaimer_label": "免责声明",
+    "reference_label": "查看来源文献",
     "intro": {
       "phq9": "PHQ-9 基于 DSM 抑郁症状标准，可用于近两周抑郁症状严重度筛查。",
       "gad7": "GAD-7 是广泛使用的焦虑筛查工具，可评估近两周焦虑症状水平。",
       "pss10": "PSS-10 用于评估个体对生活压力的主观感知，是压力研究常用量表。",
       "cssrs": "C-SSRS 采用结构化风险条目，可用于识别近期自伤/自杀意念与行为风险。",
       "scl90": "SCL-90 覆盖多维心理症状群，可用于总体心理困扰水平的广泛筛查。",
+      "who5": "WHO-5 用于评估近两周主观幸福感水平，可辅助观察情绪恢复趋势。",
       "generic": "该量表基于标准化心理测量框架，可用于初步状态评估。"
     },
     "errors": {

@@ -3,15 +3,17 @@ GAD7 = "gad7"
 PSS10 = "pss10"
 CSSRS = "cssrs"
 SCL90 = "scl90"
+WHO5 = "who5"
 
 MANDATORY_SCALES = [PHQ9, GAD7, PSS10, CSSRS]
-SUPPORTED_CLINICAL_SCALES = MANDATORY_SCALES + [SCL90]
+SUPPORTED_CLINICAL_SCALES = MANDATORY_SCALES + [SCL90, WHO5]
 
 QUESTION_COUNTS = {
     PHQ9: 9,
     GAD7: 7,
     PSS10: 10,
     SCL90: 90,
+    WHO5: 5,
 }
 
 # Roadmap/constitution cadence: core scales every 30 days in MVP.
@@ -21,6 +23,7 @@ REASSESSMENT_DAYS = {
     PSS10: 30,
     CSSRS: 30,
     SCL90: 90,
+    WHO5: 30,
 }
 
 SCL90_DIMENSIONS = [

@@ -20,10 +20,13 @@ class ScaleCatalogAPIContractTests(unittest.TestCase):
         self.assertIn("gad7", data)
         self.assertIn("cssrs", data)
         self.assertIn("scl90", data)
+        self.assertIn("who5", data)
         self.assertEqual(data["scl90"]["cadence_days"], 90)
+        self.assertEqual(data["who5"]["item_count"], 5)
         self.assertIn("question_bank", data["phq9"])
         self.assertIn("zh-CN", data["phq9"]["question_bank"]["supported_locales"])
         self.assertEqual(len(data["scl90"]["question_bank"]["questions"]), 90)
+        self.assertEqual(len(data["who5"]["question_bank"]["questions"]), 5)
 
     def test_score_scale_contract(self) -> None:
         status, body = self.api.post_score_scale(
@@ -82,12 +85,32 @@ class ScaleCatalogAPIContractTests(unittest.TestCase):
                 },
                 ("moderate_or_above", False),
             ),
+            (
+                {
+                    "scale_id": "who5",
+                    "answers": [4, 4, 4, 4, 4],
+                },
+                ("score", 80),
+            ),
         ]
 
         for payload, (expected_key, expected_value) in cases:
             status, body = self.api.post_score_scale(payload)
             self.assertEqual(status, 200)
             self.assertEqual(body["data"][expected_key], expected_value)
+
+    def test_professional_scale_library_contract(self) -> None:
+        status, body = self.api.get_professional_library()
+        self.assertEqual(status, 200)
+        data = body["data"]
+        self.assertGreaterEqual(len(data), 6)
+        self.assertIn("who5", data)
+        sample = data["who5"]
+        self.assertIn("en-US", sample["names"])
+        self.assertIn("zh-CN", sample["names"])
+        self.assertIn("en-US", sample["disclaimer"])
+        self.assertIn("zh-CN", sample["disclaimer"])
+        self.assertTrue(sample["references"])
 
 
 if __name__ == "__main__":

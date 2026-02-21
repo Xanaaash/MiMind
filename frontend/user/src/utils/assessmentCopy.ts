@@ -4,6 +4,7 @@ export const SCALE_NAME_KEYS: Record<string, string> = {
   pss10: 'scales.name.pss10',
   cssrs: 'scales.name.cssrs',
   scl90: 'scales.name.scl90',
+  who5: 'scales.name.who5',
 };
 
 export const SCALE_INTRO_KEYS: Record<string, string> = {
@@ -12,6 +13,7 @@ export const SCALE_INTRO_KEYS: Record<string, string> = {
   pss10: 'scales.intro.pss10',
   cssrs: 'scales.intro.cssrs',
   scl90: 'scales.intro.scl90',
+  who5: 'scales.intro.who5',
 };
 
 export const TEST_NAME_KEYS: Record<string, string> = {

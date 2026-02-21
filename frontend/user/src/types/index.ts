@@ -45,6 +45,22 @@ export interface ScaleCatalogItem {
   };
 }
 
+export interface ProfessionalScaleReference {
+  citation: string;
+  source_url: string;
+}
+
+export interface ProfessionalScaleLibraryItem {
+  scale_id: string;
+  names: Record<string, string>;
+  item_count: number;
+  use_cases: Record<string, string>;
+  scoring_logic: Record<string, string>;
+  disclaimer: Record<string, string>;
+  references: ProfessionalScaleReference[];
+  interactive_available: boolean;
+}
+
 export interface ScaleQuestion {
   question_id: string;
   text: Record<string, string>;
