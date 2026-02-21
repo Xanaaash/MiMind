@@ -15,6 +15,14 @@ const SCALE_ICONS: Record<string, string> = {
   scl90: '📋',
 };
 
+const SCALE_INTRO_KEYS: Record<string, string> = {
+  phq9: 'scales.intro.phq9',
+  gad7: 'scales.intro.gad7',
+  pss10: 'scales.intro.pss10',
+  cssrs: 'scales.intro.cssrs',
+  scl90: 'scales.intro.scl90',
+};
+
 export default function ScaleCenter() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -71,7 +79,10 @@ export default function ScaleCenter() {
               </div>
               <h3 className="font-heading font-bold text-lg uppercase">{scaleId}</h3>
               <p className="text-muted text-sm mt-1">{item.display_name}</p>
-              <p className="text-xs text-muted mt-2">
+              <p className="text-xs text-muted mt-2 leading-relaxed">
+                {t(SCALE_INTRO_KEYS[scaleId] ?? 'scales.intro.generic')}
+              </p>
+              <p className="text-xs text-muted mt-3">
                 {item.item_count} {t('scales.items')}
               </p>
               <button className="mt-4 text-accent font-semibold text-sm hover:underline">

@@ -174,6 +174,14 @@
     "paywall_subtitle": "Your current plan includes submissions only. Subscribe to view full score interpretation and insights.",
     "unlock_reports": "Upgrade to Unlock",
     "back_to_list": "Back to List",
+    "intro": {
+      "phq9": "PHQ-9 is aligned with DSM depressive symptom criteria and screens symptom severity over the past two weeks.",
+      "gad7": "GAD-7 is a widely validated anxiety screener for estimating anxiety severity in the past two weeks.",
+      "pss10": "PSS-10 measures perceived stress appraisal and is commonly used in stress research.",
+      "cssrs": "C-SSRS uses structured risk items to identify recent self-harm or suicidal ideation and behavior risk.",
+      "scl90": "SCL-90 spans multiple symptom domains and supports broad screening of overall psychological distress.",
+      "generic": "This scale follows standardized psychometric design for preliminary status screening."
+    },
     "errors": {
       "complete_section": "Please finish all questions in this section before continuing."
     }
@@ -194,7 +202,20 @@
     "pair_level": "Compatibility Level",
     "pair_pending": "Waiting for your partner to finish the test.",
     "share": "Share Results",
-    "back_to_list": "Back to List"
+    "back_to_list": "Back to List",
+    "intro": {
+      "mbti": "Based on Jungian type dimensions, this test profiles information and decision-making preferences.",
+      "16p": "Extends MBTI-like dimensions with an identity axis to describe personality style variation.",
+      "big5": "Grounded in the Five-Factor Model (OCEAN), one of the strongest evidence-based personality frameworks.",
+      "attachment": "Based on attachment theory, this test explores security needs and relational interaction patterns.",
+      "love_language": "Uses the five love languages framework to capture preferred ways of giving and receiving care.",
+      "stress_coping": "Based on the Lazarus-Folkman coping model, this test assesses common coping strategy tendencies.",
+      "eq": "Informed by emotional intelligence models, it evaluates awareness, regulation, empathy, and relationship skills.",
+      "inner_child": "Draws on trauma-informed inner-child frameworks to reflect emotional and protective response patterns.",
+      "boundary": "Uses interpersonal boundary-setting theory to assess boundary clarity and consistency in relationships.",
+      "psych_age": "Combines developmental and trait indicators to estimate psychological age-band tendencies.",
+      "generic": "This test is theory-informed and intended for non-clinical self-exploration."
+    }
   },
   "coach_gate": {
     "title": "Complete a quick assessment before starting AI Coach",

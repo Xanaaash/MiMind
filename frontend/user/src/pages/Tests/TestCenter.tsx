@@ -9,13 +9,30 @@ import Skeleton from '../../components/Skeleton/Skeleton';
 
 const TEST_ICONS: Record<string, string> = {
   mbti: '🎭',
+  '16p': '🧭',
   big5: '⭐',
   attachment: '💕',
   love_language: '❤️',
+  stress_coping: '🧘',
   eq: '🧠',
   inner_child: '🧸',
   boundary: '🚧',
+  psych_age: '🎂',
   mental_age: '🎂',
+};
+
+const TEST_INTRO_KEYS: Record<string, string> = {
+  mbti: 'tests.intro.mbti',
+  '16p': 'tests.intro.16p',
+  big5: 'tests.intro.big5',
+  attachment: 'tests.intro.attachment',
+  love_language: 'tests.intro.love_language',
+  stress_coping: 'tests.intro.stress_coping',
+  eq: 'tests.intro.eq',
+  inner_child: 'tests.intro.inner_child',
+  boundary: 'tests.intro.boundary',
+  psych_age: 'tests.intro.psych_age',
+  mental_age: 'tests.intro.psych_age',
 };
 
 export default function TestCenter() {
@@ -72,7 +89,10 @@ export default function TestCenter() {
                 {TEST_ICONS[testId] ?? '🧩'}
               </div>
               <h3 className="font-heading font-bold text-lg">{item.display_name}</h3>
-              <p className="text-xs text-muted mt-2">
+              <p className="text-xs text-muted mt-2 leading-relaxed">
+                {t(TEST_INTRO_KEYS[testId] ?? 'tests.intro.generic')}
+              </p>
+              <p className="text-xs text-muted mt-3">
                 {item.input_dimension_count} {t('tests.dimensions')}
               </p>
               <button className="mt-4 text-accent font-semibold text-sm hover:underline">
