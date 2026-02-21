@@ -198,6 +198,7 @@
     "paywall_subtitle": "Your current plan includes submissions only. Subscribe to view full score interpretation and insights.",
     "unlock_reports": "Upgrade to Unlock",
     "back_to_list": "Back to List",
+    "purpose_label": "What this helps with",
     "professional_library_title": "Professional Scale Library",
     "professional_library_subtitle": "Evidence-based scale references with citation, use-case, scoring logic, and boundary notes.",
     "use_case_label": "Use case",
@@ -212,6 +213,15 @@
       "scl90": "SCL-90 spans multiple symptom domains and supports broad screening of overall psychological distress.",
       "who5": "WHO-5 tracks positive well-being in the last two weeks and is useful for observing emotional recovery trend.",
       "generic": "This scale follows standardized psychometric design for preliminary status screening."
+    },
+    "purpose": {
+      "phq9": "Helps you quickly understand whether low mood symptoms have recently become heavier.",
+      "gad7": "Helps you identify if anxiety is starting to interfere with daily functioning.",
+      "pss10": "Helps you see how much stress pressure you feel and whether it is accumulating.",
+      "cssrs": "Helps detect urgent safety risk signals so the system can switch to protection flow.",
+      "scl90": "Helps map broad distress domains and spot where support may be most needed.",
+      "who5": "Helps track your positive well-being level and recovery momentum over time.",
+      "generic": "Helps you get a simple baseline snapshot for follow-up reflection."
     },
     "errors": {
       "complete_section": "Please finish all questions in this section before continuing."
@@ -246,6 +256,7 @@
     "pair_pending": "Waiting for your partner to finish the test.",
     "share": "Share Results",
     "back_to_list": "Back to List",
+    "purpose_label": "What this helps with",
     "intro": {
       "mbti": "Based on Jungian type dimensions, this test profiles information and decision-making preferences.",
       "16p": "Extends MBTI-like dimensions with an identity axis to describe personality style variation.",
@@ -258,6 +269,19 @@
       "boundary": "Uses interpersonal boundary-setting theory to assess boundary clarity and consistency in relationships.",
       "psych_age": "Combines developmental and trait indicators to estimate psychological age-band tendencies.",
       "generic": "This test is theory-informed and intended for non-clinical self-exploration."
+    },
+    "purpose": {
+      "mbti": "Helps you understand your default information-processing and decision style.",
+      "16p": "Helps you quickly describe your personality tendency in everyday language.",
+      "big5": "Helps you see your stable trait profile across the five major personality dimensions.",
+      "attachment": "Helps you understand your closeness, trust, and dependence pattern in relationships.",
+      "love_language": "Helps you clarify which care expression style makes you feel most supported.",
+      "stress_coping": "Helps you identify your default coping strategy under pressure.",
+      "eq": "Helps you review emotional awareness, regulation, and empathy strengths.",
+      "inner_child": "Helps you notice recurring emotional triggers and unmet needs patterns.",
+      "boundary": "Helps you check whether your interpersonal boundaries are clear and consistent.",
+      "psych_age": "Helps you reflect on emotional maturity tendency and growth direction.",
+      "generic": "Helps you gain a simple self-understanding angle for reflection."
     },
     "summary_label": {
       "type": "Type",

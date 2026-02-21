@@ -6,7 +6,7 @@ import { getCatalog, getProfessionalLibrary } from '../../api/scales';
 import type { ProfessionalScaleLibraryItem, ScaleCatalogItem } from '../../types';
 import Card from '../../components/Card/Card';
 import Skeleton from '../../components/Skeleton/Skeleton';
-import { SCALE_INTRO_KEYS, SCALE_NAME_KEYS } from '../../utils/assessmentCopy';
+import { SCALE_INTRO_KEYS, SCALE_NAME_KEYS, SCALE_PURPOSE_KEYS } from '../../utils/assessmentCopy';
 
 const SCALE_ICONS: Record<string, string> = {
   phq9: '🧠',
@@ -86,6 +86,10 @@ export default function ScaleCenter() {
               <p className="text-muted text-xs mt-1 uppercase tracking-wide">{scaleId}</p>
               <p className="text-xs text-muted mt-2 leading-relaxed">
                 {t(SCALE_INTRO_KEYS[scaleId] ?? 'scales.intro.generic')}
+              </p>
+              <p className="text-xs text-muted mt-2 leading-relaxed">
+                <span className="font-semibold text-ink">{t('scales.purpose_label')}: </span>
+                {t(SCALE_PURPOSE_KEYS[scaleId] ?? 'scales.purpose.generic')}
               </p>
               <p className="text-xs text-muted mt-3">
                 {item.item_count} {t('scales.items')}

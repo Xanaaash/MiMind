@@ -5,8 +5,10 @@ import enUS from '../../../public/locales/en-US.json';
 import {
   SCALE_INTRO_KEYS,
   SCALE_NAME_KEYS,
+  SCALE_PURPOSE_KEYS,
   TEST_INTRO_KEYS,
   TEST_NAME_KEYS,
+  TEST_PURPOSE_KEYS,
 } from '../../utils/assessmentCopy';
 
 type LocaleResource = Record<string, unknown>;
@@ -35,10 +37,16 @@ describe('assessment/test bilingual translations', () => {
     const mappedKeys = [
       ...Object.values(SCALE_NAME_KEYS),
       ...Object.values(SCALE_INTRO_KEYS),
+      ...Object.values(SCALE_PURPOSE_KEYS),
       ...Object.values(TEST_NAME_KEYS),
       ...Object.values(TEST_INTRO_KEYS),
+      ...Object.values(TEST_PURPOSE_KEYS),
       'scales.intro.generic',
+      'scales.purpose.generic',
       'tests.intro.generic',
+      'tests.purpose.generic',
+      'scales.purpose_label',
+      'tests.purpose_label',
     ];
     Array.from(new Set(mappedKeys)).forEach((key) => expectTranslation(key));
   });

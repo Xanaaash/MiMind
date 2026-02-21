@@ -6,7 +6,7 @@ import { getCatalog } from '../../api/tests';
 import type { TestCatalogItem } from '../../types';
 import Card from '../../components/Card/Card';
 import Skeleton from '../../components/Skeleton/Skeleton';
-import { TEST_INTRO_KEYS, TEST_NAME_KEYS } from '../../utils/assessmentCopy';
+import { TEST_INTRO_KEYS, TEST_NAME_KEYS, TEST_PURPOSE_KEYS } from '../../utils/assessmentCopy';
 
 const TEST_ICONS: Record<string, string> = {
   mbti: '🎭',
@@ -80,6 +80,10 @@ export default function TestCenter() {
               </h3>
               <p className="text-xs text-muted mt-2 leading-relaxed">
                 {t(TEST_INTRO_KEYS[testId] ?? 'tests.intro.generic')}
+              </p>
+              <p className="text-xs text-muted mt-2 leading-relaxed">
+                <span className="font-semibold text-ink">{t('tests.purpose_label')}: </span>
+                {t(TEST_PURPOSE_KEYS[testId] ?? 'tests.purpose.generic')}
               </p>
               <p className="text-xs text-muted mt-3">
                 {item.input_dimension_count} {t('tests.dimensions')}
