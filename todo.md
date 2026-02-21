@@ -73,7 +73,7 @@
 
 ### 2.1 用户认证
 
-- [🔒 codex-0220o] **T-201** 用户端 JWT 认证体系（注册/登录/刷新 token，独立于 admin session）
+- [✅] **T-201** 用户端 JWT 认证体系（注册/登录/刷新 token，独立于 admin session）
 - [ ] **T-202** 邮箱验证流程（注册后发送验证链接）
 - [✅] **T-203** API 速率限制（per-user / per-IP，防滥用）
 
