@@ -21,17 +21,61 @@ export const SENSORY_SOUNDS: AmbientSound[] = [
 ];
 
 let ctx: AudioContext | null = null;
-let activeNodes: AudioNode[] = [];
-let activeOscillators: OscillatorNode[] = [];
-let activeSources: AudioBufferSourceNode[] = [];
-let gainNode: GainNode | null = null;
-let currentSound: AmbientSoundId | null = null;
+type TimeoutHandle = ReturnType<typeof setTimeout>;
+
+interface AmbientChannel {
+  gainNode: GainNode;
+  activeNodes: AudioNode[];
+  activeOscillators: OscillatorNode[];
+  activeSources: AudioBufferSourceNode[];
+  timeouts: Set<TimeoutHandle>;
+  alive: boolean;
+}
+
+const channels = new Map<AmbientSoundId, AmbientChannel>();
 let timerHandle: ReturnType<typeof setTimeout> | null = null;
+
+function clampVolume(v: number): number {
+  return Math.max(0, Math.min(1, v));
+}
 
 function getCtx(): AudioContext {
   if (!ctx) ctx = new AudioContext();
   if (ctx.state === 'suspended') ctx.resume();
   return ctx;
+}
+
+function createChannel(ac: AudioContext, volume: number): AmbientChannel {
+  const gainNode = ac.createGain();
+  gainNode.gain.value = clampVolume(volume);
+  gainNode.connect(ac.destination);
+
+  return {
+    gainNode,
+    activeNodes: [],
+    activeOscillators: [],
+    activeSources: [],
+    timeouts: new Set(),
+    alive: true,
+  };
+}
+
+function scheduleChannelTimeout(channel: AmbientChannel, delayMs: number, fn: () => void) {
+  const handle = setTimeout(() => {
+    channel.timeouts.delete(handle);
+    fn();
+  }, delayMs);
+  channel.timeouts.add(handle);
+}
+
+function disposeChannel(channel: AmbientChannel) {
+  channel.alive = false;
+  channel.timeouts.forEach((handle) => clearTimeout(handle));
+  channel.timeouts.clear();
+  channel.activeSources.forEach((s) => { try { s.stop(); } catch { /* already stopped */ } });
+  channel.activeOscillators.forEach((o) => { try { o.stop(); } catch { /* already stopped */ } });
+  channel.activeNodes.forEach((n) => { try { n.disconnect(); } catch { /* ok */ } });
+  try { channel.gainNode.disconnect(); } catch { /* ok */ }
 }
 
 function createNoiseBuffer(seconds: number, type: 'white' | 'pink' | 'brown' = 'white'): AudioBuffer {
@@ -67,7 +111,8 @@ function createNoiseBuffer(seconds: number, type: 'white' | 'pink' | 'brown' = '
   return buffer;
 }
 
-function buildRain(ac: AudioContext, master: GainNode) {
+function buildRain(ac: AudioContext, channel: AmbientChannel) {
+  const master = channel.gainNode;
   const noise = ac.createBufferSource();
   noise.buffer = createNoiseBuffer(4, 'pink');
   noise.loop = true;
@@ -103,12 +148,13 @@ function buildRain(ac: AudioContext, master: GainNode) {
   drip.connect(dripBp).connect(dripGain).connect(master);
   drip.start();
 
-  activeNodes.push(bp, hp, lfoGain, dripBp, dripGain);
-  activeOscillators.push(lfo);
-  activeSources.push(noise, drip);
+  channel.activeNodes.push(bp, hp, lfoGain, dripBp, dripGain);
+  channel.activeOscillators.push(lfo);
+  channel.activeSources.push(noise, drip);
 }
 
-function buildOcean(ac: AudioContext, master: GainNode) {
+function buildOcean(ac: AudioContext, channel: AmbientChannel) {
+  const master = channel.gainNode;
   const noise = ac.createBufferSource();
   noise.buffer = createNoiseBuffer(6, 'brown');
   noise.loop = true;
@@ -153,12 +199,13 @@ function buildOcean(ac: AudioContext, master: GainNode) {
   foam.connect(foamBp).connect(foamGain).connect(master);
   foam.start();
 
-  activeNodes.push(lp, lfoGain, lfo2Gain, waveGain, foamBp, foamGain, foamLfoGain);
-  activeOscillators.push(lfo, lfo2, foamLfo);
-  activeSources.push(noise, foam);
+  channel.activeNodes.push(lp, lfoGain, lfo2Gain, waveGain, foamBp, foamGain, foamLfoGain);
+  channel.activeOscillators.push(lfo, lfo2, foamLfo);
+  channel.activeSources.push(noise, foam);
 }
 
-function buildForest(ac: AudioContext, master: GainNode) {
+function buildForest(ac: AudioContext, channel: AmbientChannel) {
+  const master = channel.gainNode;
   const wind = ac.createBufferSource();
   wind.buffer = createNoiseBuffer(6, 'pink');
   wind.loop = true;
@@ -190,8 +237,8 @@ function buildForest(ac: AudioContext, master: GainNode) {
 
   function scheduleBird() {
     const delay = 2 + Math.random() * 6;
-    setTimeout(() => {
-      if (!currentSound || currentSound !== 'forest') return;
+    scheduleChannelTimeout(channel, delay * 1000, () => {
+      if (!channel.alive) return;
       const osc = ac.createOscillator();
       osc.type = 'sine';
       const baseFreq = 2000 + Math.random() * 2000;
@@ -213,16 +260,17 @@ function buildForest(ac: AudioContext, master: GainNode) {
       osc.start(now);
       osc.stop(now + chirps * (dur + 0.05) + 0.1);
       scheduleBird();
-    }, delay * 1000);
+    });
   }
   scheduleBird();
 
-  activeNodes.push(windLp, windGain, windLfoG, leavesBp, leavesGain);
-  activeOscillators.push(windLfo);
-  activeSources.push(wind, leaves);
+  channel.activeNodes.push(windLp, windGain, windLfoG, leavesBp, leavesGain);
+  channel.activeOscillators.push(windLfo);
+  channel.activeSources.push(wind, leaves);
 }
 
-function buildCampfire(ac: AudioContext, master: GainNode) {
+function buildCampfire(ac: AudioContext, channel: AmbientChannel) {
+  const master = channel.gainNode;
   const noise = ac.createBufferSource();
   noise.buffer = createNoiseBuffer(4, 'brown');
   noise.loop = true;
@@ -248,8 +296,8 @@ function buildCampfire(ac: AudioContext, master: GainNode) {
 
   function schedulePop() {
     const delay = 0.3 + Math.random() * 2;
-    setTimeout(() => {
-      if (!currentSound || currentSound !== 'campfire') return;
+    scheduleChannelTimeout(channel, delay * 1000, () => {
+      if (!channel.alive) return;
       const pop = ac.createBufferSource();
       const len = 256;
       const buf = ac.createBuffer(1, len, ac.sampleRate);
@@ -267,15 +315,16 @@ function buildCampfire(ac: AudioContext, master: GainNode) {
       pop.connect(popBp).connect(popGain).connect(master);
       pop.start();
       schedulePop();
-    }, delay * 1000);
+    });
   }
   schedulePop();
 
-  activeNodes.push(lp, baseGain, crackleBp, crackleGain);
-  activeSources.push(noise, crackle);
+  channel.activeNodes.push(lp, baseGain, crackleBp, crackleGain);
+  channel.activeSources.push(noise, crackle);
 }
 
-function buildCafe(ac: AudioContext, master: GainNode) {
+function buildCafe(ac: AudioContext, channel: AmbientChannel) {
+  const master = channel.gainNode;
   const chatter = ac.createBufferSource();
   chatter.buffer = createNoiseBuffer(6, 'pink');
   chatter.loop = true;
@@ -307,8 +356,8 @@ function buildCafe(ac: AudioContext, master: GainNode) {
 
   function scheduleClink() {
     const delay = 3 + Math.random() * 8;
-    setTimeout(() => {
-      if (!currentSound || currentSound !== 'cafe') return;
+    scheduleChannelTimeout(channel, delay * 1000, () => {
+      if (!channel.alive) return;
       const osc = ac.createOscillator();
       osc.type = 'sine';
       osc.frequency.value = 3000 + Math.random() * 2000;
@@ -320,16 +369,17 @@ function buildCafe(ac: AudioContext, master: GainNode) {
       osc.start(now);
       osc.stop(now + 0.5);
       scheduleClink();
-    }, delay * 1000);
+    });
   }
   scheduleClink();
 
-  activeNodes.push(chatterBp, chatterGain, chatterLfoG, ambientLp, ambientGain);
-  activeOscillators.push(chatterLfo);
-  activeSources.push(chatter, ambient);
+  channel.activeNodes.push(chatterBp, chatterGain, chatterLfoG, ambientLp, ambientGain);
+  channel.activeOscillators.push(chatterLfo);
+  channel.activeSources.push(chatter, ambient);
 }
 
-function buildPinkNoise(ac: AudioContext, master: GainNode) {
+function buildPinkNoise(ac: AudioContext, channel: AmbientChannel) {
+  const master = channel.gainNode;
   const src = ac.createBufferSource();
   src.buffer = createNoiseBuffer(6, 'pink');
   src.loop = true;
@@ -338,11 +388,12 @@ function buildPinkNoise(ac: AudioContext, master: GainNode) {
   lp.frequency.value = 8000;
   src.connect(lp).connect(master);
   src.start();
-  activeNodes.push(lp);
-  activeSources.push(src);
+  channel.activeNodes.push(lp);
+  channel.activeSources.push(src);
 }
 
-function buildBrownNoise(ac: AudioContext, master: GainNode) {
+function buildBrownNoise(ac: AudioContext, channel: AmbientChannel) {
+  const master = channel.gainNode;
   const src = ac.createBufferSource();
   src.buffer = createNoiseBuffer(6, 'brown');
   src.loop = true;
@@ -351,11 +402,11 @@ function buildBrownNoise(ac: AudioContext, master: GainNode) {
   lp.frequency.value = 600;
   src.connect(lp).connect(master);
   src.start();
-  activeNodes.push(lp);
-  activeSources.push(src);
+  channel.activeNodes.push(lp);
+  channel.activeSources.push(src);
 }
 
-const builders: Record<AmbientSoundId, (ac: AudioContext, master: GainNode) => void> = {
+const builders: Record<AmbientSoundId, (ac: AudioContext, channel: AmbientChannel) => void> = {
   rain: buildRain,
   ocean: buildOcean,
   forest: buildForest,
@@ -365,48 +416,87 @@ const builders: Record<AmbientSoundId, (ac: AudioContext, master: GainNode) => v
   brown_noise: buildBrownNoise,
 };
 
+export function startAmbient(soundId: AmbientSoundId, volume = 0.7) {
+  const existing = channels.get(soundId);
+  if (existing) {
+    existing.gainNode.gain.value = clampVolume(volume);
+    return;
+  }
+
+  const ac = getCtx();
+  const channel = createChannel(ac, volume);
+  channels.set(soundId, channel);
+  builders[soundId](ac, channel);
+}
+
+export function stopAmbientSound(soundId: AmbientSoundId) {
+  const channel = channels.get(soundId);
+  if (!channel) return;
+
+  disposeChannel(channel);
+  channels.delete(soundId);
+
+  if (channels.size === 0) {
+    clearTimer();
+  }
+}
+
 export function playAmbient(soundId: AmbientSoundId, volume = 0.7) {
   stopAmbient();
-  const ac = getCtx();
-  gainNode = ac.createGain();
-  gainNode.gain.value = volume;
-  gainNode.connect(ac.destination);
-  currentSound = soundId;
-  builders[soundId](ac, gainNode);
+  startAmbient(soundId, volume);
 }
 
 export function stopAmbient() {
+  clearTimer();
+  channels.forEach((channel) => disposeChannel(channel));
+  channels.clear();
+}
+
+export function setAmbientVolume(soundId: AmbientSoundId, v: number) {
+  const channel = channels.get(soundId);
+  if (!channel) return;
+  channel.gainNode.gain.value = clampVolume(v);
+}
+
+export function getAmbientVolume(soundId: AmbientSoundId): number | null {
+  const channel = channels.get(soundId);
+  return channel ? channel.gainNode.gain.value : null;
+}
+
+export function setVolume(v: number) {
+  const volume = clampVolume(v);
+  channels.forEach((channel) => {
+    channel.gainNode.gain.value = volume;
+  });
+}
+
+export function setTimer(minutes: number, onEnd: () => void) {
+  clearTimer();
+  timerHandle = setTimeout(() => {
+    stopAmbient();
+    onEnd();
+  }, Math.max(0, minutes) * 60 * 1000);
+}
+
+export function clearTimer() {
   if (timerHandle) {
     clearTimeout(timerHandle);
     timerHandle = null;
   }
-  currentSound = null;
-  activeSources.forEach((s) => { try { s.stop(); } catch { /* already stopped */ } });
-  activeOscillators.forEach((o) => { try { o.stop(); } catch { /* already stopped */ } });
-  activeNodes.forEach((n) => { try { n.disconnect(); } catch { /* ok */ } });
-  if (gainNode) { try { gainNode.disconnect(); } catch { /* ok */ } }
-  activeSources = [];
-  activeOscillators = [];
-  activeNodes = [];
-  gainNode = null;
-}
-
-export function setVolume(v: number) {
-  if (gainNode) gainNode.gain.value = Math.max(0, Math.min(1, v));
-}
-
-export function setTimer(minutes: number, onEnd: () => void) {
-  if (timerHandle) clearTimeout(timerHandle);
-  timerHandle = setTimeout(() => {
-    stopAmbient();
-    onEnd();
-  }, minutes * 60 * 1000);
 }
 
 export function isPlaying(): boolean {
-  return currentSound !== null;
+  return channels.size > 0;
+}
+
+export function isSoundPlaying(soundId: AmbientSoundId): boolean {
+  return channels.has(soundId);
+}
+
+export function getPlayingSounds(): AmbientSoundId[] {
+  return Array.from(channels.keys());
 }
 
 export function getCurrentSound(): AmbientSoundId | null {
-  return currentSound;
+  return getPlayingSounds()[0] ?? null;
 }

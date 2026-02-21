@@ -4,12 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   AMBIENT_SOUNDS,
-  playAmbient,
+  startAmbient,
   stopAmbient,
-  setVolume,
+  stopAmbientSound,
+  setAmbientVolume,
   setTimer,
+  clearTimer,
   isPlaying,
-  getCurrentSound,
+  isSoundPlaying,
   type AmbientSoundId,
 } from '../../utils/ambientAudio';
 import { getToolUsageStats } from '../../api/tools';
@@ -18,20 +20,28 @@ import Card from '../../components/Card/Card';
 import type { ToolUsageStats } from '../../types';
 
 const TIMER_OPTIONS = [0, 5, 15, 30, 60];
+const DEFAULT_SOUND_VOLUME = 0.7;
+
+function buildInitialSoundVolumes(): Partial<Record<AmbientSoundId, number>> {
+  return AMBIENT_SOUNDS.reduce<Partial<Record<AmbientSoundId, number>>>((acc, sound) => {
+    acc[sound.id] = DEFAULT_SOUND_VOLUME;
+    return acc;
+  }, {});
+}
 
 export default function ToolsHub() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const userId = useAuthStore((s) => s.userId);
 
-  const [playing, setPlaying] = useState(false);
-  const [activeSound, setActiveSound] = useState<AmbientSoundId | null>(null);
-  const [volume, setVolumeState] = useState(0.7);
+  const [activeSounds, setActiveSounds] = useState<AmbientSoundId[]>([]);
+  const [soundVolumes, setSoundVolumes] = useState<Partial<Record<AmbientSoundId, number>>>(() => buildInitialSoundVolumes());
   const [timerMin, setTimerMin] = useState(0);
   const [elapsed, setElapsed] = useState(0);
   const [usageStats, setUsageStats] = useState<ToolUsageStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const playing = activeSounds.length > 0;
 
   useEffect(() => {
     return () => {
@@ -84,36 +94,45 @@ export default function ToolsHub() {
   }, [userId]);
 
   const handleToggle = useCallback((soundId: AmbientSoundId) => {
-    if (isPlaying() && getCurrentSound() === soundId) {
-      stopAmbient();
-      setPlaying(false);
-      setActiveSound(null);
-    } else {
-      playAmbient(soundId, volume);
-      setPlaying(true);
-      setActiveSound(soundId);
+    const volume = soundVolumes[soundId] ?? DEFAULT_SOUND_VOLUME;
+    setActiveSounds((prev) => {
+      if (prev.includes(soundId)) {
+        stopAmbientSound(soundId);
+        const next = prev.filter((id) => id !== soundId);
+        if (next.length === 0) {
+          clearTimer();
+        }
+        return next;
+      }
+
+      startAmbient(soundId, volume);
+      const next = [...prev, soundId];
       if (timerMin > 0) {
         setTimer(timerMin, () => {
-          setPlaying(false);
-          setActiveSound(null);
+          setActiveSounds([]);
         });
       }
-    }
-  }, [volume, timerMin]);
+      return next;
+    });
+  }, [soundVolumes, timerMin]);
 
-  const handleVolumeChange = useCallback((v: number) => {
-    setVolumeState(v);
-    setVolume(v);
+  const handleVolumeChange = useCallback((soundId: AmbientSoundId, volume: number) => {
+    setSoundVolumes((prev) => ({ ...prev, [soundId]: volume }));
+    if (isSoundPlaying(soundId)) {
+      setAmbientVolume(soundId, volume);
+    }
   }, []);
 
   const handleTimerChange = useCallback((min: number) => {
     setTimerMin(min);
-    if (isPlaying() && min > 0) {
+    if (!isPlaying()) return;
+    if (min > 0) {
       setTimer(min, () => {
-        setPlaying(false);
-        setActiveSound(null);
+        setActiveSounds([]);
       });
+      return;
     }
+    clearTimer();
   }, []);
 
   const formatTime = (sec: number) => {
@@ -190,13 +209,14 @@ export default function ToolsHub() {
           <div>
             <h3 className="font-heading font-bold text-lg">{t('tools.audio_title')}</h3>
             <p className="text-muted text-sm">{t('tools.audio_desc')}</p>
+            <p className="text-xs text-accent mt-1">{t('tools.audio_mix_hint')}</p>
           </div>
         </div>
 
         {/* Sound grid */}
         <div className="grid grid-cols-5 gap-3 mb-6">
           {AMBIENT_SOUNDS.map((s) => {
-            const isActive = activeSound === s.id && playing;
+            const isActive = activeSounds.includes(s.id);
             return (
               <button
                 key={s.id}
@@ -246,22 +266,35 @@ export default function ToolsHub() {
               </div>
 
               {/* Volume */}
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-sm text-muted w-8">🔈</span>
-                <input
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  value={volume}
-                  onChange={(e) => handleVolumeChange(Number(e.target.value))}
-                  aria-label="Audio volume"
-                  className="flex-1 accent-accent h-2"
-                />
-                <span className="text-sm text-muted w-8">🔊</span>
-                <span className="text-sm font-medium text-muted w-10 text-right">
-                  {Math.round(volume * 100)}%
-                </span>
+              <div className="space-y-3 mb-4">
+                {activeSounds.map((soundId) => {
+                  const sound = AMBIENT_SOUNDS.find((item) => item.id === soundId);
+                  if (!sound) return null;
+
+                  const volume = soundVolumes[soundId] ?? DEFAULT_SOUND_VOLUME;
+
+                  return (
+                    <div key={soundId} className="flex items-center gap-3 rounded-xl bg-paper border border-line px-3 py-2">
+                      <span className="text-base">{sound.emoji}</span>
+                      <span className="text-xs text-muted min-w-[56px]">{t(sound.nameKey)}</span>
+                      <span className="text-xs text-muted">🔈</span>
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        value={volume}
+                        onChange={(e) => handleVolumeChange(soundId, Number(e.target.value))}
+                        aria-label={`${t(sound.nameKey)} volume`}
+                        className="flex-1 accent-accent h-2"
+                      />
+                      <span className="text-xs text-muted">🔊</span>
+                      <span className="text-xs font-medium text-muted w-10 text-right">
+                        {Math.round(volume * 100)}%
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Timer */}
@@ -280,7 +313,7 @@ export default function ToolsHub() {
                     `}
                   >
                     {min === 0
-                      ? t('tools.unlimited')
+                      ? t('tools.timer_unlimited')
                       : `${min} ${t('tools.minutes')}`
                     }
                   </button>
@@ -289,7 +322,7 @@ export default function ToolsHub() {
 
               {/* Stop */}
               <button
-                onClick={() => { stopAmbient(); setPlaying(false); setActiveSound(null); }}
+                onClick={() => { stopAmbient(); setActiveSounds([]); }}
                 className="w-full py-2.5 rounded-xl bg-danger-soft text-danger font-semibold text-sm hover:bg-danger hover:text-white transition-colors"
               >
                 {t('tools.stop')}
