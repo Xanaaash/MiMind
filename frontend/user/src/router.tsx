@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import type { RouteObject } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import AppLayout from './components/Layout/AppLayout';
 
 const Landing = lazy(() => import('./pages/Landing/Landing'));
@@ -14,7 +15,6 @@ const TestQuiz = lazy(() => import('./pages/Tests/TestQuiz'));
 const TestResult = lazy(() => import('./pages/Tests/TestResult'));
 const CoachPage = lazy(() => import('./pages/Coach/CoachPage'));
 const CoachHistoryPage = lazy(() => import('./pages/Coach/CoachHistoryPage'));
-const ToolsHub = lazy(() => import('./pages/Tools/ToolsHub'));
 const ReliefHub = lazy(() => import('./pages/Relief/ReliefHub'));
 const MindfulnessHub = lazy(() => import('./pages/Mindfulness/MindfulnessHub'));
 const ManifestationPage = lazy(() => import('./pages/Mindfulness/ManifestationPage'));
@@ -58,11 +58,11 @@ export const routes: RouteObject[] = [
       { path: '/mindfulness', element: <MindfulnessHub /> },
       { path: '/mindfulness/meditation', element: <MeditationPlayer /> },
       { path: '/mindfulness/manifestation', element: <ManifestationPage /> },
-      { path: '/tools', element: <ToolsHub /> },
-      { path: '/tools/breathing', element: <BreathingExercise /> },
-      { path: '/tools/sensory-relief', element: <SensoryRelief /> },
+      { path: '/tools', element: <Navigate to="/relief" replace /> },
+      { path: '/tools/breathing', element: <Navigate to="/relief/breathing" replace /> },
+      { path: '/tools/sensory-relief', element: <Navigate to="/relief/sensory" replace /> },
       { path: '/tools/pomodoro', element: <PomodoroTimer /> },
-      { path: '/tools/meditation', element: <MeditationPlayer /> },
+      { path: '/tools/meditation', element: <Navigate to="/mindfulness/meditation" replace /> },
       { path: '/neurodiversity', element: <NeuroHub /> },
       { path: '/neurodiversity/:scaleId', element: <NeuroQuiz /> },
       { path: '/neurodiversity/:scaleId/result', element: <NeuroResult /> },

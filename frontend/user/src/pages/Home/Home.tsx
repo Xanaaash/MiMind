@@ -10,7 +10,8 @@ const MODULES = [
   { path: '/scales', labelKey: 'nav.scales', icon: '📋', descKey: 'landing.feature_scales_desc', color: 'bg-calm-soft' },
   { path: '/tests', labelKey: 'nav.tests', icon: '🧩', descKey: 'landing.feature_tests_desc', color: 'bg-warn-soft' },
   { path: '/coach', labelKey: 'nav.coach', icon: '💬', descKey: 'landing.feature_coach_desc', color: 'bg-safe-soft' },
-  { path: '/tools', labelKey: 'nav.tools', icon: '🌿', descKey: 'landing.feature_tools_desc', color: 'bg-accent-soft' },
+  { path: '/relief', labelKey: 'nav.rescue', icon: '🚨', descKey: 'relief.subtitle', color: 'bg-danger-soft' },
+  { path: '/mindfulness', labelKey: 'nav.mindfulness', icon: '🪷', descKey: 'mindfulness.subtitle', color: 'bg-accent-soft' },
   { path: '/journal', labelKey: 'nav.journal', icon: '📝', descKey: 'journal.subtitle', color: 'bg-cream' },
   { path: '/billing', labelKey: 'nav.billing', icon: '💎', descKey: 'billing.subtitle', color: 'bg-calm-soft' },
 ];

@@ -132,7 +132,7 @@ export default function PomodoroTimer() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <button
-          onClick={() => navigate('/tools')}
+          onClick={() => navigate('/home')}
           className="text-sm text-muted hover:text-ink transition-colors"
         >
           ← {t('pomo.back')}
