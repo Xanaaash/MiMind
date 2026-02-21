@@ -12,6 +12,7 @@
     "coach": "AI 教练",
     "tools": "疗愈工具",
     "rescue": "急救舱",
+    "mindfulness": "心灵空间",
     "journal": "情绪日记",
     "billing": "订阅",
     "profile": "我的",
@@ -309,6 +310,16 @@
     "quick_breath_title": "一键开始呼吸引导",
     "quick_breath_desc": "跟随节奏呼吸，先把神经系统慢下来。",
     "stop_all_audio": "停止全部声音"
+  },
+  "mindfulness": {
+    "back": "返回心灵空间",
+    "title": "心灵空间",
+    "subtitle": "在这里做更慢、更深的练习。冥想与显化工具会在这里持续扩展。",
+    "meditation_title": "冥想引导",
+    "meditation_desc": "选择一段引导语，跟随呼吸和注意力完成一次深度放松。",
+    "manifestation_badge": "即将上线",
+    "manifestation_title": "显化练习",
+    "manifestation_desc": "记录肯定语和愿景卡片，建立持续的内在强化。"
   },
   "journal": {
     "title": "情绪日记",

@@ -124,10 +124,10 @@ export default function MeditationPlayer() {
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
         <button
           type="button"
-          onClick={() => navigate('/tools')}
+          onClick={() => navigate('/mindfulness')}
           className="text-sm text-muted hover:text-accent transition-colors mb-4"
         >
-          ← {t('tools.back_to_tools')}
+          ← {t('mindfulness.back')}
         </button>
         <h1 className="font-heading text-3xl font-bold">{t('tools.meditation_page_title')}</h1>
         <p className="text-muted mt-2">{t('tools.meditation_page_subtitle')}</p>

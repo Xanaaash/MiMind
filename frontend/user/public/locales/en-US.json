@@ -12,6 +12,7 @@
     "coach": "AI Coach",
     "tools": "Tools",
     "rescue": "Relief",
+    "mindfulness": "Mindfulness",
     "journal": "Journal",
     "billing": "Plans",
     "profile": "Profile",
@@ -309,6 +310,16 @@
     "quick_breath_title": "Start Guided Breathing",
     "quick_breath_desc": "Follow the breathing cadence to downshift your nervous system.",
     "stop_all_audio": "Stop All Audio"
+  },
+  "mindfulness": {
+    "back": "Back to Mindfulness",
+    "title": "Mindfulness Space",
+    "subtitle": "Practice slower, deeper regulation here. Meditation and manifestation tools will keep expanding in this space.",
+    "meditation_title": "Guided Meditation",
+    "meditation_desc": "Pick a guided track and follow breath plus attention to settle deeply.",
+    "manifestation_badge": "Coming Soon",
+    "manifestation_title": "Manifestation",
+    "manifestation_desc": "Capture affirmations and vision cards to reinforce positive momentum."
   },
   "journal": {
     "title": "Mood Journal",

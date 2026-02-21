@@ -16,6 +16,7 @@ const CoachPage = lazy(() => import('./pages/Coach/CoachPage'));
 const CoachHistoryPage = lazy(() => import('./pages/Coach/CoachHistoryPage'));
 const ToolsHub = lazy(() => import('./pages/Tools/ToolsHub'));
 const ReliefHub = lazy(() => import('./pages/Relief/ReliefHub'));
+const MindfulnessHub = lazy(() => import('./pages/Mindfulness/MindfulnessHub'));
 const BreathingExercise = lazy(() => import('./pages/Relief/BreathingExercise'));
 const SensoryRelief = lazy(() => import('./pages/Relief/SensoryRelief'));
 const PomodoroTimer = lazy(() => import('./pages/Tools/PomodoroTimer'));
@@ -53,6 +54,8 @@ export const routes: RouteObject[] = [
       { path: '/relief', element: <ReliefHub /> },
       { path: '/relief/breathing', element: <BreathingExercise /> },
       { path: '/relief/sensory', element: <SensoryRelief /> },
+      { path: '/mindfulness', element: <MindfulnessHub /> },
+      { path: '/mindfulness/meditation', element: <MeditationPlayer /> },
       { path: '/tools', element: <ToolsHub /> },
       { path: '/tools/breathing', element: <BreathingExercise /> },
       { path: '/tools/sensory-relief', element: <SensoryRelief /> },

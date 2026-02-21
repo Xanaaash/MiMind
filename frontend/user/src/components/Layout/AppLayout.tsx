@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { path: '/neurodiversity', labelKey: 'nav.neuro', icon: '🧠' },
   { path: '/coach', labelKey: 'nav.coach', icon: '💬' },
   { path: '/tools', labelKey: 'nav.tools', icon: '🌿' },
+  { path: '/mindfulness', labelKey: 'nav.mindfulness', icon: '🪷' },
   { path: '/journal', labelKey: 'nav.journal', icon: '📝' },
   { path: '/billing', labelKey: 'nav.billing', icon: '💎' },
 ];
