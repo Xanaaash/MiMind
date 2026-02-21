@@ -89,107 +89,120 @@ export default function MeditationPlayer() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-        <button
-          type="button"
-          onClick={() => navigate('/mindfulness')}
-          className="text-sm text-muted hover:text-accent transition-colors mb-4"
-        >
-          ← {t('mindfulness.back')}
-        </button>
-        <h1 className="font-heading text-3xl font-bold">{t('tools.meditation_page_title')}</h1>
-        <p className="text-muted mt-2">{t('tools.meditation_page_subtitle')}</p>
-      </motion.div>
+    <div className="relative min-h-screen -mx-3 sm:-mx-4 -my-4 sm:-my-6 overflow-hidden bg-[#071826] px-3 sm:px-4 py-6 sm:py-8">
+      <motion.div
+        className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-cyan-300/20 blur-3xl"
+        animate={{ x: [0, 40, 0], y: [0, -30, 0] }}
+        transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className="pointer-events-none absolute -bottom-28 -right-20 h-96 w-96 rounded-full bg-indigo-300/20 blur-3xl"
+        animate={{ x: [0, -32, 0], y: [0, 24, 0] }}
+        transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+      />
 
-      <Card className="mb-6">
-        <p className="text-sm text-muted">{t('tools.meditation_local_audio_note')}</p>
-        {activeTrack ? (
-          <div className="mt-4 rounded-2xl border border-line bg-paper px-4 py-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-xs text-muted uppercase tracking-wider">{t('tools.meditation_now_playing')}</p>
-                <p className="font-semibold">{t(activeTrack.titleKey)}</p>
-              </div>
-              <span className="text-sm text-muted">
-                {formatTime(currentTime)} / {formatTime(duration)}
-              </span>
-            </div>
-            <input
-              type="range"
-              min={0}
-              max={duration > 0 ? duration : 1}
-              value={currentTime}
-              onChange={(e) => handleSeek(Number(e.target.value))}
-              className="w-full mt-3 accent-accent"
-            />
-          </div>
-        ) : null}
-      </Card>
+      <div className="relative mx-auto max-w-3xl">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+          <button
+            type="button"
+            onClick={() => navigate('/mindfulness')}
+            className="text-sm text-cyan-100/80 hover:text-cyan-100 transition-colors mb-4"
+          >
+            ← {t('mindfulness.back')}
+          </button>
+          <h1 className="font-heading text-3xl font-bold text-cyan-50">{t('tools.meditation_page_title')}</h1>
+          <p className="text-cyan-100/70 mt-2">{t('tools.meditation_page_subtitle')}</p>
+        </motion.div>
 
-      <div className="grid gap-4">
-        {meditationPlaylist.map((track, idx) => {
-          const isActive = activeTrackId === track.id;
-          const isLoading = loadingTrackId === track.id;
-
-          return (
-            <motion.div
-              key={track.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05 }}
-            >
-              <Card className={isActive ? 'border-accent/40' : ''}>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="min-w-0">
-                    <h2 className="font-heading text-lg font-bold">{t(track.titleKey)}</h2>
-                    <p className="text-sm text-muted mt-1">{t(track.descKey)}</p>
-                    <p className="text-xs text-muted mt-2">
-                      {track.minutes} {t('tools.minutes')}
-                    </p>
-                  </div>
-                  <Button onClick={() => handleToggleTrack(track)} loading={isLoading}>
-                    {isActive && playing ? t('tools.stop') : t('tools.start')}
-                  </Button>
+        <Card className="mb-6 bg-white/10 border-white/20 backdrop-blur-xl shadow-2xl">
+          <p className="text-sm text-cyan-100/75">{t('tools.meditation_local_audio_note')}</p>
+          {activeTrack ? (
+            <div className="mt-4 rounded-2xl border border-white/20 bg-white/5 px-4 py-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs text-cyan-100/70 uppercase tracking-wider">{t('tools.meditation_now_playing')}</p>
+                  <p className="font-semibold text-cyan-50">{t(activeTrack.titleKey)}</p>
                 </div>
-                <audio
-                  ref={(node) => {
-                    audioRefs.current[track.id] = node;
-                  }}
-                  preload="metadata"
-                  src={track.src}
-                  onPlay={() => {
-                    if (activeTrackId === track.id) {
-                      setPlaying(true);
-                    }
-                  }}
-                  onPause={() => {
-                    if (activeTrackId === track.id) {
-                      setPlaying(false);
-                    }
-                  }}
-                  onEnded={() => {
-                    if (activeTrackId === track.id) {
-                      setPlaying(false);
-                      setCurrentTime(0);
-                    }
-                  }}
-                  onLoadedMetadata={(e) => {
-                    if (activeTrackId === track.id) {
-                      setDuration(e.currentTarget.duration || 0);
-                    }
-                  }}
-                  onTimeUpdate={(e) => {
-                    if (activeTrackId === track.id) {
-                      setCurrentTime(e.currentTarget.currentTime);
-                      setDuration(e.currentTarget.duration || 0);
-                    }
-                  }}
-                />
-              </Card>
-            </motion.div>
-          );
-        })}
+                <span className="text-sm text-cyan-100/75">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={duration > 0 ? duration : 1}
+                value={currentTime}
+                onChange={(e) => handleSeek(Number(e.target.value))}
+                className="w-full mt-3 accent-cyan-300"
+              />
+            </div>
+          ) : null}
+        </Card>
+
+        <div className="grid gap-4">
+          {meditationPlaylist.map((track, idx) => {
+            const isActive = activeTrackId === track.id;
+            const isLoading = loadingTrackId === track.id;
+
+            return (
+              <motion.div
+                key={track.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+              >
+                <Card className={`bg-white/10 border-white/20 backdrop-blur-xl shadow-xl ${isActive ? 'border-cyan-300/60' : ''}`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="min-w-0">
+                      <h2 className="font-heading text-lg font-bold text-cyan-50">{t(track.titleKey)}</h2>
+                      <p className="text-sm text-cyan-100/75 mt-1">{t(track.descKey)}</p>
+                      <p className="text-xs text-cyan-100/65 mt-2">
+                        {track.minutes} {t('tools.minutes')}
+                      </p>
+                    </div>
+                    <Button onClick={() => handleToggleTrack(track)} loading={isLoading}>
+                      {isActive && playing ? t('tools.stop') : t('tools.start')}
+                    </Button>
+                  </div>
+                  <audio
+                    ref={(node) => {
+                      audioRefs.current[track.id] = node;
+                    }}
+                    preload="metadata"
+                    src={track.src}
+                    onPlay={() => {
+                      if (activeTrackId === track.id) {
+                        setPlaying(true);
+                      }
+                    }}
+                    onPause={() => {
+                      if (activeTrackId === track.id) {
+                        setPlaying(false);
+                      }
+                    }}
+                    onEnded={() => {
+                      if (activeTrackId === track.id) {
+                        setPlaying(false);
+                        setCurrentTime(0);
+                      }
+                    }}
+                    onLoadedMetadata={(e) => {
+                      if (activeTrackId === track.id) {
+                        setDuration(e.currentTarget.duration || 0);
+                      }
+                    }}
+                    onTimeUpdate={(e) => {
+                      if (activeTrackId === track.id) {
+                        setCurrentTime(e.currentTarget.currentTime);
+                        setDuration(e.currentTarget.duration || 0);
+                      }
+                    }}
+                  />
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
