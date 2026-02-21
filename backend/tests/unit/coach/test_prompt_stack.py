@@ -96,6 +96,30 @@ class PromptStackUnitTests(unittest.TestCase):
         self.assertIsInstance(fragments, list)
         self.assertTrue(any("asd-adapted coaching guidance" in item.lower() for item in fragments))
 
+    def test_context_prompt_adds_hsp_adaptation_fragment_for_high_hsp(self) -> None:
+        from modules.user.models import User
+
+        self.store.save_user(User(user_id="u1", email="u1@example.com", locale="en-US"))
+        self.store.save_test_result(
+            TestResult(
+                result_id="hsp-high-1",
+                user_id="u1",
+                test_id="hsp",
+                answers={"q1": 6},
+                summary={
+                    "total": 5.2,
+                    "maxTotal": 7,
+                    "level": "high",
+                },
+            )
+        )
+
+        context = build_context_prompt(self.store, "u1")
+        self.assertEqual(context["neurodiversity_scores"]["hsp"]["level"], "high")
+        fragments = context["neurodiversity_prompt_fragments"]
+        self.assertIsInstance(fragments, list)
+        self.assertTrue(any("hsp-adapted coaching guidance" in item.lower() for item in fragments))
+
 
 if __name__ == "__main__":
     unittest.main()

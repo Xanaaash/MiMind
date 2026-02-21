@@ -167,6 +167,29 @@ class CoachGatewayIntegrationUnitTests(unittest.TestCase):
         self.assertIn("asd-adapted coaching guidance", prompt_stack["system"].lower())
         self.assertEqual(prompt_stack["context"]["neurodiversity_scores"]["aq10"]["level"], "high")
 
+    def test_start_session_appends_hsp_adaptation_to_system_prompt(self) -> None:
+        self.store.save_test_result(
+            TestResult(
+                result_id="hsp-high-1",
+                user_id=self.user_id,
+                test_id="hsp",
+                answers={"q1": 6},
+                summary={"total": 5.2, "maxTotal": 7, "level": "high"},
+            )
+        )
+
+        start_status, start_body = self.coach_api.post_start_session(
+            user_id=self.user_id,
+            payload={
+                "style_id": "action_coach",
+                "subscription_active": True,
+            },
+        )
+        self.assertEqual(start_status, 200)
+        prompt_stack = start_body["data"]["prompt_stack"]
+        self.assertIn("hsp-adapted coaching guidance", prompt_stack["system"].lower())
+        self.assertEqual(prompt_stack["context"]["neurodiversity_scores"]["hsp"]["level"], "high")
+
 
 if __name__ == "__main__":
     unittest.main()
