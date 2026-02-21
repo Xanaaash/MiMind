@@ -10,6 +10,7 @@ import { markAssessmentComplete } from '../../components/AssessmentGate/Assessme
 import type { ScaleCatalogItem, ScaleQuestion, TriageChannel } from '../../types';
 import Button from '../../components/Button/Button';
 import Loading from '../../components/Loading/Loading';
+import { SCALE_INTRO_KEYS, SCALE_NAME_KEYS } from '../../utils/assessmentCopy';
 
 const REQUIRED_SCALES = ['phq9', 'gad7', 'pss10', 'cssrs'] as const;
 type RequiredScaleId = (typeof REQUIRED_SCALES)[number];
@@ -258,7 +259,12 @@ export default function Onboarding() {
         </div>
 
         <div className="bg-paper rounded-2xl border border-line p-6">
-          <p className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">{step.scaleId}</p>
+          <p className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">
+            {t(SCALE_NAME_KEYS[step.scaleId] ?? '', { defaultValue: step.scaleId.toUpperCase() })}
+          </p>
+          <p className="text-xs text-muted mb-3 leading-relaxed">
+            {t(SCALE_INTRO_KEYS[step.scaleId] ?? 'scales.intro.generic')}
+          </p>
           <h2 className="font-heading text-xl font-bold mb-5">
             {step.question.text[lang] ?? step.question.text['zh-CN'] ?? step.question.text['en-US'] ?? step.question.question_id}
           </h2>

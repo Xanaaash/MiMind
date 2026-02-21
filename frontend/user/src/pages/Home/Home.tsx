@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useAuthStore } from '../../stores/auth';
 import { getReassessmentSchedule } from '../../api/auth';
 import Card from '../../components/Card/Card';
+import { SCALE_NAME_KEYS } from '../../utils/assessmentCopy';
 
 const MODULES = [
   { path: '/scales', labelKey: 'nav.scales', icon: '📋', descKey: 'landing.feature_scales_desc', color: 'bg-calm-soft' },
@@ -20,14 +21,6 @@ const CHANNEL_CONFIG: Record<string, { labelKey: string; color: string; bg: stri
   GREEN: { labelKey: 'home.channel_green', color: 'text-safe', bg: 'bg-safe-soft', icon: '🟢' },
   YELLOW: { labelKey: 'home.channel_yellow', color: 'text-warn', bg: 'bg-warn-soft', icon: '🟡' },
   RED: { labelKey: 'home.channel_red', color: 'text-danger', bg: 'bg-danger-soft', icon: '🔴' },
-};
-
-const SCALE_LABELS: Record<string, string> = {
-  phq9: 'PHQ-9',
-  gad7: 'GAD-7',
-  pss10: 'PSS-10',
-  cssrs: 'C-SSRS',
-  scl90: 'SCL-90',
 };
 
 type ReminderState = {
@@ -54,8 +47,10 @@ export default function Home() {
   const channelInfo = channel ? CHANNEL_CONFIG[channel] : null;
   const reminderScaleText = useMemo(() => {
     if (!reminder) return '';
-    return reminder.scaleIds.map((scaleId) => SCALE_LABELS[scaleId] ?? scaleId.toUpperCase()).join(', ');
-  }, [reminder]);
+    return reminder.scaleIds
+      .map((scaleId) => t(SCALE_NAME_KEYS[scaleId] ?? '', { defaultValue: scaleId.toUpperCase() }))
+      .join(', ');
+  }, [reminder, t]);
 
   useEffect(() => {
     if (!userId) {
