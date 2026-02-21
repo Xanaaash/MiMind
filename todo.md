@@ -79,7 +79,7 @@
 
 ### 2.2 支付集成
 
-- [🔒 codex-0221a] **T-211** Stripe 支付集成（checkout session → webhook → 订阅激活）
+- [✅] **T-211** Stripe 支付集成（checkout session → webhook → 订阅激活）
 - [ ] **T-212** 支付宝/微信支付集成（国内用户）
 - [ ] **T-213** 订阅到期自动降级逻辑 + 续费提醒
 
