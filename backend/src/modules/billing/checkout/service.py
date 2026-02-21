@@ -1,6 +1,8 @@
 import uuid
 
 from modules.billing.catalog.service import BillingCatalogService
+from modules.billing.domestic.config import load_domestic_billing_config
+from modules.billing.domestic.gateway import DomesticPaymentGateway
 from modules.billing.stripe.config import load_stripe_billing_config
 from modules.billing.stripe.gateway import StripeGateway
 from modules.storage.in_memory import InMemoryStore
@@ -12,9 +14,11 @@ class CheckoutService:
         self._store = store
         self._catalog = BillingCatalogService()
         self._stripe_config = load_stripe_billing_config()
+        self._domestic_config = load_domestic_billing_config()
         self._stripe_gateway = StripeGateway(self._stripe_config)
+        self._domestic_gateway = DomesticPaymentGateway(self._domestic_config)
 
-    def create_checkout(self, user_id: str, plan_id: str) -> dict:
+    def create_checkout(self, user_id: str, plan_id: str, payment_channel: str = "") -> dict:
         user = self._store.get_user(user_id)
         if user is None:
             raise ValueError("Unknown user_id")
@@ -39,6 +43,23 @@ class CheckoutService:
                 "checkout_provider": "stripe",
                 "checkout_session_id": str(session.get("id", "")),
                 "checkout_url": str(session.get("url", "")),
+            }
+
+        if self._stripe_config.provider == "domestic":
+            order_id = str(uuid.uuid4())
+            channel_payload = self._domestic_gateway.create_checkout(
+                order_id=order_id,
+                user_id=user_id,
+                plan_id=plan.plan_id,
+                payment_channel=payment_channel,
+            )
+            return {
+                "order_id": order_id,
+                "user_id": user_id,
+                "plan_id": plan.plan_id,
+                "status": "pending_payment",
+                "checkout_provider": "domestic",
+                **channel_payload,
             }
 
         return {

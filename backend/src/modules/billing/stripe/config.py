@@ -23,7 +23,7 @@ class StripeBillingConfig:
 
 def load_stripe_billing_config() -> StripeBillingConfig:
     provider = os.getenv("BILLING_PROVIDER", "local").strip().lower()
-    if provider not in {"local", "stripe"}:
+    if provider not in {"local", "stripe", "domestic"}:
         provider = "local"
 
     tolerance_raw = os.getenv("STRIPE_WEBHOOK_TOLERANCE_SECONDS", "300").strip()

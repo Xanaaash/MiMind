@@ -35,8 +35,8 @@ class BillingService:
         subscription = self._trial.start_base_trial(user_id)
         return self._subscription_to_dict(subscription)
 
-    def create_checkout(self, user_id: str, plan_id: str) -> dict:
-        return self._checkout.create_checkout(user_id=user_id, plan_id=plan_id)
+    def create_checkout(self, user_id: str, plan_id: str, payment_channel: str = "") -> dict:
+        return self._checkout.create_checkout(user_id=user_id, plan_id=plan_id, payment_channel=payment_channel)
 
     def process_webhook(self, event_id: str, event_type: str, payload: dict) -> dict:
         return self._webhook.process_event(event_id=event_id, event_type=event_type, payload=payload)

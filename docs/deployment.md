@@ -41,6 +41,14 @@ cp .env.example .env
 - `STRIPE_CHECKOUT_SUCCESS_URL`
 - `STRIPE_CHECKOUT_CANCEL_URL`
 
+若支付 provider 使用 `domestic`（支付宝/微信），还需设置：
+
+- `BILLING_PROVIDER=domestic`
+- `ALIPAY_GATEWAY_URL`
+- `ALIPAY_NOTIFY_SECRET`
+- `WECHAT_PAY_GATEWAY_URL`
+- `WECHAT_PAY_NOTIFY_SECRET`
+
 ---
 
 ## 3. 方式 A：单容器部署

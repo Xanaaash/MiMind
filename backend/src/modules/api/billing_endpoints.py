@@ -1,5 +1,7 @@
 from typing import Any, Dict, Optional, Tuple
 
+from modules.billing.domestic.config import load_domestic_billing_config
+from modules.billing.domestic.gateway import DomesticPaymentGateway
 from modules.billing.service import BillingService
 from modules.billing.stripe.config import load_stripe_billing_config
 from modules.billing.stripe.gateway import StripeGateway
@@ -13,7 +15,9 @@ class BillingAPI:
         self._billing = BillingService(self._store)
         self._entitlement = EntitlementService()
         self._stripe_config = load_stripe_billing_config()
+        self._domestic_config = load_domestic_billing_config()
         self._stripe_gateway = StripeGateway(self._stripe_config)
+        self._domestic_gateway = DomesticPaymentGateway(self._domestic_config)
 
     @property
     def store(self) -> InMemoryStore:
@@ -34,7 +38,8 @@ class BillingAPI:
             plan_id = str(payload.get("plan_id", "")).strip()
             if not plan_id:
                 raise ValueError("plan_id is required")
-            data = self._billing.create_checkout(user_id=user_id, plan_id=plan_id)
+            payment_channel = str(payload.get("payment_channel", "")).strip()
+            data = self._billing.create_checkout(user_id=user_id, plan_id=plan_id, payment_channel=payment_channel)
             return 200, {"data": data}
         except ValueError as error:
             return 400, {"error": str(error)}
@@ -52,6 +57,17 @@ class BillingAPI:
                 event_payload = payload.get("payload", {})
                 if not isinstance(event_payload, dict):
                     raise ValueError("payload must be an object")
+            elif "provider" in payload and "payload" in payload:
+                provider = self._domestic_gateway.normalize_channel(str(payload.get("provider", "")).strip())
+                signature = str(payload.get("signature", "")).strip()
+                provider_payload = payload.get("payload", {})
+                if not isinstance(provider_payload, dict):
+                    raise ValueError("payload must be an object")
+                if self._stripe_config.provider == "domestic":
+                    self._domestic_gateway.verify_signature(provider, provider_payload, signature)
+                event_id, event_type, event_payload = self._domestic_gateway.to_internal_event(provider, provider_payload)
+                if not event_id:
+                    raise ValueError("event_id is required")
             else:
                 if self._stripe_config.stripe_enabled:
                     self._stripe_gateway.verify_webhook_signature(raw_body=raw_body, signature_header=stripe_signature or "")
@@ -63,6 +79,8 @@ class BillingAPI:
             data = self._billing.process_webhook(event_id=event_id, event_type=event_type, payload=event_payload)
             if "id" in payload and "type" in payload:
                 data["provider_event_type"] = str(payload.get("type", "")).strip()
+            if "provider" in payload and "payload" in payload:
+                data["provider_event_type"] = str(payload.get("provider", "")).strip()
             return 200, {"data": data}
         except ValueError as error:
             return 400, {"error": str(error)}

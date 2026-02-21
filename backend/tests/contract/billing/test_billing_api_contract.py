@@ -1,3 +1,5 @@
+import hashlib
+import hmac
 import json
 import os
 import unittest
@@ -60,6 +62,11 @@ class BillingAPIContractTests(unittest.TestCase):
                 }
             },
         )
+
+    @staticmethod
+    def _sign_domestic_payload(payload: dict, secret: str) -> str:
+        canonical = "&".join(f"{key}={payload[key]}" for key in sorted(payload.keys()) if payload[key] is not None)
+        return hmac.new(secret.encode("utf-8"), canonical.encode("utf-8"), hashlib.sha256).hexdigest()
 
     def test_trial_checkout_webhook_and_entitlements(self) -> None:
         trial_status, trial_body = self.billing_api.post_start_trial(self.green_user_id)
@@ -165,6 +172,92 @@ class BillingAPIContractTests(unittest.TestCase):
                 os.environ.pop("STRIPE_WEBHOOK_SECRET", None)
             else:
                 os.environ["STRIPE_WEBHOOK_SECRET"] = original_webhook_secret
+
+    def test_domestic_checkout_and_webhook_for_alipay(self) -> None:
+        original_provider = os.environ.get("BILLING_PROVIDER")
+        original_alipay_secret = os.environ.get("ALIPAY_NOTIFY_SECRET")
+        original_wechat_secret = os.environ.get("WECHAT_PAY_NOTIFY_SECRET")
+        try:
+            os.environ["BILLING_PROVIDER"] = "domestic"
+            os.environ["ALIPAY_NOTIFY_SECRET"] = "ali_secret_123"
+            os.environ["WECHAT_PAY_NOTIFY_SECRET"] = "wx_secret_123"
+            domestic_api = BillingAPI(store=self.store)
+
+            checkout_status, checkout_body = domestic_api.post_checkout(
+                self.green_user_id,
+                {"plan_id": "coach", "payment_channel": "alipay"},
+            )
+            self.assertEqual(checkout_status, 200)
+            self.assertEqual(checkout_body["data"]["checkout_provider"], "domestic")
+            self.assertEqual(checkout_body["data"]["payment_channel"], "alipay")
+            self.assertIn("checkout_url", checkout_body["data"])
+
+            event_payload = {
+                "notify_id": "ali-notify-1",
+                "trade_status": "TRADE_SUCCESS",
+                "user_id": self.green_user_id,
+                "plan_id": "coach",
+            }
+            signature = self._sign_domestic_payload(event_payload, "ali_secret_123")
+            webhook_status, webhook_body = domestic_api.post_webhook(
+                {
+                    "provider": "alipay",
+                    "signature": signature,
+                    "payload": event_payload,
+                }
+            )
+            self.assertEqual(webhook_status, 200)
+            self.assertEqual(webhook_body["data"]["status"], "subscription_activated")
+            self.assertEqual(webhook_body["data"]["provider_event_type"], "alipay")
+        finally:
+            if original_provider is None:
+                os.environ.pop("BILLING_PROVIDER", None)
+            else:
+                os.environ["BILLING_PROVIDER"] = original_provider
+
+            if original_alipay_secret is None:
+                os.environ.pop("ALIPAY_NOTIFY_SECRET", None)
+            else:
+                os.environ["ALIPAY_NOTIFY_SECRET"] = original_alipay_secret
+
+            if original_wechat_secret is None:
+                os.environ.pop("WECHAT_PAY_NOTIFY_SECRET", None)
+            else:
+                os.environ["WECHAT_PAY_NOTIFY_SECRET"] = original_wechat_secret
+
+    def test_domestic_provider_rejects_invalid_signature(self) -> None:
+        original_provider = os.environ.get("BILLING_PROVIDER")
+        original_alipay_secret = os.environ.get("ALIPAY_NOTIFY_SECRET")
+        try:
+            os.environ["BILLING_PROVIDER"] = "domestic"
+            os.environ["ALIPAY_NOTIFY_SECRET"] = "ali_secret_123"
+            domestic_api = BillingAPI(store=self.store)
+
+            event_payload = {
+                "notify_id": "ali-notify-2",
+                "trade_status": "TRADE_SUCCESS",
+                "user_id": self.green_user_id,
+                "plan_id": "coach",
+            }
+            webhook_status, webhook_body = domestic_api.post_webhook(
+                {
+                    "provider": "alipay",
+                    "signature": "invalid",
+                    "payload": event_payload,
+                }
+            )
+            self.assertEqual(webhook_status, 400)
+            self.assertIn("signature", webhook_body["error"].lower())
+        finally:
+            if original_provider is None:
+                os.environ.pop("BILLING_PROVIDER", None)
+            else:
+                os.environ["BILLING_PROVIDER"] = original_provider
+
+            if original_alipay_secret is None:
+                os.environ.pop("ALIPAY_NOTIFY_SECRET", None)
+            else:
+                os.environ["ALIPAY_NOTIFY_SECRET"] = original_alipay_secret
 
 
 if __name__ == "__main__":
