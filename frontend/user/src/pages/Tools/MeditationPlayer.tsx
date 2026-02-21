@@ -7,38 +7,7 @@ import Button from '../../components/Button/Button';
 import { startMeditation } from '../../api/tools';
 import { useAuthStore } from '../../stores/auth';
 import { toast } from '../../stores/toast';
-
-type MeditationTrack = {
-  id: string;
-  src: string;
-  minutes: number;
-  titleKey: string;
-  descKey: string;
-};
-
-const MEDITATION_TRACKS: MeditationTrack[] = [
-  {
-    id: 'calm-10',
-    src: '/audio/meditation/calm-reset.m4a',
-    minutes: 10,
-    titleKey: 'tools.meditation_track_calm_title',
-    descKey: 'tools.meditation_track_calm_desc',
-  },
-  {
-    id: 'focus-15',
-    src: '/audio/meditation/focus-grounding.m4a',
-    minutes: 15,
-    titleKey: 'tools.meditation_track_focus_title',
-    descKey: 'tools.meditation_track_focus_desc',
-  },
-  {
-    id: 'sleep-20',
-    src: '/audio/meditation/sleep-winddown.m4a',
-    minutes: 20,
-    titleKey: 'tools.meditation_track_sleep_title',
-    descKey: 'tools.meditation_track_sleep_desc',
-  },
-];
+import { meditationPlaylist, type MeditationTrackConfig } from '../../config/meditationPlaylist';
 
 function formatTime(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds < 0) return '00:00';
@@ -60,7 +29,7 @@ export default function MeditationPlayer() {
   const [loadingTrackId, setLoadingTrackId] = useState<string | null>(null);
 
   const activeTrack = useMemo(
-    () => MEDITATION_TRACKS.find((item) => item.id === activeTrackId) ?? null,
+    () => meditationPlaylist.find((item) => item.id === activeTrackId) ?? null,
     [activeTrackId],
   );
 
@@ -72,7 +41,7 @@ export default function MeditationPlayer() {
     });
   };
 
-  const handleToggleTrack = async (track: MeditationTrack) => {
+  const handleToggleTrack = async (track: MeditationTrackConfig) => {
     const audio = audioRefs.current[track.id];
     if (!audio) return;
 
@@ -159,7 +128,7 @@ export default function MeditationPlayer() {
       </Card>
 
       <div className="grid gap-4">
-        {MEDITATION_TRACKS.map((track, idx) => {
+        {meditationPlaylist.map((track, idx) => {
           const isActive = activeTrackId === track.id;
           const isLoading = loadingTrackId === track.id;
 
