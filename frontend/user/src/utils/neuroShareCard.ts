@@ -1,3 +1,5 @@
+import i18n from '../i18n';
+
 export type NeuroSharePreset = 'xiaohongshu' | 'instagram' | 'tiktok';
 
 type Dimension = {
@@ -24,26 +26,26 @@ const PRESET_SIZE: Record<NeuroSharePreset, { width: number; height: number }> =
   tiktok: { width: 1080, height: 1920 },
 };
 
-const ARCHETYPE_COPY: Record<string, Record<string, { title: string; tags: string[] }>> = {
+const ARCHETYPE_KEYS: Record<string, Record<string, string>> = {
   asrs: {
-    low: { title: '稳定节奏型 / Steady Flow', tags: ['节奏稳定', '执行平衡', '可持续推进'] },
-    moderate: { title: '猎人型倾向 / Hunter Lean', tags: ['高唤醒启动', '任务切换快', '需要结构化'] },
-    high: { title: '猎人型执行者 / Hunter Executor', tags: ['高能量驱动', '冲刺型完成', '微结构最友好'] },
+    low: 'neuro_share.archetypes.asrs.low',
+    moderate: 'neuro_share.archetypes.asrs.moderate',
+    high: 'neuro_share.archetypes.asrs.high',
   },
   aq10: {
-    low: { title: '均衡社交型 / Social Balance', tags: ['社交信号均衡', '情境适配强', '沟通弹性好'] },
-    moderate: { title: '系统化倾向 / System Lean', tags: ['细节敏锐', '深度聚焦', '偏好清晰规则'] },
-    high: { title: '系统化分析者 / System Builder', tags: ['模式识别强', '结构思维强', '信息压缩效率高'] },
+    low: 'neuro_share.archetypes.aq10.low',
+    moderate: 'neuro_share.archetypes.aq10.moderate',
+    high: 'neuro_share.archetypes.aq10.high',
   },
   hsp: {
-    low: { title: '稳态感知型 / Stable Sensor', tags: ['刺激耐受高', '环境适配快', '情绪波动平稳'] },
-    moderate: { title: '敏锐感知型 / Sensitive Lean', tags: ['环境察觉快', '情绪共鸣强', '需要节奏留白'] },
-    high: { title: '感知放大器 / Sensory Amplifier', tags: ['高分辨感知', '深度情绪加工', '恢复窗口重要'] },
+    low: 'neuro_share.archetypes.hsp.low',
+    moderate: 'neuro_share.archetypes.hsp.moderate',
+    high: 'neuro_share.archetypes.hsp.high',
   },
   catq: {
-    low: { title: '自然呈现型 / Natural Presence', tags: ['表达较自然', '社交耗能较低', '适配压力较小'] },
-    moderate: { title: '适配协商型 / Adaptive Negotiator', tags: ['场景化调节', '策略性表达', '需要恢复时间'] },
-    high: { title: '高负荷适配者 / High Camouflage Adapter', tags: ['持续社交监控', '强适配驱动', '社交后耗竭明显'] },
+    low: 'neuro_share.archetypes.catq.low',
+    moderate: 'neuro_share.archetypes.catq.moderate',
+    high: 'neuro_share.archetypes.catq.high',
   },
 };
 
@@ -74,13 +76,23 @@ function clampSummary(summary: string): string {
 export function buildNeuroArchetype(scaleId: string, level: string): { title: string; tags: string[] } {
   const normalizedScale = scaleId.toLowerCase();
   const normalizedLevel = level.toLowerCase();
-  const fallback = { title: '认知特质画像 / Cognitive Profile', tags: ['神经多样性', '特质探索', '非临床诊断'] };
+  const fallback = {
+    title: i18n.t('neuro_share.fallback.title'),
+    tags: i18n.t('neuro_share.fallback.tags', { returnObjects: true }) as string[],
+  };
 
-  const byScale = ARCHETYPE_COPY[normalizedScale];
+  const byScale = ARCHETYPE_KEYS[normalizedScale];
   if (!byScale) {
     return fallback;
   }
-  return byScale[normalizedLevel] ?? fallback;
+  const baseKey = byScale[normalizedLevel];
+  if (!baseKey) {
+    return fallback;
+  }
+  return {
+    title: i18n.t(`${baseKey}.title`),
+    tags: i18n.t(`${baseKey}.tags`, { returnObjects: true }) as string[],
+  };
 }
 
 export function generateNeuroShareCard(payload: Payload, preset: NeuroSharePreset): HTMLCanvasElement {
@@ -105,7 +117,7 @@ export function generateNeuroShareCard(payload: Payload, preset: NeuroSharePrese
 
   ctx.fillStyle = '#b4553f';
   ctx.font = `bold ${Math.round(width * 0.05)}px Fraunces, serif`;
-  ctx.fillText('你的大脑说明书 · Brain Manual', width / 2, Math.round(height * 0.13));
+  ctx.fillText(i18n.t('neuro_share.card_title'), width / 2, Math.round(height * 0.13));
 
   ctx.fillStyle = '#6d4c45';
   ctx.font = `${Math.round(width * 0.024)}px Nunito Sans, sans-serif`;
@@ -132,7 +144,11 @@ export function generateNeuroShareCard(payload: Payload, preset: NeuroSharePrese
 
   ctx.fillStyle = '#7a5a54';
   ctx.font = `${Math.round(width * 0.024)}px Nunito Sans, sans-serif`;
-  ctx.fillText(`Score ${payload.total} / ${payload.maxTotal}`, contentX + 26, topCardY + topCardH - 20);
+  ctx.fillText(
+    `${i18n.t('neuro_share.score_label')} ${payload.total} / ${payload.maxTotal}`,
+    contentX + 26,
+    topCardY + topCardH - 20
+  );
 
   const tagY = topCardY + topCardH + 24;
   let tagX = contentX;
@@ -192,7 +208,7 @@ export function generateNeuroShareCard(payload: Payload, preset: NeuroSharePrese
 
   ctx.fillStyle = '#7b5b54';
   ctx.font = `600 ${Math.round(width * 0.022)}px Nunito Sans, sans-serif`;
-  ctx.fillText('Insight', contentX + 20, summaryY + 30);
+  ctx.fillText(i18n.t('neuro_share.insight_label'), contentX + 20, summaryY + 30);
 
   ctx.fillStyle = '#4f3530';
   ctx.font = `${Math.round(width * 0.022)}px Nunito Sans, sans-serif`;
@@ -218,7 +234,7 @@ export function generateNeuroShareCard(payload: Payload, preset: NeuroSharePrese
   ctx.textAlign = 'center';
   ctx.fillStyle = '#8a665e';
   ctx.font = `${Math.round(width * 0.02)}px Nunito Sans, sans-serif`;
-  ctx.fillText('Neurodiversity Trait Exploration · Not a Clinical Diagnosis', width / 2, Math.round(height * 0.965));
+  ctx.fillText(i18n.t('neuro_share.footer'), width / 2, Math.round(height * 0.965));
 
   return canvas;
 }

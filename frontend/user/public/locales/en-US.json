@@ -40,6 +40,55 @@
     "feature_tools": "Healing Tools",
     "feature_tools_desc": "White noise, breathing exercises, guided meditation for stress relief"
   },
+  "legal": {
+    "back_home": "Back to home",
+    "privacy": {
+      "title": "Privacy Policy",
+      "subtitle": "How we collect, use, and protect your information",
+      "updated_at": "Last updated: 2026-02-20",
+      "sections": [
+        {
+          "heading": "1. Information We Collect",
+          "body": "We collect account details, assessment responses, conversation data, and usage logs that you provide for service delivery and safety triage."
+        },
+        {
+          "heading": "2. How We Use Information",
+          "body": "Your data is used for account management, assessment scoring, risk detection, entitlement control, and service improvement."
+        },
+        {
+          "heading": "3. Data Security and Retention",
+          "body": "We apply encrypted transport and storage, strict internal access controls, and retention/deletion practices aligned with compliance requirements."
+        },
+        {
+          "heading": "4. Your Rights",
+          "body": "You may request data export or deletion. This product is a mental wellness coaching tool and does not provide medical diagnosis or prescriptions."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "subtitle": "Please review these terms before using MiMind",
+      "updated_at": "Last updated: 2026-02-20",
+      "sections": [
+        {
+          "heading": "1. Nature of Service",
+          "body": "MiMind is a mental wellness coaching platform, not a medical service, and does not provide diagnosis, treatment, or medication advice."
+        },
+        {
+          "heading": "2. User Responsibilities",
+          "body": "You agree to provide accurate information, use the platform lawfully, and not bypass safety protections."
+        },
+        {
+          "heading": "3. Risk and Emergency Support",
+          "body": "If there is self-harm, harm-to-others, or any immediate danger, contact local emergency or professional services immediately."
+        },
+        {
+          "heading": "4. Updates to Terms",
+          "body": "We may update these terms for product and compliance reasons. Continued use indicates acceptance of the latest version."
+        }
+      ]
+    }
+  },
   "home": {
     "reassessment_overdue_title": "Assessment Retest Overdue",
     "reassessment_overdue_body": "{{scales}} are overdue by {{days}} days. Please retake soon to refresh your assessment.",
@@ -439,7 +488,76 @@
     "accept": "I understand, continue",
     "decline": "Not now",
     "banner_title": "Trait Exploration — Not a Clinical Diagnosis",
-    "banner_body": "These results help you understand your cognitive and behavioral patterns. They cannot replace professional evaluation. Consult a psychiatrist for further guidance."
+    "banner_body": "These results help you understand your cognitive and behavioral patterns. They cannot replace professional evaluation. Consult a psychiatrist for further guidance.",
+    "coach_message": "💡 Heads up: The following discussion involves neurodiversity-related traits. MiMind assessments and conversations are designed to help you explore your cognitive and behavioral patterns — they are NOT clinical diagnoses. If you feel these traits significantly impact your daily life, we recommend seeking evaluation from a qualified professional."
+  },
+  "neuro_share": {
+    "card_title": "Your Brain Manual",
+    "score_label": "Score",
+    "insight_label": "Insight",
+    "footer": "Neurodiversity Trait Exploration · Not a Clinical Diagnosis",
+    "fallback": {
+      "title": "Cognitive Profile",
+      "tags": ["Neurodiversity", "Trait Exploration", "Not a Clinical Diagnosis"]
+    },
+    "archetypes": {
+      "asrs": {
+        "low": {
+          "title": "Steady Flow",
+          "tags": ["Stable pace", "Balanced execution", "Sustainable progress"]
+        },
+        "moderate": {
+          "title": "Hunter Lean",
+          "tags": ["High arousal starts", "Fast task switching", "Needs structure"]
+        },
+        "high": {
+          "title": "Hunter Executor",
+          "tags": ["High-energy drive", "Sprint completion style", "Micro-structure friendly"]
+        }
+      },
+      "aq10": {
+        "low": {
+          "title": "Social Balance",
+          "tags": ["Balanced social signals", "Strong context adaptation", "Flexible communication"]
+        },
+        "moderate": {
+          "title": "System Lean",
+          "tags": ["Detail sensitive", "Deep focus", "Prefers clear rules"]
+        },
+        "high": {
+          "title": "System Builder",
+          "tags": ["Strong pattern recognition", "Structured thinking", "Efficient information compression"]
+        }
+      },
+      "hsp": {
+        "low": {
+          "title": "Stable Sensor",
+          "tags": ["High stimulus tolerance", "Fast environment adaptation", "Steady emotional variance"]
+        },
+        "moderate": {
+          "title": "Sensitive Lean",
+          "tags": ["Quick environmental awareness", "Strong emotional resonance", "Needs pacing whitespace"]
+        },
+        "high": {
+          "title": "Sensory Amplifier",
+          "tags": ["High-resolution perception", "Deep emotional processing", "Recovery windows matter"]
+        }
+      },
+      "catq": {
+        "low": {
+          "title": "Natural Presence",
+          "tags": ["More natural expression", "Lower social energy cost", "Lower adaptation pressure"]
+        },
+        "moderate": {
+          "title": "Adaptive Negotiator",
+          "tags": ["Context-based adjustment", "Strategic expression", "Needs recovery time"]
+        },
+        "high": {
+          "title": "High Camouflage Adapter",
+          "tags": ["Continuous social monitoring", "Strong adaptation drive", "Post-social fatigue is notable"]
+        }
+      }
+    }
   },
   "pwa": {
     "install_title": "Install MiMind",

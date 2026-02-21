@@ -1,3 +1,5 @@
+import i18n from '../i18n';
+
 const COACH_DISCLAIMER_KEY = 'nd_coach_disclaimer_shown';
 
 const NEURO_KEYWORDS = [
@@ -19,8 +21,6 @@ export function markNeuroDisclaimerShown(userId: string): void {
 }
 
 export function getNeuroDisclaimerMessage(lang: string): string {
-  if (lang.startsWith('zh')) {
-    return '💡 温馨提示：以下讨论涉及神经多样性相关特质。MiMind 的评估和对话旨在帮助你探索个人认知与行为模式，绝非临床诊断。如果你认为这些特质已严重影响日常生活，建议寻求专业精神科医生的评估。';
-  }
-  return '💡 Heads up: The following discussion involves neurodiversity-related traits. MiMind assessments and conversations are designed to help you explore your cognitive and behavioral patterns — they are NOT clinical diagnoses. If you feel these traits significantly impact your daily life, we recommend seeking evaluation from a qualified professional.';
+  const locale = lang.startsWith('zh') ? 'zh-CN' : 'en-US';
+  return i18n.t('nd_disclaimer.coach_message', { lng: locale });
 }
