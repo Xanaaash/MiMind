@@ -200,6 +200,11 @@ def apply_sqlite_migrations(connection: sqlite3.Connection, migrations: Iterable
                 if "duplicate column name" in message:
                     continue
                 raise
+            except sqlite3.IntegrityError as error:
+                message = str(error).lower()
+                if "idx_users_email_unique" in statement.lower() and "unique constraint failed" in message:
+                    continue
+                raise
 
         connection.execute(
             """
