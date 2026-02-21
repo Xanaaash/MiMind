@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Calm cover">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0ea5e9" />
+      <stop offset="100%" stop-color="#14b8a6" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" rx="28" fill="url(#g1)" />
+  <circle cx="96" cy="98" r="42" fill="#ffffff33" />
+  <text x="32" y="345" font-family="Arial, sans-serif" font-size="42" fill="#e6faff">Calm</text>
+</svg>

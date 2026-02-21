@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Restore cover">
+  <defs>
+    <linearGradient id="g4" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#b45309" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" rx="28" fill="url(#g4)" />
+  <circle cx="200" cy="180" r="92" fill="#ffffff22" />
+  <text x="32" y="345" font-family="Arial, sans-serif" font-size="42" fill="#fffbeb">Restore</text>
+</svg>

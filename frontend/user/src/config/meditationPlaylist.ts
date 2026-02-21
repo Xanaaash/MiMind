@@ -3,6 +3,7 @@ export interface MeditationTrackConfig {
   sessionId: 'calm-10' | 'focus-15' | 'sleep-20';
   src: string;
   minutes: number;
+<<<<<<< HEAD
   theme: 'stress' | 'sleep' | 'focus' | 'recovery';
   titleKey: string;
   descKey: string;
@@ -195,5 +196,177 @@ export const meditationPlaylist: MeditationTrackConfig[] = [
     sourceUrl: 'https://web.incompetech.com/music/royalty-free/licenses/retail.php',
     licenseType: 'CC BY 4.0 / Retail License',
     attributionKey: 'tools.meditation_attr.incompetech_retail_note',
+=======
+  cover: string;
+  titleKey: string;
+  descKey: string;
+  tagKeys: string[];
+  sourceName: string;
+  sourcePageUrl: string;
+  licenseName: string;
+  licenseUrl: string;
+  attribution?: string;
+}
+
+// Curated meditation playlist with explicit source and license metadata.
+export const meditationPlaylist: MeditationTrackConfig[] = [
+  {
+    id: 'stress-gentle-reset',
+    src: 'https://cdn.pixabay.com/download/audio/2021/11/23/audio_64b2dd1bce.mp3?filename=just-relax-11157.mp3',
+    minutes: 10,
+    cover: '/images/meditation/cover-calm.svg',
+    titleKey: 'tools.meditation_track_stress_reset_title',
+    descKey: 'tools.meditation_track_stress_reset_desc',
+    tagKeys: ['tools.meditation_tag_stress', 'tools.meditation_tag_breathing'],
+    sourceName: 'Pixabay',
+    sourcePageUrl: 'https://pixabay.com/music/search/meditation/',
+    licenseName: 'Pixabay License',
+    licenseUrl: 'https://pixabay.com/service/license-summary/',
+  },
+  {
+    id: 'sleep-starlight-drift',
+    src: 'https://cdn.pixabay.com/download/audio/2021/11/20/audio_149ed16bc3.mp3?filename=starlight-meditation-10986.mp3',
+    minutes: 12,
+    cover: '/images/meditation/cover-sleep.svg',
+    titleKey: 'tools.meditation_track_sleep_starlight_title',
+    descKey: 'tools.meditation_track_sleep_starlight_desc',
+    tagKeys: ['tools.meditation_tag_sleep', 'tools.meditation_tag_ambient'],
+    sourceName: 'Pixabay',
+    sourcePageUrl: 'https://pixabay.com/music/search/sleep/',
+    licenseName: 'Pixabay License',
+    licenseUrl: 'https://pixabay.com/service/license-summary/',
+  },
+  {
+    id: 'focus-soft-pulse',
+    src: 'https://cdn.pixabay.com/download/audio/2022/04/03/audio_02c92d065c.mp3?filename=muzyka-wyciszajaca-108908.mp3',
+    minutes: 14,
+    cover: '/images/meditation/cover-focus.svg',
+    titleKey: 'tools.meditation_track_focus_pulse_title',
+    descKey: 'tools.meditation_track_focus_pulse_desc',
+    tagKeys: ['tools.meditation_tag_focus', 'tools.meditation_tag_ambient'],
+    sourceName: 'Pixabay',
+    sourcePageUrl: 'https://pixabay.com/music/search/focus/',
+    licenseName: 'Pixabay License',
+    licenseUrl: 'https://pixabay.com/service/license-summary/',
+  },
+  {
+    id: 'recovery-forest-heart',
+    src: 'https://cdn.pixabay.com/download/audio/2023/04/21/audio_fcabae02b4.mp3?filename=twinfish-meditation-4-heart-of-the-forest-147196.mp3',
+    minutes: 16,
+    cover: '/images/meditation/cover-restore.svg',
+    titleKey: 'tools.meditation_track_recovery_forest_title',
+    descKey: 'tools.meditation_track_recovery_forest_desc',
+    tagKeys: ['tools.meditation_tag_recovery', 'tools.meditation_tag_nature'],
+    sourceName: 'Pixabay',
+    sourcePageUrl: 'https://pixabay.com/music/search/forest/',
+    licenseName: 'Pixabay License',
+    licenseUrl: 'https://pixabay.com/service/license-summary/',
+  },
+  {
+    id: 'focus-deep-session',
+    src: 'https://cdn.pixabay.com/download/audio/2024/02/24/audio_1fe2d5f39b.mp3?filename=deep-meditation-192828.mp3',
+    minutes: 18,
+    cover: '/images/meditation/cover-focus.svg',
+    titleKey: 'tools.meditation_track_focus_deep_title',
+    descKey: 'tools.meditation_track_focus_deep_desc',
+    tagKeys: ['tools.meditation_tag_focus', 'tools.meditation_tag_breathing'],
+    sourceName: 'Pixabay',
+    sourcePageUrl: 'https://pixabay.com/music/search/deep%20meditation/',
+    licenseName: 'Pixabay License',
+    licenseUrl: 'https://pixabay.com/service/license-summary/',
+  },
+  {
+    id: 'recovery-mantra-wave',
+    src: 'https://cdn.pixabay.com/download/audio/2024/08/25/audio_64b13a24d0.mp3?filename=shiva-gayatri-mantra-shiv-gayatri-mantra-235074.mp3',
+    minutes: 15,
+    cover: '/images/meditation/cover-restore.svg',
+    titleKey: 'tools.meditation_track_recovery_mantra_title',
+    descKey: 'tools.meditation_track_recovery_mantra_desc',
+    tagKeys: ['tools.meditation_tag_recovery', 'tools.meditation_tag_mantra'],
+    sourceName: 'Pixabay',
+    sourcePageUrl: 'https://pixabay.com/music/search/mantra/',
+    licenseName: 'Pixabay License',
+    licenseUrl: 'https://pixabay.com/service/license-summary/',
+  },
+  {
+    id: 'stress-soft-drone',
+    src: 'https://cdn.pixabay.com/download/audio/2024/08/27/audio_f380e15506.mp3',
+    minutes: 11,
+    cover: '/images/meditation/cover-calm.svg',
+    titleKey: 'tools.meditation_track_stress_drone_title',
+    descKey: 'tools.meditation_track_stress_drone_desc',
+    tagKeys: ['tools.meditation_tag_stress', 'tools.meditation_tag_ambient'],
+    sourceName: 'Pixabay',
+    sourcePageUrl: 'https://pixabay.com/music/search/relax/',
+    licenseName: 'Pixabay License',
+    licenseUrl: 'https://pixabay.com/service/license-summary/',
+  },
+  {
+    id: 'sleep-night-comfort',
+    src: 'https://cdn.pixabay.com/download/audio/2022/11/16/audio_a2b0a45199.mp3?filename=6-islamic-background-sounds-alfa-relaxing-music-126060.mp3',
+    minutes: 13,
+    cover: '/images/meditation/cover-sleep.svg',
+    titleKey: 'tools.meditation_track_sleep_night_title',
+    descKey: 'tools.meditation_track_sleep_night_desc',
+    tagKeys: ['tools.meditation_tag_sleep', 'tools.meditation_tag_recovery'],
+    sourceName: 'Pixabay',
+    sourcePageUrl: 'https://pixabay.com/music/search/relaxing%20music/',
+    licenseName: 'Pixabay License',
+    licenseUrl: 'https://pixabay.com/service/license-summary/',
+  },
+  {
+    id: 'stress-breath-anchor',
+    src: 'https://cdn.pixabay.com/download/audio/2022/10/13/audio_c1b863d4dc.mp3?filename=meditation-sounds-122698.mp3',
+    minutes: 9,
+    cover: '/images/meditation/cover-calm.svg',
+    titleKey: 'tools.meditation_track_stress_anchor_title',
+    descKey: 'tools.meditation_track_stress_anchor_desc',
+    tagKeys: ['tools.meditation_tag_stress', 'tools.meditation_tag_breathing'],
+    sourceName: 'Pixabay',
+    sourcePageUrl: 'https://pixabay.com/music/search/meditation/',
+    licenseName: 'Pixabay License',
+    licenseUrl: 'https://pixabay.com/service/license-summary/',
+  },
+  {
+    id: 'recovery-yoga-grounding',
+    src: 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Yoga-Meditation.ogg',
+    minutes: 12,
+    cover: '/images/meditation/cover-restore.svg',
+    titleKey: 'tools.meditation_track_recovery_yoga_title',
+    descKey: 'tools.meditation_track_recovery_yoga_desc',
+    tagKeys: ['tools.meditation_tag_recovery', 'tools.meditation_tag_breathing'],
+    sourceName: 'Wikimedia Commons',
+    sourcePageUrl: 'https://commons.wikimedia.org/wiki/File:Yoga-Meditation.ogg',
+    licenseName: 'CC BY-SA 3.0',
+    licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
+    attribution: 'Author: Nobody60',
+  },
+  {
+    id: 'focus-sun-meditation',
+    src: 'https://upload.wikimedia.org/wikipedia/commons/1/12/Sun-Meditation.ogg',
+    minutes: 10,
+    cover: '/images/meditation/cover-focus.svg',
+    titleKey: 'tools.meditation_track_focus_sun_title',
+    descKey: 'tools.meditation_track_focus_sun_desc',
+    tagKeys: ['tools.meditation_tag_focus', 'tools.meditation_tag_breathing'],
+    sourceName: 'Wikimedia Commons',
+    sourcePageUrl: 'https://commons.wikimedia.org/wiki/File:Sun-Meditation.ogg',
+    licenseName: 'CC BY-SA 3.0',
+    licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
+    attribution: 'Author: Nobody60',
+  },
+  {
+    id: 'sleep-deep-breath-long',
+    src: 'https://cdn.pixabay.com/download/audio/2024/02/24/audio_1fe2d5f39b.mp3?filename=deep-meditation-192828.mp3',
+    minutes: 20,
+    cover: '/images/meditation/cover-sleep.svg',
+    titleKey: 'tools.meditation_track_sleep_long_title',
+    descKey: 'tools.meditation_track_sleep_long_desc',
+    tagKeys: ['tools.meditation_tag_sleep', 'tools.meditation_tag_recovery'],
+    sourceName: 'Pixabay',
+    sourcePageUrl: 'https://pixabay.com/music/search/sleep/',
+    licenseName: 'Pixabay License',
+    licenseUrl: 'https://pixabay.com/service/license-summary/',
+>>>>>>> 7f5c721 (feat(meditation): ship 12-track curated playlist with license metadata (T-803))
   },
 ];
