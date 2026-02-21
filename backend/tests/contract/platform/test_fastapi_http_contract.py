@@ -309,6 +309,55 @@ class FastAPIHTTPContractTests(unittest.TestCase):
         export_after_erase = self.client.get(f"/api/compliance/{user_id}/export")
         self.assertEqual(export_after_erase.status_code, 400)
 
+    def test_admin_user_management_and_compliance_http(self) -> None:
+        unauth_users = self.client.get("/api/admin/users")
+        self.assertEqual(unauth_users.status_code, 401)
+
+        admin_login = self.client.post(
+            "/api/admin/login",
+            json={"username": "admin", "password": "admin"},
+        )
+        self.assertEqual(admin_login.status_code, 200)
+        self.assertIn("mc_admin_session", admin_login.cookies)
+
+        email = f"admin-users-{uuid4().hex[:8]}@example.com"
+        register = self.client.post(
+            "/api/register",
+            json={
+                "email": email,
+                "locale": "en-US",
+                "policy_version": "2026.02",
+            },
+        )
+        self.assertEqual(register.status_code, 200)
+        user_id = register.json()["user_id"]
+
+        users = self.client.get("/api/admin/users", params={"limit": 50})
+        self.assertEqual(users.status_code, 200)
+        users_payload = users.json()
+        self.assertGreaterEqual(users_payload["count"], 1)
+        matched = [item for item in users_payload["items"] if item["user_id"] == user_id]
+        self.assertEqual(len(matched), 1)
+
+        override = self.client.post(
+            f"/api/admin/users/{user_id}/triage",
+            json={"channel": "red", "reasons": ["admin-http-test"]},
+        )
+        self.assertEqual(override.status_code, 200)
+        self.assertEqual(override.json()["triage"]["channel"], "red")
+        self.assertTrue(override.json()["triage"]["halt_coaching"])
+
+        export = self.client.get(f"/api/compliance/{user_id}/export")
+        self.assertEqual(export.status_code, 200)
+        self.assertEqual(export.json()["user_id"], user_id)
+
+        erase = self.client.post(f"/api/compliance/{user_id}/erase")
+        self.assertEqual(erase.status_code, 200)
+        self.assertGreater(erase.json()["total_deleted"], 0)
+
+        export_after_erase = self.client.get(f"/api/compliance/{user_id}/export")
+        self.assertEqual(export_after_erase.status_code, 400)
+
 
 if __name__ == "__main__":
     unittest.main()
