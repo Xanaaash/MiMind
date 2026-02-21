@@ -108,7 +108,7 @@ export default function MeditationPlayer() {
             onClick={() => navigate('/mindfulness')}
             className="text-sm text-cyan-100/80 hover:text-cyan-100 transition-colors mb-4"
           >
-            ← {t('mindfulness.back')}
+            ← {t('tools.mindfulness.back')}
           </button>
           <h1 className="font-heading text-3xl font-bold text-cyan-50">{t('tools.meditation_page_title')}</h1>
           <p className="text-cyan-100/70 mt-2">{t('tools.meditation_page_subtitle')}</p>

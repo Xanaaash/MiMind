@@ -81,25 +81,25 @@ export default function ManifestationPage() {
           onClick={() => navigate('/mindfulness')}
           className="text-sm text-muted hover:text-accent transition-colors"
         >
-          ← {t('mindfulness.back')}
+          ← {t('tools.mindfulness.back')}
         </button>
-        <h1 className="mt-2 font-heading text-2xl font-bold">{t('mindfulness.manifestation_title')}</h1>
-        <p className="mt-2 text-sm text-muted">{t('mindfulness.manifestation_desc')}</p>
+        <h1 className="mt-2 font-heading text-2xl font-bold">{t('tools.manifestation.title')}</h1>
+        <p className="mt-2 text-sm text-muted">{t('tools.manifestation.desc')}</p>
         <div className="mt-4">
           <Button onClick={toggleSoftAudio}>
-            {oceanActive ? t('mindfulness.manifestation_audio_stop') : t('mindfulness.manifestation_audio_start')}
+            {oceanActive ? t('tools.manifestation.audio_stop') : t('tools.manifestation.audio_start')}
           </Button>
         </div>
       </motion.section>
 
       <Card>
-        <h2 className="font-heading text-lg font-bold">{t('mindfulness.manifestation_affirmation_title')}</h2>
-        <p className="text-sm text-muted mt-1">{t('mindfulness.manifestation_affirmation_desc')}</p>
+        <h2 className="font-heading text-lg font-bold">{t('tools.manifestation.affirmation_title')}</h2>
+        <p className="text-sm text-muted mt-1">{t('tools.manifestation.affirmation_desc')}</p>
         <div className="mt-3 flex gap-2">
           <input
             value={affirmationInput}
             onChange={(e) => setAffirmationInput(e.target.value)}
-            placeholder={t('mindfulness.manifestation_affirmation_placeholder')}
+            placeholder={t('tools.manifestation.affirmation_placeholder')}
             className="flex-1 rounded-xl border border-line bg-paper px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
           />
           <Button onClick={addAffirmation} disabled={!affirmationInput.trim()}>
@@ -108,7 +108,7 @@ export default function ManifestationPage() {
         </div>
         <div className="mt-4 space-y-2">
           {affirmations.length === 0 ? (
-            <p className="text-sm text-muted">{t('mindfulness.manifestation_empty_affirmation')}</p>
+            <p className="text-sm text-muted">{t('tools.manifestation.empty_affirmation')}</p>
           ) : (
             affirmations.map((item, idx) => (
               <div key={`${idx}-${item}`} className="rounded-xl border border-line bg-paper px-3 py-2 text-sm">
@@ -120,19 +120,19 @@ export default function ManifestationPage() {
       </Card>
 
       <Card>
-        <h2 className="font-heading text-lg font-bold">{t('mindfulness.manifestation_vision_title')}</h2>
-        <p className="text-sm text-muted mt-1">{t('mindfulness.manifestation_vision_desc')}</p>
+        <h2 className="font-heading text-lg font-bold">{t('tools.manifestation.vision_title')}</h2>
+        <p className="text-sm text-muted mt-1">{t('tools.manifestation.vision_desc')}</p>
         <div className="mt-3 grid gap-2">
           <input
             value={visionTitle}
             onChange={(e) => setVisionTitle(e.target.value)}
-            placeholder={t('mindfulness.manifestation_vision_title_placeholder')}
+            placeholder={t('tools.manifestation.vision_title_placeholder')}
             className="rounded-xl border border-line bg-paper px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
           />
           <textarea
             value={visionNote}
             onChange={(e) => setVisionNote(e.target.value)}
-            placeholder={t('mindfulness.manifestation_vision_note_placeholder')}
+            placeholder={t('tools.manifestation.vision_note_placeholder')}
             className="min-h-24 rounded-xl border border-line bg-paper px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
           />
           <Button onClick={addVisionCard} disabled={!visionTitle.trim() || !visionNote.trim()}>
@@ -141,7 +141,7 @@ export default function ManifestationPage() {
         </div>
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {visionCards.length === 0 ? (
-            <p className="text-sm text-muted">{t('mindfulness.manifestation_empty_vision')}</p>
+            <p className="text-sm text-muted">{t('tools.manifestation.empty_vision')}</p>
           ) : (
             visionCards.map((card) => (
               <div key={card.id} className="rounded-2xl border border-line bg-paper p-4">

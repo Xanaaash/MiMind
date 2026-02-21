@@ -18,24 +18,24 @@ export default function MindfulnessHub() {
           {t('nav.mindfulness')}
         </div>
         <h1 className="mt-2 font-heading text-2xl sm:text-3xl font-bold text-ink">
-          {t('mindfulness.title')}
+          {t('tools.mindfulness.title')}
         </h1>
         <p className="mt-2 text-sm text-muted max-w-2xl">
-          {t('mindfulness.subtitle')}
+          {t('tools.mindfulness.subtitle')}
         </p>
       </motion.section>
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Card hoverable onClick={() => navigate('/mindfulness/meditation')}>
           <div className="text-sm text-muted">{t('tools.meditation_title')}</div>
-          <div className="mt-1 text-xl font-heading font-bold">{t('mindfulness.meditation_title')}</div>
-          <p className="mt-1 text-sm text-muted">{t('mindfulness.meditation_desc')}</p>
+          <div className="mt-1 text-xl font-heading font-bold">{t('tools.mindfulness.meditation_title')}</div>
+          <p className="mt-1 text-sm text-muted">{t('tools.mindfulness.meditation_desc')}</p>
         </Card>
 
         <Card hoverable onClick={() => navigate('/mindfulness/manifestation')}>
-          <div className="text-sm text-muted">{t('mindfulness.manifestation_badge')}</div>
-          <div className="mt-1 text-xl font-heading font-bold">{t('mindfulness.manifestation_title')}</div>
-          <p className="mt-1 text-sm text-muted">{t('mindfulness.manifestation_desc')}</p>
+          <div className="text-sm text-muted">{t('tools.manifestation.badge')}</div>
+          <div className="mt-1 text-xl font-heading font-bold">{t('tools.manifestation.title')}</div>
+          <p className="mt-1 text-sm text-muted">{t('tools.manifestation.desc')}</p>
         </Card>
       </section>
     </div>

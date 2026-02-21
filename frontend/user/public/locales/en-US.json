@@ -296,7 +296,43 @@
     "stats_total_duration": "Total time",
     "stats_sessions_unit": "times",
     "stats_hour_short": "h",
-    "stats_min_short": "m"
+    "stats_min_short": "m",
+    "rescue": {
+      "title": "Relief Hub",
+      "subtitle": "When everything feels too much, pause here first. Use the fastest stabilization tools and return to a tolerable rhythm.",
+      "minimal_hint": "Do one thing first. Lower stimulation and guide your body back to safety.",
+      "quick_pink_caption": "Low-Frequency Support",
+      "quick_pink_start": "Start Pink Noise",
+      "quick_pink_running": "Pink Noise Playing",
+      "quick_sensory_title": "Start Sensory Relief",
+      "quick_sensory_desc": "Reduce overload and rebuild a sense of safety quickly.",
+      "quick_breath_title": "Start Guided Breathing",
+      "quick_breath_desc": "Follow the breathing cadence to downshift your nervous system.",
+      "stop_all_audio": "Stop All Audio"
+    },
+    "mindfulness": {
+      "back": "Back to Mindfulness",
+      "title": "Mindfulness Space",
+      "subtitle": "Practice slower, deeper regulation here. Meditation and manifestation tools will keep expanding in this space.",
+      "meditation_title": "Guided Meditation",
+      "meditation_desc": "Pick a guided track and follow breath plus attention to settle deeply."
+    },
+    "manifestation": {
+      "badge": "Live v1",
+      "title": "Manifestation",
+      "desc": "Capture affirmations and vision cards to reinforce positive momentum.",
+      "audio_start": "Play Gentle Ocean Ambience",
+      "audio_stop": "Stop Background Audio",
+      "affirmation_title": "Affirmation Journal",
+      "affirmation_desc": "Write one sentence you want to reinforce now.",
+      "affirmation_placeholder": "e.g. I am becoming steadier, clearer, and more grounded.",
+      "empty_affirmation": "No entries yet. Add your first affirmation.",
+      "vision_title": "Vision Cards",
+      "vision_desc": "Turn your desired future into cards you can read and feel.",
+      "vision_title_placeholder": "Card title",
+      "vision_note_placeholder": "Describe what you see and feel when this vision has happened.",
+      "empty_vision": "No vision cards yet. Save your first one."
+    }
   },
   "relief": {
     "title": "Relief Hub",
@@ -545,63 +581,115 @@
     "footer": "Neurodiversity Trait Exploration · Not a Clinical Diagnosis",
     "fallback": {
       "title": "Cognitive Profile",
-      "tags": ["Neurodiversity", "Trait Exploration", "Not a Clinical Diagnosis"]
+      "tags": [
+        "Neurodiversity",
+        "Trait Exploration",
+        "Not a Clinical Diagnosis"
+      ]
     },
     "archetypes": {
       "asrs": {
         "low": {
           "title": "Steady Flow",
-          "tags": ["Stable pace", "Balanced execution", "Sustainable progress"]
+          "tags": [
+            "Stable pace",
+            "Balanced execution",
+            "Sustainable progress"
+          ]
         },
         "moderate": {
           "title": "Hunter Lean",
-          "tags": ["High arousal starts", "Fast task switching", "Needs structure"]
+          "tags": [
+            "High arousal starts",
+            "Fast task switching",
+            "Needs structure"
+          ]
         },
         "high": {
           "title": "Hunter Executor",
-          "tags": ["High-energy drive", "Sprint completion style", "Micro-structure friendly"]
+          "tags": [
+            "High-energy drive",
+            "Sprint completion style",
+            "Micro-structure friendly"
+          ]
         }
       },
       "aq10": {
         "low": {
           "title": "Social Balance",
-          "tags": ["Balanced social signals", "Strong context adaptation", "Flexible communication"]
+          "tags": [
+            "Balanced social signals",
+            "Strong context adaptation",
+            "Flexible communication"
+          ]
         },
         "moderate": {
           "title": "System Lean",
-          "tags": ["Detail sensitive", "Deep focus", "Prefers clear rules"]
+          "tags": [
+            "Detail sensitive",
+            "Deep focus",
+            "Prefers clear rules"
+          ]
         },
         "high": {
           "title": "System Builder",
-          "tags": ["Strong pattern recognition", "Structured thinking", "Efficient information compression"]
+          "tags": [
+            "Strong pattern recognition",
+            "Structured thinking",
+            "Efficient information compression"
+          ]
         }
       },
       "hsp": {
         "low": {
           "title": "Stable Sensor",
-          "tags": ["High stimulus tolerance", "Fast environment adaptation", "Steady emotional variance"]
+          "tags": [
+            "High stimulus tolerance",
+            "Fast environment adaptation",
+            "Steady emotional variance"
+          ]
         },
         "moderate": {
           "title": "Sensitive Lean",
-          "tags": ["Quick environmental awareness", "Strong emotional resonance", "Needs pacing whitespace"]
+          "tags": [
+            "Quick environmental awareness",
+            "Strong emotional resonance",
+            "Needs pacing whitespace"
+          ]
         },
         "high": {
           "title": "Sensory Amplifier",
-          "tags": ["High-resolution perception", "Deep emotional processing", "Recovery windows matter"]
+          "tags": [
+            "High-resolution perception",
+            "Deep emotional processing",
+            "Recovery windows matter"
+          ]
         }
       },
       "catq": {
         "low": {
           "title": "Natural Presence",
-          "tags": ["More natural expression", "Lower social energy cost", "Lower adaptation pressure"]
+          "tags": [
+            "More natural expression",
+            "Lower social energy cost",
+            "Lower adaptation pressure"
+          ]
         },
         "moderate": {
           "title": "Adaptive Negotiator",
-          "tags": ["Context-based adjustment", "Strategic expression", "Needs recovery time"]
+          "tags": [
+            "Context-based adjustment",
+            "Strategic expression",
+            "Needs recovery time"
+          ]
         },
         "high": {
           "title": "High Camouflage Adapter",
-          "tags": ["Continuous social monitoring", "Strong adaptation drive", "Post-social fatigue is notable"]
+          "tags": [
+            "Continuous social monitoring",
+            "Strong adaptation drive",
+            "Post-social fatigue is notable"
+          ]
         }
       }
     }

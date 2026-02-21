@@ -29,10 +29,10 @@ export default function ReliefHub() {
           {t('nav.rescue')}
         </div>
         <h1 className="mt-2 font-heading text-2xl sm:text-3xl font-bold">
-          {t('relief.title')}
+          {t('tools.rescue.title')}
         </h1>
         <p className="mt-2 text-sm text-[#b9a7a0] max-w-2xl">
-          {t('relief.minimal_hint')}
+          {t('tools.rescue.minimal_hint')}
         </p>
 
         <button
@@ -41,10 +41,10 @@ export default function ReliefHub() {
           className="mt-5 w-full rounded-2xl border border-[#e07a60]/60 bg-[#241814] px-5 py-5 text-left transition-colors hover:bg-[#2f1f1a]"
         >
           <div className="text-xs uppercase tracking-wider text-[#c8aea3]">
-            {t('relief.quick_pink_caption')}
+            {t('tools.rescue.quick_pink_caption')}
           </div>
           <div className="mt-1 font-heading text-2xl font-bold">
-            {pinkNoiseActive ? t('relief.quick_pink_running') : t('relief.quick_pink_start')}
+            {pinkNoiseActive ? t('tools.rescue.quick_pink_running') : t('tools.rescue.quick_pink_start')}
           </div>
         </button>
       </motion.section>
@@ -56,7 +56,7 @@ export default function ReliefHub() {
           className="rounded-2xl border border-[#3a2a25] bg-[#120e0c] px-5 py-6 text-left transition-colors hover:bg-[#1d1613]"
         >
           <div className="text-xs uppercase tracking-wider text-[#c8aea3]">{t('tools.sensory_title')}</div>
-          <div className="mt-1 font-heading text-xl font-bold">{t('relief.quick_sensory_title')}</div>
+          <div className="mt-1 font-heading text-xl font-bold">{t('tools.rescue.quick_sensory_title')}</div>
         </button>
 
         <button
@@ -65,7 +65,7 @@ export default function ReliefHub() {
           className="rounded-2xl border border-[#3a2a25] bg-[#120e0c] px-5 py-6 text-left transition-colors hover:bg-[#1d1613]"
         >
           <div className="text-xs uppercase tracking-wider text-[#c8aea3]">{t('tools.breathing_title')}</div>
-          <div className="mt-1 font-heading text-xl font-bold">{t('relief.quick_breath_title')}</div>
+          <div className="mt-1 font-heading text-xl font-bold">{t('tools.rescue.quick_breath_title')}</div>
         </button>
 
         {activeSoundIds.length > 0 && (
@@ -74,7 +74,7 @@ export default function ReliefHub() {
             onClick={stopAllAmbientPlayback}
             className="sm:col-span-2 rounded-2xl border border-[#5b2e28] bg-[#2a1614] px-5 py-4 text-sm font-semibold text-[#efb2a0] transition-colors hover:bg-[#3a1e1b]"
           >
-            {t('relief.stop_all_audio')}
+            {t('tools.rescue.stop_all_audio')}
           </button>
         )}
       </section>
